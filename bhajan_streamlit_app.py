@@ -225,10 +225,20 @@ st.markdown("""
 # Load data
 bhajan_data = load_data()
 
-# Get unique categories and authors
-categories = sorted(list(set(bhajan['category'] for bhajan in bhajan_data)))
-authors = sorted(list(set(bhajan['author'] for bhajan in bhajan_data)))
-sorted_titles = sorted(bhajan_data, key=lambda x: x['title'])
+# Safety check - ensure bhajan_data is not empty and has valid data
+if not bhajan_data:
+    st.error("⚠️ No bhajan data found! Please check your Excel file format.")
+    st.stop()
+
+# Get unique categories and authors with safety checks
+try:
+    categories = sorted(list(set(bhajan['category'] for bhajan in bhajan_data if bhajan.get('category'))))
+    authors = sorted(list(set(bhajan['author'] for bhajan in bhajan_data if bhajan.get('author'))))
+    sorted_titles = sorted(bhajan_data, key=lambda x: x['title'])
+except Exception as e:
+    st.error(f"⚠️ Error processing bhajan data: {e}")
+    st.error("Please check that your Excel file has the correct format with columns: Category, Bhajan_Title, Author, Verse_Number, Original, English")
+    st.stop()
 
 # Navigation
 if st.session_state.page != 'home':

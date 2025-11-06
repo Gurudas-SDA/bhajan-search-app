@@ -20,30 +20,50 @@ def load_bhajan_data_from_excel(excel_file_path=None):
             # Read Excel file
             df = pd.read_excel(excel_file_path)
             
+            # Clean the data - remove rows with missing critical data
+            df = df.dropna(subset=['Bhajan_Title', 'Author', 'Category'])
+            
+            # Fill missing values with empty strings for text fields
+            df['Original'] = df['Original'].fillna('')
+            df['English'] = df['English'].fillna('')
+            
+            # Ensure Verse_Number is numeric and handle missing values
+            df['Verse_Number'] = pd.to_numeric(df['Verse_Number'], errors='coerce')
+            df = df.dropna(subset=['Verse_Number'])
+            df['Verse_Number'] = df['Verse_Number'].astype(int)
+            
             # Process the data
             bhajans = {}
             for _, row in df.iterrows():
-                title = row['Bhajan_Title']
+                title = str(row['Bhajan_Title']).strip()
+                author = str(row['Author']).strip()
+                category = str(row['Category']).strip()
+                
+                # Skip if any critical field is empty
+                if not title or not author or not category or title.lower() == 'nan' or author.lower() == 'nan':
+                    continue
+                    
                 if title not in bhajans:
                     bhajans[title] = {
                         'title': title,
-                        'author': row['Author'],
-                        'category': row['Category'],
+                        'author': author,
+                        'category': category,
                         'verses': []
                     }
                 
                 bhajans[title]['verses'].append({
-                    'number': row['Verse_Number'],
-                    'original': row['Original'],
-                    'english': row['English']
+                    'number': int(row['Verse_Number']),
+                    'original': str(row['Original']).strip(),
+                    'english': str(row['English']).strip()
                 })
             
             # Sort verses by number for each bhajan
             for title in bhajans:
                 bhajans[title]['verses'].sort(key=lambda x: x['number'])
             
-            # Convert to list
-            return list(bhajans.values())
+            # Convert to list and filter out empty bhajans
+            result = [bhajan for bhajan in bhajans.values() if bhajan['verses']]
+            return result
             
         except Exception as e:
             st.error(f"Error reading Excel file: {e}")
