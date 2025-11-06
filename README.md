@@ -1,6 +1,6 @@
 # 🕉️ Bhajan Search - Streamlit App
 
-Šī ir bhajanu meklētāja aplikācija, kas izveidota ar Streamlit. Aplikācija ļauj jums ielādēt Excel failu ar bhajanu datiem un meklēt bhajanus pēc nosaukuma, kategorijas vai autora.
+Šī ir bhajanu meklētāja aplikācija ar fiksētu bhajanu kolekciju. Aplikācija ielādē datus no `Bhajans.xlsx` faila un ļauj meklēt bhajanus pēc nosaukuma, kategorijas vai autora.
 
 ## 📋 Prasības
 
@@ -9,7 +9,15 @@
 
 ## 🚀 Instalācija un palaišana
 
-### 1. Instalējiet nepieciešamās bibliotēkas
+### 1. Lejupielādējiet failus
+
+Jums nepieciešami šie faili:
+- `bhajan_streamlit_app.py` (galvenā aplikācijas faila)
+- `data_loader.py` (datu ielādētāja modulis)
+- `Bhajans.xlsx` (jūsu bhajanu datu fails)
+- `requirements.txt` (Python bibliotēku saraksts)
+
+### 2. Instalējiet nepieciešamās bibliotēkas
 
 ```bash
 pip install -r requirements.txt
@@ -20,25 +28,27 @@ Vai manuāli:
 pip install streamlit pandas openpyxl
 ```
 
-### 2. Palaidiet aplikāciju
+### 3. Pārliecinieties, ka Bhajans.xlsx ir tajā pašā mapē
+
+Failu struktūrai jābūt:
+```
+bhajan-search/
+├── bhajan_streamlit_app.py
+├── data_loader.py
+├── Bhajans.xlsx          # Svarīgi: šim failam jābūt šeit!
+├── requirements.txt
+└── README.md
+```
+
+### 4. Palaidiet aplikāciju
 
 ```bash
 streamlit run bhajan_streamlit_app.py
 ```
 
-### 3. Atveriet aplikāciju
+### 5. Atveriet aplikāciju
 
-Pēc komandas izpildes jūsu pārlūkprogrammā automātiski atvērsies aplikācija adresē: `http://localhost:8501`
-
-## 📂 Failu struktūra
-
-```
-bhajan-search/
-├── bhajan_streamlit_app.py    # Galvenā aplikācijas faila
-├── data_loader.py             # Datu ielādētāja modulis
-├── requirements.txt           # Python bibliotēku saraksts
-└── README.md                  # Šis fails
-```
+Aplikācija atvērsies jūsu pārlūkprogrammā adresē: `http://localhost:8501`
 
 ## 📊 Excel faila formāts
 
@@ -60,9 +70,8 @@ Jūsu Excel failam jābūt šādām kolonnām:
 ## 🎯 Aplikācijas funkcijas
 
 ### 🏠 Sākuma lapa
-- Faila augšupielāde
 - Trīs galvenās navegācijas opcijas
-- Statistika par bhajanu skaitu
+- Statistika par bhajanu kolekciju
 
 ### 📚 Meklēšanas opcijas
 1. **By Title: A-Z** - visi bhajani alfabētiskā secībā
@@ -80,45 +89,90 @@ Jūsu Excel failam jābūt šādām kolonnām:
 - Mūsdienīgs, tīrs dizains
 - Viegla navigācija
 
+## 🌐 GitHub + Streamlit Community Cloud izvietošana
+
+### 1. Izveidojiet GitHub repozitoriju
+1. Dodieties uz [github.com](https://github.com) 
+2. Izveidojiet jaunu public repozitoriju `bhajan-search-app`
+3. Augšupielādējiet visus failus:
+   - `bhajan_streamlit_app.py`
+   - `data_loader.py` 
+   - `Bhajans.xlsx`
+   - `requirements.txt`
+   - `README.md`
+
+### 2. Izvietojiet Streamlit Community Cloud
+1. Dodieties uz [share.streamlit.io](https://share.streamlit.io)
+2. Piesakieties ar GitHub kontu
+3. Izveidojiet jaunu aplikāciju:
+   - **Repository:** `jūsu-lietotājvārds/bhajan-search-app`
+   - **Branch:** `main`  
+   - **Main file path:** `bhajan_streamlit_app.py`
+4. Nospiediet "Deploy!"
+
+### 3. Rezultāts
+Jūs iegūsiet publisko URL: `https://jūsu-app.streamlit.app`
+
+## 📁 Bhajanu kolekcijas paplašināšana
+
+Lai pievienotu jaunus bhajanus:
+
+1. Atveriet `Bhajans.xlsx` Excel failā
+2. Pievienojiet jaunas rindas ar bhajanu datiem
+3. Saglabājiet failu
+4. Ja izmantojat GitHub, augšupielādējiet atjaunināto failu
+5. Streamlit automātiski atjauninās aplikāciju
+
+### Piemērs jaunai rindai:
+| Category | Bhajan_Title | Author | Verse_Number | Original | English |
+|----------|-------------|--------|--------------|----------|---------|
+| Śrī Kṛṣṇa | Govinda Jaya Jaya | Traditional | 1 | govinda jaya jaya... | All glories to Govinda... |
+
 ## 🔧 Pielāgošana
 
-### Datu avotu maiņa
-Ja vēlaties izmantot citu datu avotu, rediģējiet `data_loader.py` failu un pielāgojiet `load_bhajan_data_from_excel()` funkciju.
+### Dizaina maiņa
+CSS stili ir definēti `bhajan_streamlit_app.py` failā. Varat pielāgot:
+- Krāsas
+- Fontus
+- Izliktum
+- Animācijas
 
-### Dizaina pielāgošana
-CSS stili ir definēti `bhajan_streamlit_app.py` failā. Varat tos pielāgot savām vajadzībām.
+### Funkcionalitātes paplašināšana
+Varat pievienot:
+- Meklēšanas funkciju
+- Favorītu sistēmu
+- Print/PDF opcijas
+- Audio atskaņošanu
+- Komentāru sistēmu
 
-### Jaunu funkciju pievienošana
-Aplikācija ir modulāri uzbudēta, tāpēc jūs viegli varat pievienot jaunas funkcijas, piemēram:
-- Meklēšana pēc atslēgvārdiem
-- Favorītu sistēma
-- Audio atskaņošana
-- PDF eksports
+## ⚠️ Svarīgi
 
-## 🚀 Izvietošana (Deployment)
+1. **Excel faila nosaukums:** Failam obligāti jābūt `Bhajans.xlsx`
+2. **Kolonnu nosaukumi:** Izmantojiet tieši tos pašus nosaukumus kā parādīts
+3. **Failu izvietojums:** Visi faili jābūt vienā mapē
+4. **Encoding:** Pārliecinieties, ka Excel fails ir saglabāts UTF-8 formātā
 
-### Streamlit Community Cloud
-1. Ielieciet kodu GitHub repozitorijā
-2. Dodieties uz [share.streamlit.io](https://share.streamlit.io)
-3. Izveidojiet kontu un savienojiet ar GitHub
-4. Izvēlieties savu repozitoriju un palaidiet
+## 📞 Problēmu risināšana
 
-### Heroku
-1. Izveidojiet `Procfile` ar saturu: `web: streamlit run bhajan_streamlit_app.py --server.port=$PORT --server.address=0.0.0.0`
-2. Izvietojiet kā parasto Heroku aplikāciju
+### Aplikācija nesākas
+```bash
+# Pārbaudiet Python versiju
+python --version
 
-### Docker
-Varat izveidot Docker konteineru ar Python un Streamlit vidi.
+# Pārinstalējiet bibliotēkas
+pip install --upgrade streamlit pandas openpyxl
+```
 
-## 📞 Atbalsts
+### Excel fails netiek atrasts
+- Pārliecinieties, ka `Bhajans.xlsx` ir tajā pašā mapē kā `.py` faili
+- Pārbaudiet faila nosaukumu (lietot/mazie burti ir svarīgi)
 
-Ja jums ir jautājumi vai problēmas, lūdzu:
-1. Pārbaudiet failu formātus
-2. Pārliecinieties, ka visas bibliotēkas ir instalētas
-3. Pārbaudiet kļūdu ziņojumus terminālā
+### Dati neparādās pareizi
+- Atveriet Excel failu un pārbaudiet kolonnu nosaukumus
+- Pārliecinieties, ka nav tukšu rindu starp datiem
 
 ## 🙏 Pateicības
 
-Šī aplikācija ir veidota, lai palīdzētu bhakti kopienu dalīties un meklēt svētās dziesmas un mantras. Izmantojiet ar mīlestību un godu pret tradīciju.
+Šī aplikācija ir veidota, lai palīdzētu bhakti kopienu dalīties un meklēt svētās dziesmas un mantras. 
 
 **Hare Kṛṣṇa! 🕉️**

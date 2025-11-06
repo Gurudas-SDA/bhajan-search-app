@@ -1,11 +1,10 @@
 import streamlit as st
 import pandas as pd
-import tempfile
 import os
 from pathlib import Path
 
 # Import data loader
-from data_loader import load_bhajan_data_from_excel, save_bhajan_data_to_json
+from data_loader import load_bhajan_data_from_excel
 
 # Page configuration
 st.set_page_config(
@@ -138,14 +137,13 @@ st.markdown("""
         color: #ea580c;
     }
     
-    /* Upload section */
-    .upload-section {
-        background: #f0f9ff;
-        border: 2px dashed #60a5fa;
+    /* Stats container */
+    .stats-container {
+        background: #f8fafc;
         border-radius: 10px;
-        padding: 1.5rem;
-        text-align: center;
+        padding: 1rem;
         margin: 1rem 0;
+        border: 1px solid #e2e8f0;
     }
     
     /* Mobile responsive */
@@ -176,10 +174,6 @@ if 'selected_author' not in st.session_state:
     st.session_state.selected_author = None
 if 'show_english' not in st.session_state:
     st.session_state.show_english = False
-if 'excel_file_path' not in st.session_state:
-    st.session_state.excel_file_path = None
-if 'bhajan_data' not in st.session_state:
-    st.session_state.bhajan_data = None
 
 def go_home():
     st.session_state.page = 'home'
@@ -209,10 +203,16 @@ def show_bhajan(bhajan):
     st.session_state.page = 'bhajan'
     st.session_state.selected_bhajan = bhajan
 
-# Load bhajan data
+# Load bhajan data from fixed Excel file
 @st.cache_data
-def load_data(excel_path=None):
-    return load_bhajan_data_from_excel(excel_path)
+def load_data():
+    # Try to load from the fixed Excel file
+    excel_file_path = "Bhajans.xlsx"
+    if os.path.exists(excel_file_path):
+        return load_bhajan_data_from_excel(excel_file_path)
+    else:
+        # If file doesn't exist, use default data
+        return load_bhajan_data_from_excel()
 
 # Header
 st.markdown("""
@@ -222,36 +222,8 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-# File upload section (only on home page)
-if st.session_state.page == 'home':
-    st.markdown("### Upload Your Bhajan Collection")
-    
-    uploaded_file = st.file_uploader(
-        "Choose an Excel file containing bhajan data",
-        type=['xlsx', 'xls'],
-        help="Upload an Excel file with columns: Category, Bhajan_Title, Author, Verse_Number, Original, English"
-    )
-    
-    if uploaded_file is not None:
-        # Save uploaded file temporarily
-        with tempfile.NamedTemporaryFile(delete=False, suffix='.xlsx') as tmp_file:
-            tmp_file.write(uploaded_file.getvalue())
-            st.session_state.excel_file_path = tmp_file.name
-        
-        st.success(f"✅ File '{uploaded_file.name}' uploaded successfully!")
-        
-        # Force reload of data
-        st.session_state.bhajan_data = load_data(st.session_state.excel_file_path)
-    else:
-        # Use default data if no file uploaded
-        if st.session_state.bhajan_data is None:
-            st.session_state.bhajan_data = load_data()
-
-# Load data if not already loaded
-if st.session_state.bhajan_data is None:
-    st.session_state.bhajan_data = load_data(st.session_state.excel_file_path)
-
-bhajan_data = st.session_state.bhajan_data
+# Load data
+bhajan_data = load_data()
 
 # Get unique categories and authors
 categories = sorted(list(set(bhajan['category'] for bhajan in bhajan_data)))
@@ -288,6 +260,12 @@ if st.session_state.page == 'home':
     
     # Show stats
     st.markdown("---")
+    st.markdown("""
+    <div class="stats-container">
+        <h4 style="text-align: center; margin: 0 0 1rem 0; color: #374151;">📊 Collection Statistics</h4>
+    </div>
+    """, unsafe_allow_html=True)
+    
     col1, col2, col3 = st.columns(3)
     with col1:
         st.metric("Total Bhajans", len(bhajan_data))
