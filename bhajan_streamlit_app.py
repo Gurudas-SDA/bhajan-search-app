@@ -373,7 +373,8 @@ elif st.session_state.page == 'author_bhajans':
             show_bhajan(bhajan)
             st.rerun()
         
-        st.markdown("---")
+        # Add spacing between bhajans (like in other pages)
+        st.markdown("")
 
 elif st.session_state.page == 'bhajan':
     # Bhajan display page
