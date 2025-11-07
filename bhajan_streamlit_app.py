@@ -249,8 +249,6 @@ if st.session_state.page != 'home':
 # Page content
 if st.session_state.page == 'home':
     # Home page
-    st.markdown("### Choose how you want to explore the bhajans:")
-    
     col1, col2, col3 = st.columns(3)
     
     with col1:
@@ -289,19 +287,19 @@ elif st.session_state.page == 'titles':
     st.markdown("## 📚 All Bhajans (A-Z)")
     
     for bhajan in sorted_titles:
-        with st.container():
-            col1, col2 = st.columns([4, 1])
-            with col1:
-                st.markdown(f"""
-                <div class="bhajan-item">
-                    <div class="bhajan-title">{bhajan['title']}</div>
-                    <div class="bhajan-author">{bhajan['author']}</div>
-                </div>
-                """, unsafe_allow_html=True)
-            with col2:
-                if st.button("View", key=f"view_{bhajan['title']}", help=f"Read {bhajan['title']}"):
-                    show_bhajan(bhajan)
-                    st.rerun()
+        # Create clickable title
+        title_clicked = st.button(bhajan['title'], key=f"title_{bhajan['title']}", use_container_width=True)
+        if title_clicked:
+            show_bhajan(bhajan)
+            st.rerun()
+        
+        # Create clickable author link
+        author_clicked = st.button(f"👤 {bhajan['author']}", key=f"author_from_title_{bhajan['title']}", use_container_width=True, type="secondary")
+        if author_clicked:
+            show_author_bhajans(bhajan['author'])
+            st.rerun()
+        
+        st.markdown("---")
 
 elif st.session_state.page == 'categories':
     # Categories page
@@ -309,19 +307,13 @@ elif st.session_state.page == 'categories':
     
     for category in categories:
         count = len([b for b in bhajan_data if b['category'] == category])
-        with st.container():
-            col1, col2 = st.columns([4, 1])
-            with col1:
-                st.markdown(f"""
-                <div class="bhajan-item">
-                    <div class="bhajan-title">{category}</div>
-                    <div class="bhajan-author">{count} bhajan(s)</div>
-                </div>
-                """, unsafe_allow_html=True)
-            with col2:
-                if st.button("Browse", key=f"cat_{category}", help=f"Browse {category} bhajans"):
-                    show_category_bhajans(category)
-                    st.rerun()
+        # Create clickable category
+        category_clicked = st.button(f"{category} ({count} bhajan{'s' if count != 1 else ''})", 
+                                   key=f"cat_{category}", 
+                                   use_container_width=True)
+        if category_clicked:
+            show_category_bhajans(category)
+            st.rerun()
 
 elif st.session_state.page == 'authors':
     # Authors page
@@ -329,19 +321,13 @@ elif st.session_state.page == 'authors':
     
     for author in authors:
         count = len([b for b in bhajan_data if b['author'] == author])
-        with st.container():
-            col1, col2 = st.columns([4, 1])
-            with col1:
-                st.markdown(f"""
-                <div class="bhajan-item">
-                    <div class="bhajan-title">{author}</div>
-                    <div class="bhajan-author">{count} bhajan(s)</div>
-                </div>
-                """, unsafe_allow_html=True)
-            with col2:
-                if st.button("Browse", key=f"auth_{author}", help=f"Browse bhajans by {author}"):
-                    show_author_bhajans(author)
-                    st.rerun()
+        # Create clickable author
+        author_clicked = st.button(f"{author} ({count} bhajan{'s' if count != 1 else ''})", 
+                                 key=f"auth_{author}", 
+                                 use_container_width=True)
+        if author_clicked:
+            show_author_bhajans(author)
+            st.rerun()
 
 elif st.session_state.page == 'category_bhajans':
     # Category bhajans page
@@ -355,19 +341,19 @@ elif st.session_state.page == 'category_bhajans':
     category_bhajans.sort(key=lambda x: x['title'])
     
     for bhajan in category_bhajans:
-        with st.container():
-            col1, col2 = st.columns([4, 1])
-            with col1:
-                st.markdown(f"""
-                <div class="bhajan-item">
-                    <div class="bhajan-title">{bhajan['title']}</div>
-                    <div class="bhajan-author">{bhajan['author']}</div>
-                </div>
-                """, unsafe_allow_html=True)
-            with col2:
-                if st.button("View", key=f"view_cat_{bhajan['title']}", help=f"Read {bhajan['title']}"):
-                    show_bhajan(bhajan)
-                    st.rerun()
+        # Create clickable title
+        title_clicked = st.button(bhajan['title'], key=f"cat_title_{bhajan['title']}", use_container_width=True)
+        if title_clicked:
+            show_bhajan(bhajan)
+            st.rerun()
+        
+        # Create clickable author link
+        author_clicked = st.button(f"👤 {bhajan['author']}", key=f"cat_author_{bhajan['title']}", use_container_width=True, type="secondary")
+        if author_clicked:
+            show_author_bhajans(bhajan['author'])
+            st.rerun()
+        
+        st.markdown("---")
 
 elif st.session_state.page == 'author_bhajans':
     # Author bhajans page
@@ -381,18 +367,13 @@ elif st.session_state.page == 'author_bhajans':
     author_bhajans.sort(key=lambda x: x['title'])
     
     for bhajan in author_bhajans:
-        with st.container():
-            col1, col2 = st.columns([4, 1])
-            with col1:
-                st.markdown(f"""
-                <div class="bhajan-item">
-                    <div class="bhajan-title">{bhajan['title']}</div>
-                </div>
-                """, unsafe_allow_html=True)
-            with col2:
-                if st.button("View", key=f"view_auth_{bhajan['title']}", help=f"Read {bhajan['title']}"):
-                    show_bhajan(bhajan)
-                    st.rerun()
+        # Create clickable title
+        title_clicked = st.button(bhajan['title'], key=f"auth_title_{bhajan['title']}", use_container_width=True)
+        if title_clicked:
+            show_bhajan(bhajan)
+            st.rerun()
+        
+        st.markdown("---")
 
 elif st.session_state.page == 'bhajan':
     # Bhajan display page
