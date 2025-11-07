@@ -67,22 +67,49 @@ Jūsu Excel failam jābūt šādām kolonnām:
 - **Original**: Oriģināls teksts sanskritā/bengali
 - **English**: Tulkojums angļu valodā
 
+### ⚠️ **Datu kvalitātes prasības:**
+
+- **Nav tukšu šūnu**: Category, Bhajan_Title, Author kolonnas nedrīkst būt tukšas
+- **Verse_Number**: Jābūt skaitlim (1, 2, 3...)
+- **Nav dublējošu pantu**: Katram bhajanam katrs Verse_Number drīkst būt tikai vienreiz
+- **UTF-8 encoding**: Saglabājiet Excel failu ar UTF-8 kodējumu diakritiskajām zīmēm
+
+### 🧹 **Automātiskā teksta tīrīšana:**
+
+Aplikācija automātiski notīra:
+- ✅ `_x000D_` simbolus (Excel line break artefakti)
+- ✅ Liekos atstarpes un tukšas rindas
+- ✅ Nederīgos rakstzīmju kodējumus
+- ✅ Saglabā pareizos line breaks sanskrita/bengali pantiem
+
 ## 🎯 Aplikācijas funkcijas
 
 ### 🏠 Sākuma lapa
-- Trīs galvenās navegācijas opcijas
+- Trīs galvenās navegācijas opcijas (pogas)
 - Statistika par bhajanu kolekciju
 
 ### 📚 Meklēšanas opcijas
 1. **By Title: A-Z** - visi bhajani alfabētiskā secībā
+   - **Bhajana nosaukums** = hipersaite uz bhajanu
+   - **👤 Autora vārds** = hipersaite uz autora visiem bhajaniem
+
 2. **By Category** - bhajani grupēti pēc kategorijām  
+   - **Kategorija (skaits)** = hipersaite uz kategorijas bhajaniem
+
 3. **By Author** - bhajani grupēti pēc autoriem
+   - **Autors (skaits)** = hipersaite uz autora bhajaniem
 
 ### 📖 Bhajana apskatīšana
 - Nosaukums un autors
 - Kategorijas norāde
 - Pārslēgšanās starp oriģinālu un angļu valodu
 - Skaidrs, lasāms izkārtojums ar versiem
+
+### 🔗 Interaktīvā navigācija
+- **Nav "View" vai "Browse" pogu** - viss darbojas ar hipersaitēm
+- **Bhajanu nosaukumi** ved tieši uz bhajanu saturu
+- **Autoru vārdi** ved uz autora bhajanu sarakstu
+- **Kategorijas** ved uz kategorijas bhajanu sarakstu
 
 ### 📱 Responsīvs dizains
 - Optimizēts gan datoriem, gan mobilajām ierīcēm
