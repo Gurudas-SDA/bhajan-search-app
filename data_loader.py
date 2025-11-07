@@ -26,6 +26,8 @@ def load_bhajan_data_from_excel(excel_file_path=None):
             # Fill missing values with empty strings for text fields
             df['Original'] = df['Original'].fillna('')
             df['English'] = df['English'].fillna('')
+            df['Russian'] = df['Russian'].fillna('') if 'Russian' in df.columns else ''
+            df['Latvian'] = df['Latvian'].fillna('') if 'Latvian' in df.columns else ''
             
             # Clean text fields - remove unwanted symbols
             def clean_text(text):
@@ -49,6 +51,10 @@ def load_bhajan_data_from_excel(excel_file_path=None):
             # Apply cleaning to text columns
             df['Original'] = df['Original'].apply(clean_text)
             df['English'] = df['English'].apply(clean_text)
+            if 'Russian' in df.columns:
+                df['Russian'] = df['Russian'].apply(clean_text)
+            if 'Latvian' in df.columns:
+                df['Latvian'] = df['Latvian'].apply(clean_text)
             df['Bhajan_Title'] = df['Bhajan_Title'].apply(clean_text)
             df['Author'] = df['Author'].apply(clean_text)
             df['Category'] = df['Category'].apply(clean_text)
@@ -80,7 +86,9 @@ def load_bhajan_data_from_excel(excel_file_path=None):
                 bhajans[title]['verses'].append({
                     'number': int(row['Verse_Number']),
                     'original': row['Original'],
-                    'english': row['English']
+                    'english': row['English'],
+                    'russian': row.get('Russian', '') if 'Russian' in df.columns else '',
+                    'latvian': row.get('Latvian', '') if 'Latvian' in df.columns else ''
                 })
             
             # Sort verses by number for each bhajan
@@ -112,7 +120,9 @@ def get_default_data():
                 {
                     "number": 1,
                     "original": "kṛṣṇa hôite catur-mukha, haya kṛṣṇa-sevonmukha,\nbrahmā hôite nāradera mati\nnārada hôite vyāsa, madhva kahe vyāsa-dāsa,\npūrṇaprajña padmanābha-gati (1)",
-                    "english": "In the beginning of creation Śrī Kṛṣṇa spoke the science of devotional service to Lord Brahmā. He in turn passed these teachings on to Śrī Nārada Muni, who accepted Śrī Kṛṣṇa Dvaipāyana Vyāsadeva as his disciple. Śrī Vyāsa transmitted this knowledge to Śrī Madhvācārya, who is also known as Pūrṇaprajña Tīrtha and who is the sole refuge for his disciple Śrī Padmanābha Tīrtha."
+                    "english": "In the beginning of creation Śrī Kṛṣṇa spoke the science of devotional service to Lord Brahmā. He in turn passed these teachings on to Śrī Nārada Muni, who accepted Śrī Kṛṣṇa Dvaipāyana Vyāsadeva as his disciple. Śrī Vyāsa transmitted this knowledge to Śrī Madhvācārya, who is also known as Pūrṇaprajña Tīrtha and who is the sole refuge for his disciple Śrī Padmanābha Tīrtha.",
+                    "russian": "",
+                    "latvian": ""
                 },
                 {
                     "number": 2,

@@ -103,6 +103,22 @@ st.markdown("""
         white-space: pre-line;
     }
     
+    /* Russian and Latvian text styling */
+    .verse-russian {
+        line-height: 1.5;
+        font-size: 1rem;
+        color: #1f2937;
+        white-space: pre-line;
+        font-family: 'Times New Roman', serif;
+    }
+    
+    .verse-latvian {
+        line-height: 1.5;
+        font-size: 1rem;
+        color: #1f2937;
+        white-space: pre-line;
+    }
+    
     /* Song Index alphabet navigation */
     .alphabet-nav {
         text-align: center;
@@ -203,6 +219,8 @@ if 'selected_author' not in st.session_state:
     st.session_state.selected_author = None
 if 'show_english' not in st.session_state:
     st.session_state.show_english = False
+if 'selected_language' not in st.session_state:
+    st.session_state.selected_language = 'original'  # original, english, russian, latvian
 
 def go_home():
     st.session_state.page = 'home'
@@ -472,31 +490,67 @@ elif st.session_state.page == 'bhajan':
         st.markdown("---")
         
         # Language toggle
-        col1, col2 = st.columns(2)
+        col1, col2, col3, col4 = st.columns(4)
         with col1:
             if st.button("📜 Original", 
                         key="original_btn",
                         help="Show original text",
-                        type="primary" if not st.session_state.show_english else "secondary",
+                        type="primary" if st.session_state.selected_language == 'original' else "secondary",
                         use_container_width=True):
-                st.session_state.show_english = False
+                st.session_state.selected_language = 'original'
                 st.rerun()
         
         with col2:
             if st.button("🇬🇧 English", 
                         key="english_btn",
                         help="Show English translation",
-                        type="primary" if st.session_state.show_english else "secondary",
+                        type="primary" if st.session_state.selected_language == 'english' else "secondary",
                         use_container_width=True):
-                st.session_state.show_english = True
+                st.session_state.selected_language = 'english'
+                st.rerun()
+        
+        with col3:
+            if st.button("🇷🇺 Русский", 
+                        key="russian_btn",
+                        help="Show Russian translation",
+                        type="primary" if st.session_state.selected_language == 'russian' else "secondary",
+                        use_container_width=True):
+                st.session_state.selected_language = 'russian'
+                st.rerun()
+        
+        with col4:
+            if st.button("🇱🇻 Latviešu", 
+                        key="latvian_btn",
+                        help="Show Latvian translation",
+                        type="primary" if st.session_state.selected_language == 'latvian' else "secondary",
+                        use_container_width=True):
+                st.session_state.selected_language = 'latvian'
                 st.rerun()
         
         st.markdown("---")
         
         # Display verses
         for i, verse in enumerate(bhajan['verses']):
-            text_class = "verse-english" if st.session_state.show_english else "verse-original"
-            text_content = verse['english'] if st.session_state.show_english else verse['original']
+            # Determine which text to show based on selected language
+            if st.session_state.selected_language == 'english':
+                text_content = verse['english']
+                text_class = "verse-english"
+            elif st.session_state.selected_language == 'russian':
+                text_content = verse.get('russian', 'Перевод недоступен')
+                text_class = "verse-russian"
+            elif st.session_state.selected_language == 'latvian':
+                text_content = verse.get('latvian', 'Tulkojums nav pieejams')
+                text_class = "verse-latvian"
+            else:  # original
+                text_content = verse['original']
+                text_class = "verse-original"
+            
+            # Add verse number to the text if it exists and text is available
+            verse_number = verse.get('number', i + 1)
+            if text_content and text_content not in ['Перевод недоступен', 'Tulkojums nav pieejams']:
+                # Only add number if not already present in text
+                if f'({verse_number})' not in text_content:
+                    text_content = f"{text_content}\n\n({verse_number})"
             
             st.markdown(f"""
             <div class="verse-container">

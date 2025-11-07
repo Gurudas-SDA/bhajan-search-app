@@ -54,9 +54,9 @@ Aplikācija atvērsies jūsu pārlūkprogrammā adresē: `http://localhost:8501`
 
 Jūsu Excel failam jābūt šādām kolonnām:
 
-| Category | Bhajan_Title | Author | Verse_Number | Original | English |
-|----------|-------------|--------|--------------|----------|---------|
-| Śrī Guru | Śrī Guru-paramparā | Śrīla Bhaktisiddhānta... | 1 | kṛṣṇa hôite... | In the beginning... |
+| Category | Bhajan_Title | Author | Verse_Number | Original | English | Russian | Latvian |
+|----------|-------------|--------|--------------|----------|---------|---------|---------|
+| Śrī Guru | Śrī Guru-paramparā | Śrīla Bhaktisiddhānta... | 1 | kṛṣṇa hôite... | In the beginning... | В начале... | Radīšanas sākumā... |
 
 ### Kolonnu apraksti:
 
@@ -66,6 +66,8 @@ Jūsu Excel failam jābūt šādām kolonnām:
 - **Verse_Number**: Panta numurs (1, 2, 3, utt.)
 - **Original**: Oriģināls teksts sanskritā/bengali
 - **English**: Tulkojums angļu valodā
+- **Russian**: Tulkojums krievu valodā (optional)
+- **Latvian**: Tulkojums latviešu valodā (optional)
 
 ### ⚠️ **Datu kvalitātes prasības:**
 
@@ -102,7 +104,12 @@ Aplikācija automātiski notīra:
 ### 📖 Bhajana apskatīšana
 - Nosaukums un autors
 - Kategorijas norāde
-- Pārslēgšanās starp oriģinālu un angļu valodu
+- **4 valodu atbalsts**: 
+  - 📜 Original (Sanskrit/Bengali)
+  - 🇬🇧 English 
+  - 🇷🇺 Русский (Russian)
+  - 🇱🇻 Latviešu (Latvian)
+- **Verse numuri** redzami visās valodās
 - Skaidrs, lasāms izkārtojums ar versiem
 
 ### 🔗 Interaktīvā navigācija
