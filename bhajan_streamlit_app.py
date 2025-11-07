@@ -83,7 +83,7 @@ st.markdown("""
         background: white;
         border: 1px solid #e5e7eb;
         border-radius: 10px;
-        padding: 1.5rem;
+        padding: 0.75rem;
         margin: 0.5rem 0;
         box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     }
