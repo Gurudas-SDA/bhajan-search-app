@@ -84,20 +84,20 @@ st.markdown("""
         border: 1px solid #e5e7eb;
         border-radius: 10px;
         padding: 1.5rem;
-        margin: 1rem 0;
+        margin: 0.5rem 0;
         box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     }
     
     .verse-original {
         font-family: 'Times New Roman', serif;
-        line-height: 1.8;
+        line-height: 1.4;
         font-size: 1.1rem;
         color: #1f2937;
         white-space: pre-line;
     }
     
     .verse-english {
-        line-height: 1.7;
+        line-height: 1.5;
         font-size: 1rem;
         color: #1f2937;
         white-space: pre-line;
