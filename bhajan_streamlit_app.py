@@ -287,19 +287,11 @@ elif st.session_state.page == 'titles':
     st.markdown("## 📚 All Bhajans (A-Z)")
     
     for bhajan in sorted_titles:
-        # Create clickable title
+        # Create clickable title only - no boxes, no author links
         title_clicked = st.button(bhajan['title'], key=f"title_{bhajan['title']}", use_container_width=True)
         if title_clicked:
             show_bhajan(bhajan)
             st.rerun()
-        
-        # Create clickable author link
-        author_clicked = st.button(f"👤 {bhajan['author']}", key=f"author_from_title_{bhajan['title']}", use_container_width=True, type="secondary")
-        if author_clicked:
-            show_author_bhajans(bhajan['author'])
-            st.rerun()
-        
-        st.markdown("---")
 
 elif st.session_state.page == 'categories':
     # Categories page
