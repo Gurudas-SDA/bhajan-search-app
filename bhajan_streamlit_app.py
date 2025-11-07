@@ -103,9 +103,38 @@ st.markdown("""
         white-space: pre-line;
     }
     
-    /* Menu styling */
-    .menu-section {
+    /* Song Index alphabet navigation */
+    .alphabet-nav {
+        text-align: center;
+        font-size: 1.2rem;
         margin: 1.5rem 0;
+        padding: 1rem;
+        background: #f8f9fa;
+        border-radius: 10px;
+        border: 1px solid #e2e8f0;
+    }
+    
+    .alphabet-nav a {
+        color: #ea580c;
+        text-decoration: underline;
+        font-weight: bold;
+        margin: 0 0.2rem;
+    }
+    
+    .alphabet-inactive {
+        color: #9ca3af;
+        margin: 0 0.2rem;
+    }
+    
+    /* Letter section headers */
+    .letter-header {
+        font-size: 2rem;
+        font-weight: bold;
+        color: #1f2937;
+        text-align: center;
+        margin: 2rem 0 1rem 0;
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid #ea580c;
     }
     
     .category-section {
@@ -252,7 +281,7 @@ if st.session_state.page == 'home':
     col1, col2, col3 = st.columns(3)
     
     with col1:
-        if st.button("📚\nBy Title: A-Z", key="titles_btn", help="Browse all bhajans alphabetically", use_container_width=True):
+        if st.button("🎵\nSong Index", key="titles_btn", help="Browse all bhajans alphabetically", use_container_width=True):
             show_titles()
             st.rerun()
     
@@ -283,15 +312,78 @@ if st.session_state.page == 'home':
         st.metric("Authors", len(authors))
 
 elif st.session_state.page == 'titles':
-    # All titles page
-    st.markdown("## 📚 All Bhajans (A-Z)")
+    # Song Index page
+    st.markdown("## 🎵 Song Index")
     
+    # Group bhajans by first letter
+    from collections import defaultdict
+    import re
+    
+    bhajans_by_letter = defaultdict(list)
     for bhajan in sorted_titles:
-        # Create clickable title only - no boxes, no author links
-        title_clicked = st.button(bhajan['title'], key=f"title_{bhajan['title']}", use_container_width=True)
-        if title_clicked:
-            show_bhajan(bhajan)
-            st.rerun()
+        # Get first letter, handle special characters
+        title = bhajan['title']
+        # Remove common prefixes and get first meaningful letter
+        clean_title = re.sub(r'^[\(\)\-\s]*', '', title)
+        if clean_title:
+            first_char = clean_title[0].upper()
+            
+            # Normalize Sanskrit/Bengali characters to closest ASCII
+            char_map = {
+                'Ś': 'S', 'Ṣ': 'S', 'Ṥ': 'S', 'Ŝ': 'S',
+                'Ṛ': 'R', 'Ṝ': 'R', 'Ṟ': 'R', 'Ŗ': 'R',
+                'Ṇ': 'N', 'Ṅ': 'N', 'Ñ': 'N', 'Ṉ': 'N',
+                'Ṭ': 'T', 'Ṫ': 'T',
+                'Ḍ': 'D', 'Ḑ': 'D',
+                'Ṁ': 'M', 'Ṃ': 'M',
+                'Ā': 'A', 'Á': 'A', 'À': 'A', 'Ä': 'A', 'Â': 'A',
+                'Ī': 'I', 'Í': 'I', 'Ì': 'I', 'Ï': 'I', 'Î': 'I',
+                'Ū': 'U', 'Ú': 'U', 'Ù': 'U', 'Ü': 'U', 'Û': 'U',
+                'Ē': 'E', 'É': 'E', 'È': 'E', 'Ë': 'E', 'Ê': 'E',
+                'Ō': 'O', 'Ó': 'O', 'Ò': 'O', 'Ö': 'O', 'Ô': 'O',
+                'Ṟ': 'R', 'Ř': 'R'
+            }
+            
+            # Convert to ASCII equivalent
+            first_letter = char_map.get(first_char, first_char)
+            
+            # Ensure it's a valid ASCII letter
+            if first_letter.isalpha():
+                bhajans_by_letter[first_letter].append(bhajan)
+    
+    # Get available letters and sort them
+    available_letters = sorted(bhajans_by_letter.keys())
+    
+    # Create alphabet navigation with clickable and non-clickable letters
+    alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+    nav_items = []
+    
+    for letter in alphabet:
+        if letter in available_letters:
+            nav_items.append(f'<a href="#{letter.lower()}" style="color: #ea580c; text-decoration: underline; font-weight: bold; margin: 0 0.3rem;">{letter}</a>')
+        else:
+            nav_items.append(f'<span style="color: #9ca3af; margin: 0 0.3rem;">{letter}</span>')
+    
+    # Display alphabet navigation
+    st.markdown(
+        f'<div class="alphabet-nav">{" - ".join(nav_items)}</div>', 
+        unsafe_allow_html=True
+    )
+    
+    # Display bhajans grouped by letter
+    for letter in available_letters:
+        # Letter header
+        st.markdown(f'<div class="letter-header" id="{letter.lower()}">{letter}</div>', unsafe_allow_html=True)
+        
+        # Bhajans for this letter
+        for bhajan in bhajans_by_letter[letter]:
+            # Create clickable title as a styled link
+            if st.button(bhajan['title'], key=f"index_{letter}_{bhajan['title']}", use_container_width=True):
+                show_bhajan(bhajan)
+                st.rerun()
+        
+        # Space between sections
+        st.markdown("<br>", unsafe_allow_html=True)
 
 elif st.session_state.page == 'categories':
     # Categories page
