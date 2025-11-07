@@ -27,6 +27,32 @@ def load_bhajan_data_from_excel(excel_file_path=None):
             df['Original'] = df['Original'].fillna('')
             df['English'] = df['English'].fillna('')
             
+            # Clean text fields - remove unwanted symbols
+            def clean_text(text):
+                if pd.isna(text):
+                    return ''
+                text = str(text)
+                # Replace Excel line break artifacts with proper newlines
+                text = text.replace('_x000D_\n', '\n')
+                text = text.replace('_x000D_', '\n')
+                text = text.replace('\r\n', '\n')
+                text = text.replace('\r', '\n')
+                # Clean up multiple newlines but preserve single ones
+                import re
+                text = re.sub(r'\n\s*\n', '\n', text)
+                # Clean up whitespace within lines but preserve line structure
+                lines = text.split('\n')
+                cleaned_lines = [' '.join(line.split()) for line in lines]
+                text = '\n'.join(cleaned_lines)
+                return text.strip()
+            
+            # Apply cleaning to text columns
+            df['Original'] = df['Original'].apply(clean_text)
+            df['English'] = df['English'].apply(clean_text)
+            df['Bhajan_Title'] = df['Bhajan_Title'].apply(clean_text)
+            df['Author'] = df['Author'].apply(clean_text)
+            df['Category'] = df['Category'].apply(clean_text)
+            
             # Ensure Verse_Number is numeric and handle missing values
             df['Verse_Number'] = pd.to_numeric(df['Verse_Number'], errors='coerce')
             df = df.dropna(subset=['Verse_Number'])
@@ -35,12 +61,12 @@ def load_bhajan_data_from_excel(excel_file_path=None):
             # Process the data
             bhajans = {}
             for _, row in df.iterrows():
-                title = str(row['Bhajan_Title']).strip()
-                author = str(row['Author']).strip()
-                category = str(row['Category']).strip()
+                title = row['Bhajan_Title']
+                author = row['Author'] 
+                category = row['Category']
                 
                 # Skip if any critical field is empty
-                if not title or not author or not category or title.lower() == 'nan' or author.lower() == 'nan':
+                if not title or not author or not category:
                     continue
                     
                 if title not in bhajans:
@@ -53,8 +79,8 @@ def load_bhajan_data_from_excel(excel_file_path=None):
                 
                 bhajans[title]['verses'].append({
                     'number': int(row['Verse_Number']),
-                    'original': str(row['Original']).strip(),
-                    'english': str(row['English']).strip()
+                    'original': row['Original'],
+                    'english': row['English']
                 })
             
             # Sort verses by number for each bhajan
