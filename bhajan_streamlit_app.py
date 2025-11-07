@@ -296,7 +296,7 @@ if st.session_state.page != 'home':
 # Page content
 if st.session_state.page == 'home':
     # Home page
-    col1, col2, col3 = st.columns(3)
+    col1, col2, col3, col4 = st.columns(4)
     
     with col1:
         if st.button("🎵\nSong Index", key="titles_btn", help="Browse all bhajans alphabetically", use_container_width=True):
@@ -304,11 +304,16 @@ if st.session_state.page == 'home':
             st.rerun()
     
     with col2:
+        if st.button("📝\nBy First Line", key="first_line_btn", help="Browse bhajans by first line", use_container_width=True):
+            st.session_state.page = 'first_line'
+            st.rerun()
+    
+    with col3:
         if st.button("📁\nBy Category", key="categories_btn", help="Explore by devotional themes", use_container_width=True):
             show_categories()
             st.rerun()
     
-    with col3:
+    with col4:
         if st.button("👤\nBy Author", key="authors_btn", help="Find bhajans by their composers", use_container_width=True):
             show_authors()
             st.rerun()
@@ -397,6 +402,122 @@ elif st.session_state.page == 'titles':
         for bhajan in bhajans_by_letter[letter]:
             # Create clickable title as a styled link
             if st.button(bhajan['title'], key=f"index_{letter}_{bhajan['title']}", use_container_width=True):
+                show_bhajan(bhajan)
+                st.rerun()
+        
+        # Space between sections
+        st.markdown("<br>", unsafe_allow_html=True)
+
+elif st.session_state.page == 'first_line':
+    # Song Index by First Line page
+    st.markdown("## 📝 Song Index by First Line")
+    
+    # Extract first lines and group by letter
+    from collections import defaultdict
+    import re
+    
+    bhajans_by_first_line = []
+    for bhajan in sorted_titles:
+        if bhajan['verses']:
+            # Get the first verse
+            first_verse = bhajan['verses'][0]
+            first_line_text = first_verse.get('original', '')
+            
+            # Extract the first line (until first newline)
+            if first_line_text:
+                first_line = first_line_text.split('\n')[0].strip()
+                # Remove verse numbers if present
+                first_line = re.sub(r'\s*\(\d+\)\s*$', '', first_line)
+                
+                # Handle cases where line starts with parentheses - extract the first word
+                if first_line.startswith('('):
+                    # Extract content within parentheses or first meaningful word
+                    match = re.match(r'\(([^)]+)\)', first_line)
+                    if match:
+                        first_meaningful = match.group(1).strip()
+                        if first_meaningful:
+                            first_line = first_meaningful + first_line[first_line.find(')') + 1:].strip()
+                
+                bhajans_by_first_line.append({
+                    'first_line': first_line,
+                    'bhajan': bhajan
+                })
+    
+    # Sort by first line
+    bhajans_by_first_line.sort(key=lambda x: x['first_line'])
+    
+    # Group by first letter
+    first_lines_by_letter = defaultdict(list)
+    for item in bhajans_by_first_line:
+        first_line = item['first_line']
+        if first_line:
+            # Get first character and normalize
+            first_char = first_line[0].upper()
+            
+            # Normalize Sanskrit/Bengali characters to closest ASCII
+            char_map = {
+                'Ś': 'S', 'Ṣ': 'S', 'Ṥ': 'S', 'Ŝ': 'S',
+                'Ṛ': 'R', 'Ṝ': 'R', 'Ṟ': 'R', 'Ŗ': 'R',
+                'Ṇ': 'N', 'Ṅ': 'N', 'Ñ': 'N', 'Ṉ': 'N',
+                'Ṭ': 'T', 'Ṫ': 'T',
+                'Ḍ': 'D', 'Ḑ': 'D',
+                'Ṁ': 'M', 'Ṃ': 'M',
+                'Ā': 'A', 'Á': 'A', 'À': 'A', 'Ä': 'A', 'Â': 'A',
+                'Ī': 'I', 'Í': 'I', 'Ì': 'I', 'Ï': 'I', 'Î': 'I',
+                'Ū': 'U', 'Ú': 'U', 'Ù': 'U', 'Ü': 'U', 'Û': 'U',
+                'Ē': 'E', 'É': 'E', 'È': 'E', 'Ë': 'E', 'Ê': 'E',
+                'Ō': 'O', 'Ó': 'O', 'Ò': 'O', 'Ö': 'O', 'Ô': 'O',
+                'Ṟ': 'R', 'Ř': 'R'
+            }
+            
+            # Convert to ASCII equivalent
+            first_letter = char_map.get(first_char, first_char)
+            
+            # Handle special cases that aren't letters
+            if not first_letter.isalpha():
+                # Try to find first alphabetic character
+                for char in first_line:
+                    if char.isalpha():
+                        first_letter = char_map.get(char.upper(), char.upper())
+                        break
+                else:
+                    first_letter = 'OTHER'  # Fallback for non-alphabetic starts
+            
+            # Ensure it's a valid ASCII letter
+            if first_letter.isalpha():
+                first_lines_by_letter[first_letter].append(item)
+    
+    # Get available letters and sort them
+    available_letters = sorted(first_lines_by_letter.keys())
+    
+    # Create alphabet navigation
+    alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+    nav_items = []
+    
+    for letter in alphabet:
+        if letter in available_letters:
+            nav_items.append(f'<a href="#{letter.lower()}" style="color: #ea580c; text-decoration: underline; font-weight: bold; margin: 0 0.3rem;">{letter}</a>')
+        else:
+            nav_items.append(f'<span style="color: #9ca3af; margin: 0 0.3rem;">{letter}</span>')
+    
+    # Display alphabet navigation
+    st.markdown(
+        f'<div class="alphabet-nav">{" - ".join(nav_items)}</div>', 
+        unsafe_allow_html=True
+    )
+    
+    # Display bhajans grouped by first letter of first line
+    for letter in available_letters:
+        # Letter header
+        st.markdown(f'<div class="letter-header" id="{letter.lower()}">{letter}</div>', unsafe_allow_html=True)
+        
+        # First lines for this letter
+        for item in first_lines_by_letter[letter]:
+            first_line = item['first_line']
+            bhajan = item['bhajan']
+            
+            # Create clickable first line as button
+            if st.button(first_line, key=f"firstline_{letter}_{bhajan['title']}", use_container_width=True):
                 show_bhajan(bhajan)
                 st.rerun()
         
