@@ -233,6 +233,23 @@ st.markdown("""
         .verse-english, .verse-russian, .verse-latvian {
             font-size: 1rem;
         }
+        
+        /* Mobile statistics styling */
+        .stats-container {
+            padding: 1rem !important;
+        }
+        
+        .stats-grid {
+            gap: 0.3rem !important;
+        }
+        
+        .stats-number {
+            font-size: 1.4rem !important;
+        }
+        
+        .stats-label {
+            font-size: 0.8rem !important;
+        }
     }
     
     /* Remove Streamlit branding */
@@ -463,21 +480,106 @@ if st.session_state.page == 'home':
             show_authors()
             st.rerun()
     
-    # Show stats
+    # Show elegant statistics
     st.markdown("---")
-    st.markdown("""
-    <div class="stats-container">
-        <h4 style="text-align: center; margin: 0 0 1rem 0; color: #374151;">📊 Collection Statistics</h4>
-    </div>
-    """, unsafe_allow_html=True)
     
-    col1, col2, col3 = st.columns(3)
-    with col1:
-        st.metric("Total Bhajans", len(bhajan_data))
-    with col2:
-        st.metric("Categories", len(categories))
-    with col3:
-        st.metric("Authors", len(authors))
+    # Calculate total verses for more interesting statistics
+    total_verses = sum(len(bhajan['verses']) for bhajan in bhajan_data)
+    
+    st.markdown("""
+    <div style="
+        background: linear-gradient(135deg, #fefcf8 0%, #f8f4e6 100%);
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin: 1.5rem 0;
+        border: 1px solid #d1c4b0;
+        box-shadow: 0 4px 12px rgba(160, 149, 107, 0.1);
+    ">
+        <div style="
+            text-align: center; 
+            margin-bottom: 1.2rem;
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #5d4e37;
+            letter-spacing: 0.5px;
+        ">
+            📊 Collection Overview
+        </div>
+        
+        <div style="
+            display: flex; 
+            justify-content: space-around; 
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        ">
+            <div style="text-align: center; min-width: 80px;">
+                <div style="
+                    font-family: 'Playfair Display', serif;
+                    font-size: 1.8rem;
+                    font-weight: 600;
+                    color: #2c1810;
+                    margin-bottom: 0.2rem;
+                ">{}</div>
+                <div style="
+                    font-family: 'Cormorant Garamond', serif;
+                    font-size: 0.9rem;
+                    color: #8b7355;
+                    font-weight: 500;
+                ">Bhajans</div>
+            </div>
+            
+            <div style="text-align: center; min-width: 80px;">
+                <div style="
+                    font-family: 'Playfair Display', serif;
+                    font-size: 1.8rem;
+                    font-weight: 600;
+                    color: #2c1810;
+                    margin-bottom: 0.2rem;
+                ">{}</div>
+                <div style="
+                    font-family: 'Cormorant Garamond', serif;
+                    font-size: 0.9rem;
+                    color: #8b7355;
+                    font-weight: 500;
+                ">Verses</div>
+            </div>
+            
+            <div style="text-align: center; min-width: 80px;">
+                <div style="
+                    font-family: 'Playfair Display', serif;
+                    font-size: 1.8rem;
+                    font-weight: 600;
+                    color: #2c1810;
+                    margin-bottom: 0.2rem;
+                ">{}</div>
+                <div style="
+                    font-family: 'Cormorant Garamond', serif;
+                    font-size: 0.9rem;
+                    color: #8b7355;
+                    font-weight: 500;
+                ">Categories</div>
+            </div>
+            
+            <div style="text-align: center; min-width: 80px;">
+                <div style="
+                    font-family: 'Playfair Display', serif;
+                    font-size: 1.8rem;
+                    font-weight: 600;
+                    color: #2c1810;
+                    margin-bottom: 0.2rem;
+                ">{}</div>
+                <div style="
+                    font-family: 'Cormorant Garamond', serif;
+                    font-size: 0.9rem;
+                    color: #8b7355;
+                    font-weight: 500;
+                ">Authors</div>
+            </div>
+        </div>
+    </div>
+    """.format(len(bhajan_data), total_verses, len(categories), len(authors)), unsafe_allow_html=True)
 
 elif st.session_state.page == 'titles':
     # Song Index page
