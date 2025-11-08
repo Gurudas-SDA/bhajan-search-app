@@ -17,8 +17,8 @@ st.set_page_config(
 # Custom CSS for elegant design with proper fonts
 st.markdown("""
 <style>
-    /* Import elegant fonts */
-    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Crimson+Text:ital,wght@0,400;0,600;1,400&family=Cormorant+Garamond:wght@300;400;500;600&display=swap');
+    /* Import elegant fonts with better Unicode support */
+    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Crimson+Text:ital,wght@0,400;0,600;1,400&family=Cormorant+Garamond:wght@300;400;500;600&family=Noto+Serif:wght@300;400;500;600&display=swap');
     
     /* Main container styling */
     .main {
@@ -120,19 +120,24 @@ st.markdown("""
     }
     
     .verse-original {
-        font-family: 'Cormorant Garamond', serif;
+        font-family: 'Noto Serif', 'Cormorant Garamond', serif;
         line-height: 1.4;
         font-size: 1.2rem;
-        color: #2c1810;
+        color: #000000;
         white-space: pre-line;
         font-weight: 400;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        text-rendering: optimizeLegibility;
+        font-feature-settings: "kern" 1, "liga" 1;
+        font-variant-ligatures: common-ligatures;
     }
     
     .verse-english {
         font-family: 'Crimson Text', serif;
         line-height: 1.5;
         font-size: 1.05rem;
-        color: #2c1810;
+        color: #000000;
         white-space: pre-line;
     }
     
@@ -141,7 +146,7 @@ st.markdown("""
         font-family: 'Crimson Text', serif;
         line-height: 1.5;
         font-size: 1.05rem;
-        color: #2c1810;
+        color: #000000;
         white-space: pre-line;
     }
     
@@ -149,7 +154,7 @@ st.markdown("""
         font-family: 'Crimson Text', serif;
         line-height: 1.5;
         font-size: 1.05rem;
-        color: #2c1810;
+        color: #000000;
         white-space: pre-line;
     }
     
@@ -192,6 +197,42 @@ st.markdown("""
         border-radius: 10px;
         padding: 1rem;
         margin: 1rem 0;
+    }
+    
+    /* Responsive design for mobile */
+    @media (max-width: 768px) {
+        .main-title {
+            font-size: 1.8rem;
+        }
+        
+        .subtitle {
+            font-size: 1rem;
+        }
+        
+        .language-note {
+            font-size: 0.85rem;
+        }
+        
+        /* Mobile bhajan title styling */
+        .stMarkdown h1 {
+            font-size: 1.5rem !important;
+            line-height: 1.3 !important;
+            margin-bottom: 0.5rem !important;
+        }
+        
+        /* Mobile verse containers */
+        .verse-container {
+            padding: 0.5rem;
+            margin: 0.3rem 0;
+        }
+        
+        .verse-original {
+            font-size: 1.1rem;
+        }
+        
+        .verse-english, .verse-russian, .verse-latvian {
+            font-size: 1rem;
+        }
     }
     
     /* Remove Streamlit branding */
@@ -246,9 +287,14 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# Initialize session state
+# Initialize session state with URL parameter support
 if 'page' not in st.session_state:
-    st.session_state.page = 'home'
+    # Check URL parameters first
+    query_params = st.query_params
+    if 'page' in query_params:
+        st.session_state.page = query_params['page']
+    else:
+        st.session_state.page = 'home'
 if 'selected_bhajan' not in st.session_state:
     st.session_state.selected_bhajan = None
 if 'selected_category' not in st.session_state:
@@ -260,35 +306,55 @@ if 'show_english' not in st.session_state:
 if 'selected_language' not in st.session_state:
     st.session_state.selected_language = 'original'  # original, english, russian, latvian
 
+# Function to update URL when navigation changes
+def update_url_params():
+    """Update URL parameters to reflect current state for browser navigation"""
+    params = {'page': st.session_state.page}
+    if st.session_state.selected_category:
+        params['category'] = st.session_state.selected_category
+    if st.session_state.selected_author:
+        params['author'] = st.session_state.selected_author
+    if st.session_state.selected_bhajan and st.session_state.selected_bhajan.get('title'):
+        params['bhajan'] = st.session_state.selected_bhajan['title']
+    
+    st.query_params.update(params)
+
 def go_home():
     st.session_state.page = 'home'
     st.session_state.selected_bhajan = None
     st.session_state.selected_category = None
     st.session_state.selected_author = None
     st.session_state.show_english = False
+    update_url_params()
 
 def show_titles():
     st.session_state.page = 'titles'
+    update_url_params()
 
 def show_categories():
     st.session_state.page = 'categories'
+    update_url_params()
 
 def show_authors():
     st.session_state.page = 'authors'
+    update_url_params()
 
 def show_category_bhajans(category):
     st.session_state.page = 'category_bhajans'
     st.session_state.selected_category = category
+    update_url_params()
 
 def show_author_bhajans(author):
     st.session_state.page = 'author_bhajans'
     st.session_state.selected_author = author
+    update_url_params()
 
 def show_bhajan(bhajan):
     # Store current page as previous for back navigation
     st.session_state.previous_page = st.session_state.page
     st.session_state.page = 'bhajan'
     st.session_state.selected_bhajan = bhajan
+    update_url_params()
 
 # Load bhajan data from fixed Excel file
 @st.cache_data
@@ -300,6 +366,39 @@ def load_data():
     else:
         # If file doesn't exist, use default data
         return load_bhajan_data_from_excel()
+
+# Check URL parameters and restore state if needed
+def restore_state_from_url():
+    """Restore session state from URL parameters when user uses browser back/forward"""
+    query_params = st.query_params
+    
+    if 'page' in query_params:
+        page = query_params['page']
+        
+        # Restore page state
+        if page != st.session_state.page:
+            st.session_state.page = page
+            
+        # Restore category if specified
+        if 'category' in query_params and page == 'category_bhajans':
+            st.session_state.selected_category = query_params['category']
+            
+        # Restore author if specified  
+        if 'author' in query_params and page == 'author_bhajans':
+            st.session_state.selected_author = query_params['author']
+            
+        # Restore bhajan if specified
+        if 'bhajan' in query_params and page == 'bhajan':
+            bhajan_title = query_params['bhajan']
+            # Find the bhajan by title
+            bhajan_data = load_data()
+            for bhajan in bhajan_data:
+                if bhajan['title'] == bhajan_title:
+                    st.session_state.selected_bhajan = bhajan
+                    break
+
+# Restore state from URL parameters
+restore_state_from_url()
 
 # Header
 st.markdown("""
@@ -351,6 +450,7 @@ if st.session_state.page == 'home':
     with col2:
         if st.button("📝\nBy First Line", key="first_line_btn", help="Browse bhajans by first line", use_container_width=True):
             st.session_state.page = 'first_line'
+            update_url_params()
             st.rerun()
     
     with col3:
@@ -649,18 +749,50 @@ elif st.session_state.page == 'bhajan':
     bhajan = st.session_state.selected_bhajan
     
     if bhajan:
-        # Add invisible anchor at the top and scroll reset
+        # More aggressive scroll reset - try multiple methods
         st.markdown("""
         <div id="bhajan-start" style="position: relative; top: 0;"></div>
         <style>
-            .main { scroll-behavior: auto !important; }
+            .main { 
+                scroll-behavior: auto !important; 
+            }
+            /* Better font rendering for diacritics */
+            .verse-original, .verse-english, .verse-russian, .verse-latvian {
+                -webkit-font-smoothing: antialiased;
+                -moz-osx-font-smoothing: grayscale;
+                text-rendering: optimizeLegibility;
+                font-feature-settings: "kern" 1, "liga" 1;
+            }
         </style>
         <script>
-            setTimeout(function() {
-                window.scrollTo({top: 0, behavior: 'instant'});
+            // Immediate scroll reset
+            window.scrollTo(0, 0);
+            document.documentElement.scrollTop = 0;
+            document.body.scrollTop = 0;
+            
+            // Try parent window
+            if (window.parent !== window) {
+                window.parent.scrollTo(0, 0);
                 const main = window.parent.document.querySelector('.main');
                 if (main) main.scrollTop = 0;
-            }, 100);
+                const body = window.parent.document.body;
+                if (body) body.scrollTop = 0;
+            }
+            
+            // Delayed scroll reset as backup
+            setTimeout(function() {
+                window.scrollTo({top: 0, left: 0, behavior: 'instant'});
+                const main = window.parent.document.querySelector('.main');
+                if (main) {
+                    main.scrollTop = 0;
+                    main.scrollIntoView({block: 'start', behavior: 'instant'});
+                }
+            }, 50);
+            
+            // Extra backup
+            setTimeout(function() {
+                window.scrollTo(0, 0);
+            }, 200);
         </script>
         """, unsafe_allow_html=True)
         
@@ -720,8 +852,11 @@ elif st.session_state.page == 'bhajan':
         
         st.markdown("---")
         
+        # Sort verses by number to ensure correct order
+        sorted_verses = sorted(bhajan['verses'], key=lambda x: x.get('number', 0))
+        
         # Display verses
-        for i, verse in enumerate(bhajan['verses']):
+        for i, verse in enumerate(sorted_verses):
             # Determine which text to show based on selected language
             if st.session_state.selected_language == 'english':
                 text_content = verse['english']
