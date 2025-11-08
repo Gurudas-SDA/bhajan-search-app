@@ -817,12 +817,98 @@ elif st.session_state.page == 'author_bhajans':
         st.markdown("")
 
 elif st.session_state.page == 'bhajan':
-    # MEGA TEST: Confirm this version is running
-    st.error("🔴 TEST VERSION 5.0 - ANCHOR FIX LOADED")
-    st.write(f"Current query params: {dict(st.query_params)}")
-    
-    # Bhajan display page with query params routing fix
+    # Expert solution: non-header title + fixed container for verses
     bhajan = st.session_state.selected_bhajan
+    
+    if bhajan:
+        # Back button at very top
+        if st.button("← Back", key=f"back_{bhajan['title'][:10]}"):
+            if hasattr(st.session_state, 'previous_page'):
+                st.session_state.page = st.session_state.previous_page
+            else:
+                st.session_state.page = 'home'
+            st.rerun()
+        
+        # NON-HEADER title (avoids anchor creation)
+        st.markdown(f"""
+        <div style="
+            font-size: 2rem; 
+            font-weight: 600; 
+            margin: 1rem 0; 
+            font-family: 'Playfair Display', serif;
+            color: #2c1810;
+        ">{bhajan['title']}</div>
+        """, unsafe_allow_html=True)
+        
+        # Author and category info
+        st.caption(f"{bhajan['author']} • {bhajan['category']}")
+        
+        # Language selection
+        col1, col2, col3, col4 = st.columns(4)
+        with col1:
+            if st.button("📜 Original", 
+                        key=f"lang_orig_{bhajan['title'][:10]}",
+                        type="primary" if st.session_state.selected_language == 'original' else "secondary",
+                        use_container_width=True):
+                st.session_state.selected_language = 'original'
+                st.rerun()
+        
+        with col2:
+            if st.button("🇬🇧 English", 
+                        key=f"lang_en_{bhajan['title'][:10]}",
+                        type="primary" if st.session_state.selected_language == 'english' else "secondary", 
+                        use_container_width=True):
+                st.session_state.selected_language = 'english'
+                st.rerun()
+        
+        with col3:
+            if st.button("🇷🇺 Русский", 
+                        key=f"lang_ru_{bhajan['title'][:10]}",
+                        type="primary" if st.session_state.selected_language == 'russian' else "secondary",
+                        use_container_width=True):
+                st.session_state.selected_language = 'russian'
+                st.rerun()
+        
+        with col4:
+            if st.button("🇱🇻 Latviešu", 
+                        key=f"lang_lv_{bhajan['title'][:10]}",
+                        type="primary" if st.session_state.selected_language == 'latvian' else "secondary",
+                        use_container_width=True):
+                st.session_state.selected_language = 'latvian'
+                st.rerun()
+        
+        # FIXED-HEIGHT CONTAINER prevents page scroll (expert solution #2)
+        with st.container(height=600, border=False, key=f"verses_{bhajan['title'][:10]}"):
+            # Sort verses by number to ensure correct order
+            sorted_verses = sorted(bhajan['verses'], key=lambda x: x.get('number', 0))
+            
+            # Display verses
+            for i, verse in enumerate(sorted_verses):
+                # Determine which text to show based on selected language
+                if st.session_state.selected_language == 'english':
+                    text_content = verse['english']
+                    text_class = "verse-english"
+                elif st.session_state.selected_language == 'russian':
+                    text_content = verse.get('russian', 'Перевод недоступен')
+                    text_class = "verse-russian"
+                elif st.session_state.selected_language == 'latvian':
+                    text_content = verse.get('latvian', 'Tulkojums nav pieejams')
+                    text_class = "verse-latvian"
+                else:  # original
+                    text_content = verse['original']
+                    text_class = "verse-original"
+                
+                # Add verse number
+                verse_number = verse.get('number', i + 1)
+                if text_content and text_content not in ['Перевод недоступен', 'Tulkojums nav pieejams']:
+                    if f'({verse_number})' not in text_content:
+                        text_content = f"{text_content}\n\n({verse_number})"
+                
+                st.markdown(f"""
+                <div class="verse-container">
+                    <div class="{text_class}">{text_content}</div>
+                </div>
+                """, unsafe_allow_html=True)
     
     if bhajan:
         # Force query params update to avoid anchor preservation
