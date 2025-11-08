@@ -679,10 +679,4 @@ elif st.session_state.page == 'bhajan':
             </div>
             """, unsafe_allow_html=True)
 
-# Footer
-st.markdown("---")
-st.markdown("""
-<div style="text-align: center; color: #6b7280; font-size: 0.9rem; padding: 1rem;">
-    🕉️ Bhajan Search App • Made with ❤️ for devotional service
-</div>
-""", unsafe_allow_html=True)
+
