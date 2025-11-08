@@ -967,39 +967,5 @@ elif st.session_state.page == 'bhajan':
                         use_container_width=True):
                 st.session_state.selected_language = 'latvian'
                 st.rerun()
-        
-        st.markdown("---")
-        
-        # Sort verses by number to ensure correct order
-        sorted_verses = sorted(bhajan['verses'], key=lambda x: x.get('number', 0))
-        
-        # Display verses
-        for i, verse in enumerate(sorted_verses):
-            # Determine which text to show based on selected language
-            if st.session_state.selected_language == 'english':
-                text_content = verse['english']
-                text_class = "verse-english"
-            elif st.session_state.selected_language == 'russian':
-                text_content = verse.get('russian', 'Перевод недоступен')
-                text_class = "verse-russian"
-            elif st.session_state.selected_language == 'latvian':
-                text_content = verse.get('latvian', 'Tulkojums nav pieejams')
-                text_class = "verse-latvian"
-            else:  # original
-                text_content = verse['original']
-                text_class = "verse-original"
-            
-            # Add verse number to the text if it exists and text is available
-            verse_number = verse.get('number', i + 1)
-            if text_content and text_content not in ['Перевод недоступен', 'Tulkojums nav pieejams']:
-                # Only add number if not already present in text
-                if f'({verse_number})' not in text_content:
-                    text_content = f"{text_content}\n\n({verse_number})"
-            
-            st.markdown(f"""
-            <div class="verse-container">
-                <div class="{text_class}">{text_content}</div>
-            </div>
-            """, unsafe_allow_html=True)
 
 
