@@ -8,24 +8,55 @@ from data_loader import load_bhajan_data_from_excel
 
 # Page configuration
 st.set_page_config(
-    page_title="🕉️ Bhajan Search",
+    page_title="Śrī Gauḍīya Gīti-guccha",
     page_icon="🕉️",
     layout="wide",
     initial_sidebar_state="collapsed"
 )
 
-# Custom CSS for mobile-friendly design
+# Custom CSS for elegant design with proper fonts
 st.markdown("""
 <style>
-    /* Import Google Fonts */
-    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+    /* Import elegant fonts */
+    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Crimson+Text:ital,wght@0,400;0,600;1,400&family=Cormorant+Garamond:wght@300;400;500;600&display=swap');
     
     /* Main container styling */
     .main {
         padding: 1rem;
-        font-family: 'Poppins', sans-serif;
+        font-family: 'Crimson Text', serif;
         max-width: 800px;
         margin: 0 auto;
+    }
+    
+    /* Title styling */
+    .main-title {
+        font-family: 'Playfair Display', serif;
+        font-size: 2.5rem;
+        font-weight: 600;
+        text-align: center;
+        color: #2c1810;
+        margin: 1rem 0 0.5rem 0;
+        line-height: 1.2;
+    }
+    
+    .subtitle {
+        font-family: 'Cormorant Garamond', serif;
+        font-size: 1.2rem;
+        font-style: italic;
+        text-align: center;
+        color: #5d4e37;
+        margin: 0.5rem 0;
+        line-height: 1.4;
+    }
+    
+    .language-note {
+        font-family: 'Cormorant Garamond', serif;
+        font-size: 0.95rem;
+        text-align: center;
+        color: #8b7355;
+        margin: 0.25rem 0 2rem 0;
+        font-weight: 500;
+        letter-spacing: 0.5px;
     }
     
     /* Header styling */
@@ -89,33 +120,36 @@ st.markdown("""
     }
     
     .verse-original {
-        font-family: 'Times New Roman', serif;
+        font-family: 'Cormorant Garamond', serif;
         line-height: 1.4;
-        font-size: 1.1rem;
-        color: #1f2937;
+        font-size: 1.2rem;
+        color: #2c1810;
         white-space: pre-line;
+        font-weight: 400;
     }
     
     .verse-english {
+        font-family: 'Crimson Text', serif;
         line-height: 1.5;
-        font-size: 1rem;
-        color: #1f2937;
+        font-size: 1.05rem;
+        color: #2c1810;
         white-space: pre-line;
     }
     
     /* Russian and Latvian text styling */
     .verse-russian {
+        font-family: 'Crimson Text', serif;
         line-height: 1.5;
-        font-size: 1rem;
-        color: #1f2937;
+        font-size: 1.05rem;
+        color: #2c1810;
         white-space: pre-line;
-        font-family: 'Times New Roman', serif;
     }
     
     .verse-latvian {
+        font-family: 'Crimson Text', serif;
         line-height: 1.5;
-        font-size: 1rem;
-        color: #1f2937;
+        font-size: 1.05rem;
+        color: #2c1810;
         white-space: pre-line;
     }
     
@@ -168,18 +202,22 @@ st.markdown("""
     /* Button styling */
     .stButton > button {
         width: 100%;
-        border-radius: 8px;
-        border: 1px solid #e5e7eb;
-        background: white;
-        color: #374151;
-        padding: 0.5rem 1rem;
-        transition: all 0.2s ease;
+        border-radius: 6px;
+        border: 1px solid #d1c4b0;
+        background: #fefcf8;
+        color: #5d4e37;
+        padding: 0.75rem 1rem;
+        transition: all 0.3s ease;
+        font-family: 'Cormorant Garamond', serif;
+        font-size: 1.05rem;
+        font-weight: 500;
     }
     
     .stButton > button:hover {
-        background: #fff7ed;
-        border-color: #ea580c;
-        color: #ea580c;
+        background: #f8f4e6;
+        border-color: #a0956b;
+        color: #2c1810;
+        box-shadow: 0 2px 8px rgba(93, 78, 55, 0.1);
     }
     
     /* Stats container */
@@ -247,6 +285,8 @@ def show_author_bhajans(author):
     st.session_state.selected_author = author
 
 def show_bhajan(bhajan):
+    # Store current page as previous for back navigation
+    st.session_state.previous_page = st.session_state.page
     st.session_state.page = 'bhajan'
     st.session_state.selected_bhajan = bhajan
 
@@ -263,9 +303,14 @@ def load_data():
 
 # Header
 st.markdown("""
-<div class="header">
-    <h1>🕉️ Bhajan Search</h1>
-    <p>Discover and explore sacred bhajans</p>
+<div class="main-title">
+    Śrī Gauḍīya Gīti-guccha
+</div>
+<div class="subtitle">
+    An Anthology of Gauḍīya Vaiṣṇava Songs
+</div>
+<div class="language-note">
+    IN BENGALI, SANSKRIT, HINDI AND ORIYA
 </div>
 """, unsafe_allow_html=True)
 
@@ -600,10 +645,35 @@ elif st.session_state.page == 'author_bhajans':
         st.markdown("")
 
 elif st.session_state.page == 'bhajan':
-    # Bhajan display page
+    # Bhajan display page  
     bhajan = st.session_state.selected_bhajan
     
     if bhajan:
+        # Add invisible anchor at the top and scroll reset
+        st.markdown("""
+        <div id="bhajan-start" style="position: relative; top: 0;"></div>
+        <style>
+            .main { scroll-behavior: auto !important; }
+        </style>
+        <script>
+            setTimeout(function() {
+                window.scrollTo({top: 0, behavior: 'instant'});
+                const main = window.parent.document.querySelector('.main');
+                if (main) main.scrollTop = 0;
+            }, 100);
+        </script>
+        """, unsafe_allow_html=True)
+        
+        # Back button at the top
+        if st.button("← Back", key="back_from_bhajan_top"):
+            if hasattr(st.session_state, 'previous_page'):
+                st.session_state.page = st.session_state.previous_page
+            else:
+                st.session_state.page = 'home'
+            st.rerun()
+        
+        st.markdown("")  # Small space
+        
         # Title and author
         st.markdown(f"# {bhajan['title']}")
         st.markdown(f"**{bhajan['author']}**")
