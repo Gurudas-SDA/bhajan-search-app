@@ -817,6 +817,10 @@ elif st.session_state.page == 'author_bhajans':
         st.markdown("")
 
 elif st.session_state.page == 'bhajan':
+    # MEGA TEST: Confirm this version is running
+    st.error("🔴 TEST VERSION 5.0 - ANCHOR FIX LOADED")
+    st.write(f"Current query params: {dict(st.query_params)}")
+    
     # Bhajan display page with query params routing fix
     bhajan = st.session_state.selected_bhajan
     
