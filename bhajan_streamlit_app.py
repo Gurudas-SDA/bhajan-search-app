@@ -817,34 +817,19 @@ elif st.session_state.page == 'author_bhajans':
         st.markdown("")
 
 elif st.session_state.page == 'bhajan':
-    # Emergency solution: Scroll to Top button
+    # Clean bhajan display without broken TOP buttons
     bhajan = st.session_state.selected_bhajan
     
     if bhajan:
-        # Prominent scroll to top button
-        col1, col2 = st.columns([1, 3])
-        with col1:
-            if st.button("⬆️ TOP", key="goto_top", help="Go to top of bhajan", use_container_width=True):
-                st.components.v1.html("""
-                <script>
-                    window.scrollTo({top: 0, behavior: 'smooth'});
-                    setTimeout(() => {
-                        window.parent.scrollTo({top: 0, behavior: 'smooth'});
-                        const main = window.parent.document.querySelector('.main');
-                        if (main) main.scrollTop = 0;
-                    }, 100);
-                </script>
-                """, height=0)
+        # Back button
+        if st.button("← Back", key="back_btn"):
+            if hasattr(st.session_state, 'previous_page'):
+                st.session_state.page = st.session_state.previous_page
+            else:
+                st.session_state.page = 'home'
+            st.rerun()
         
-        with col2:
-            if st.button("← Back", key=f"back_btn"):
-                if hasattr(st.session_state, 'previous_page'):
-                    st.session_state.page = st.session_state.previous_page
-                else:
-                    st.session_state.page = 'home'
-                st.rerun()
-        
-        # Clear title and info
+        # Title and info
         st.subheader(bhajan['title'])
         st.caption(f"{bhajan['author']} • {bhajan['category']}")
         
@@ -852,7 +837,7 @@ elif st.session_state.page == 'bhajan':
         col1, col2, col3, col4 = st.columns(4)
         with col1:
             if st.button("📜 Original", 
-                        key=f"orig_lang",
+                        key="orig_lang",
                         type="primary" if st.session_state.selected_language == 'original' else "secondary",
                         use_container_width=True):
                 st.session_state.selected_language = 'original'
@@ -860,7 +845,7 @@ elif st.session_state.page == 'bhajan':
         
         with col2:
             if st.button("🇬🇧 English", 
-                        key=f"en_lang",
+                        key="en_lang",
                         type="primary" if st.session_state.selected_language == 'english' else "secondary", 
                         use_container_width=True):
                 st.session_state.selected_language = 'english'
@@ -868,7 +853,7 @@ elif st.session_state.page == 'bhajan':
         
         with col3:
             if st.button("🇷🇺 Русский", 
-                        key=f"ru_lang",
+                        key="ru_lang",
                         type="primary" if st.session_state.selected_language == 'russian' else "secondary",
                         use_container_width=True):
                 st.session_state.selected_language = 'russian'
@@ -876,7 +861,7 @@ elif st.session_state.page == 'bhajan':
         
         with col4:
             if st.button("🇱🇻 Latviešu", 
-                        key=f"lv_lang",
+                        key="lv_lang",
                         type="primary" if st.session_state.selected_language == 'latvian' else "secondary",
                         use_container_width=True):
                 st.session_state.selected_language = 'latvian'
@@ -884,7 +869,7 @@ elif st.session_state.page == 'bhajan':
         
         st.markdown("---")
         
-        # Display verses with floating TOP button
+        # Display verses cleanly
         sorted_verses = sorted(bhajan['verses'], key=lambda x: x.get('number', 0))
         
         for i, verse in enumerate(sorted_verses):
@@ -911,22 +896,6 @@ elif st.session_state.page == 'bhajan':
                 <div class="{text_class}">{text_content}</div>
             </div>
             """, unsafe_allow_html=True)
-            
-            # Add TOP button after every few verses (where users will see it)
-            if (i + 1) % 5 == 0 or i == len(sorted_verses) - 1:
-                col1, col2, col3 = st.columns([1, 2, 1])
-                with col2:
-                    if st.button(f"⬆️ Go to Top", key=f"top_{i}", use_container_width=True):
-                        st.components.v1.html("""
-                        <script>
-                            window.scrollTo({top: 0, behavior: 'smooth'});
-                            setTimeout(() => {
-                                window.parent.scrollTo({top: 0, behavior: 'smooth'});
-                                const main = window.parent.document.querySelector('.main');
-                                if (main) main.scrollTop = 0;
-                            }, 100);
-                        </script>
-                        """, height=0)
     
     if bhajan:
         # Force query params update to avoid anchor preservation
