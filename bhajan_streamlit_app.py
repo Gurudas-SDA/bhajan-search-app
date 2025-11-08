@@ -136,7 +136,7 @@ st.markdown("""
     .verse-english {
         font-family: 'Crimson Text', serif;
         line-height: 1.5;
-        font-size: 1.05rem;
+        font-size: 1.2rem;
         color: #000000;
         white-space: pre-line;
     }
@@ -145,7 +145,7 @@ st.markdown("""
     .verse-russian {
         font-family: 'Crimson Text', serif;
         line-height: 1.5;
-        font-size: 1.05rem;
+        font-size: 1.2rem;
         color: #000000;
         white-space: pre-line;
     }
@@ -153,7 +153,7 @@ st.markdown("""
     .verse-latvian {
         font-family: 'Crimson Text', serif;
         line-height: 1.5;
-        font-size: 1.05rem;
+        font-size: 1.2rem;
         color: #000000;
         white-space: pre-line;
     }
