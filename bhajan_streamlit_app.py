@@ -833,39 +833,62 @@ elif st.session_state.page == 'bhajan':
         st.subheader(bhajan['title'])
         st.caption(f"{bhajan['author']} • {bhajan['category']}")
         
-        # Language buttons
+        # Language buttons with clear active state
+        st.markdown("**Select Language / Izvēlieties valodu:**")
         col1, col2, col3, col4 = st.columns(4)
+        
         with col1:
-            if st.button("📜 Original", 
+            button_type = "primary" if st.session_state.selected_language == 'original' else "secondary"
+            button_emoji = "✅ 📜" if st.session_state.selected_language == 'original' else "📜"
+            if st.button(f"{button_emoji} Original", 
                         key="orig_lang",
-                        type="primary" if st.session_state.selected_language == 'original' else "secondary",
+                        type=button_type,
+                        help="Sanskrit/Devanagari original text",
                         use_container_width=True):
                 st.session_state.selected_language = 'original'
                 st.rerun()
         
         with col2:
-            if st.button("🇬🇧 English", 
+            button_type = "primary" if st.session_state.selected_language == 'english' else "secondary"
+            button_emoji = "✅ 🇬🇧" if st.session_state.selected_language == 'english' else "🇬🇧"
+            if st.button(f"{button_emoji} English", 
                         key="en_lang",
-                        type="primary" if st.session_state.selected_language == 'english' else "secondary", 
+                        type=button_type,
+                        help="English translation", 
                         use_container_width=True):
                 st.session_state.selected_language = 'english'
                 st.rerun()
         
         with col3:
-            if st.button("🇷🇺 Русский", 
+            button_type = "primary" if st.session_state.selected_language == 'russian' else "secondary"
+            button_emoji = "✅ 🇷🇺" if st.session_state.selected_language == 'russian' else "🇷🇺"
+            if st.button(f"{button_emoji} Русский", 
                         key="ru_lang",
-                        type="primary" if st.session_state.selected_language == 'russian' else "secondary",
+                        type=button_type,
+                        help="Russian translation",
                         use_container_width=True):
                 st.session_state.selected_language = 'russian'
                 st.rerun()
         
         with col4:
-            if st.button("🇱🇻 Latviešu", 
+            button_type = "primary" if st.session_state.selected_language == 'latvian' else "secondary"
+            button_emoji = "✅ 🇱🇻" if st.session_state.selected_language == 'latvian' else "🇱🇻"
+            if st.button(f"{button_emoji} Latviešu", 
                         key="lv_lang",
-                        type="primary" if st.session_state.selected_language == 'latvian' else "secondary",
+                        type=button_type,
+                        help="Latvian translation",
                         use_container_width=True):
                 st.session_state.selected_language = 'latvian'
                 st.rerun()
+        
+        # Show current language clearly
+        current_lang_names = {
+            'original': '📜 Sanskrit/Devanagari Original',
+            'english': '🇬🇧 English Translation', 
+            'russian': '🇷🇺 Русский перевод',
+            'latvian': '🇱🇻 Latviešu tulkojums'
+        }
+        st.info(f"**Currently viewing:** {current_lang_names.get(st.session_state.selected_language, 'Original')}")
         
         st.markdown("---")
         
@@ -896,5 +919,27 @@ elif st.session_state.page == 'bhajan':
                 <div class="{text_class}">{text_content}</div>
             </div>
             """, unsafe_allow_html=True)
+        
+        # Navigation buttons at the bottom for easy exit
+        st.markdown("---")
+        st.markdown("### Navigation")
+        
+        col1, col2, col3 = st.columns([1, 1, 2])
+        
+        with col1:
+            if st.button("← Back", key="back_bottom", use_container_width=True, type="secondary"):
+                if hasattr(st.session_state, 'previous_page'):
+                    st.session_state.page = st.session_state.previous_page
+                else:
+                    st.session_state.page = 'home'
+                st.rerun()
+        
+        with col2:
+            if st.button("🏠 Home", key="home_bottom", use_container_width=True, type="primary"):
+                st.session_state.page = 'home'
+                st.rerun()
+        
+        with col3:
+            st.markdown("*End of bhajan / Bhajana beigas*")
 
 
