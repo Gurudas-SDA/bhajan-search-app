@@ -372,11 +372,8 @@ def show_bhajan(bhajan):
     st.session_state.page = 'bhajan'
     st.session_state.selected_bhajan = bhajan
     
-    # Force scroll position reset in session state
-    if hasattr(st.session_state, 'force_scroll_reset'):
-        st.session_state.force_scroll_reset = True
-    else:
-        st.session_state.force_scroll_reset = True
+    # Force complete page refresh to reset scroll
+    st.session_state.bhajan_just_opened = True
     
     update_url_params()
 
@@ -820,19 +817,28 @@ elif st.session_state.page == 'author_bhajans':
         st.markdown("")
 
 elif st.session_state.page == 'bhajan':
-    # Bhajan display page
+    # Bhajan display page with query params routing fix
     bhajan = st.session_state.selected_bhajan
     
     if bhajan:
+        # Force query params update to avoid anchor preservation
+        current_params = dict(st.query_params)
+        if current_params.get('view') != 'bhajan' or current_params.get('id') != bhajan['title']:
+            st.query_params.update({
+                "view": "bhajan", 
+                "id": bhajan['title'],
+                "page": "bhajan"
+            })
+            st.rerun()
+        
         # Create container at the very top
         top_container = st.container()
         
         with top_container:
-            # DEBUG: Test if changes are working
-            st.info("🔧 DEBUG: Scroll fix version 3.0 loaded")
-            
-            # Back button at the top
-            if st.button("← Back", key="back_from_bhajan_top"):
+            # Back button at the top with unique key
+            if st.button("← Back", key=f"bhajan_back_{bhajan['title'][:10]}"):
+                # Clear bhajan-specific query params
+                st.query_params.update({"view": "list", "page": st.session_state.previous_page})
                 if hasattr(st.session_state, 'previous_page'):
                     st.session_state.page = st.session_state.previous_page
                 else:
@@ -841,17 +847,17 @@ elif st.session_state.page == 'bhajan':
             
             st.markdown("")  # Small space
             
-            # Title and author
+            # Title and author - non-focusable elements first
             st.markdown(f"# {bhajan['title']}")
             st.markdown(f"**{bhajan['author']}**")
             st.markdown(f"*Category: {bhajan['category']}*")
             st.markdown("---")
         
-        # Language toggle
+        # Language toggle with unique keys
         col1, col2, col3, col4 = st.columns(4)
         with col1:
             if st.button("📜 Original", 
-                        key="original_btn",
+                        key=f"bhajan_original_{bhajan['title'][:10]}",
                         help="Show original text",
                         type="primary" if st.session_state.selected_language == 'original' else "secondary",
                         use_container_width=True):
@@ -860,7 +866,7 @@ elif st.session_state.page == 'bhajan':
         
         with col2:
             if st.button("🇬🇧 English", 
-                        key="english_btn",
+                        key=f"bhajan_english_{bhajan['title'][:10]}",
                         help="Show English translation",
                         type="primary" if st.session_state.selected_language == 'english' else "secondary",
                         use_container_width=True):
@@ -869,7 +875,7 @@ elif st.session_state.page == 'bhajan':
         
         with col3:
             if st.button("🇷🇺 Русский", 
-                        key="russian_btn",
+                        key=f"bhajan_russian_{bhajan['title'][:10]}",
                         help="Show Russian translation",
                         type="primary" if st.session_state.selected_language == 'russian' else "secondary",
                         use_container_width=True):
@@ -878,7 +884,7 @@ elif st.session_state.page == 'bhajan':
         
         with col4:
             if st.button("🇱🇻 Latviešu", 
-                        key="latvian_btn",
+                        key=f"bhajan_latvian_{bhajan['title'][:10]}",
                         help="Show Latvian translation",
                         type="primary" if st.session_state.selected_language == 'latvian' else "secondary",
                         use_container_width=True):
