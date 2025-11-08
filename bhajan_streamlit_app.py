@@ -486,7 +486,7 @@ if st.session_state.page == 'home':
     # Calculate total verses for more interesting statistics
     total_verses = sum(len(bhajan['verses']) for bhajan in bhajan_data)
     
-    st.markdown("""
+    stats_html = f"""
     <div style="
         background: linear-gradient(135deg, #fefcf8 0%, #f8f4e6 100%);
         border-radius: 12px;
@@ -521,7 +521,7 @@ if st.session_state.page == 'home':
                     font-weight: 600;
                     color: #2c1810;
                     margin-bottom: 0.2rem;
-                ">{}</div>
+                ">{len(bhajan_data)}</div>
                 <div style="
                     font-family: 'Cormorant Garamond', serif;
                     font-size: 0.9rem;
@@ -537,7 +537,7 @@ if st.session_state.page == 'home':
                     font-weight: 600;
                     color: #2c1810;
                     margin-bottom: 0.2rem;
-                ">{}</div>
+                ">{total_verses}</div>
                 <div style="
                     font-family: 'Cormorant Garamond', serif;
                     font-size: 0.9rem;
@@ -553,7 +553,7 @@ if st.session_state.page == 'home':
                     font-weight: 600;
                     color: #2c1810;
                     margin-bottom: 0.2rem;
-                ">{}</div>
+                ">{len(categories)}</div>
                 <div style="
                     font-family: 'Cormorant Garamond', serif;
                     font-size: 0.9rem;
@@ -569,7 +569,7 @@ if st.session_state.page == 'home':
                     font-weight: 600;
                     color: #2c1810;
                     margin-bottom: 0.2rem;
-                ">{}</div>
+                ">{len(authors)}</div>
                 <div style="
                     font-family: 'Cormorant Garamond', serif;
                     font-size: 0.9rem;
@@ -579,7 +579,9 @@ if st.session_state.page == 'home':
             </div>
         </div>
     </div>
-    """.format(len(bhajan_data), total_verses, len(categories), len(authors)), unsafe_allow_html=True)
+    """
+    
+    st.markdown(stats_html, unsafe_allow_html=True)
 
 elif st.session_state.page == 'titles':
     # Song Index page
