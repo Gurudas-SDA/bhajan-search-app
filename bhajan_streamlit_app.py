@@ -371,6 +371,13 @@ def show_bhajan(bhajan):
     st.session_state.previous_page = st.session_state.page
     st.session_state.page = 'bhajan'
     st.session_state.selected_bhajan = bhajan
+    
+    # Force scroll position reset in session state
+    if hasattr(st.session_state, 'force_scroll_reset'):
+        st.session_state.force_scroll_reset = True
+    else:
+        st.session_state.force_scroll_reset = True
+    
     update_url_params()
 
 # Load bhajan data from fixed Excel file
@@ -817,7 +824,7 @@ elif st.session_state.page == 'bhajan':
     bhajan = st.session_state.selected_bhajan
     
     if bhajan:
-        # More aggressive scroll reset - try multiple methods
+        # Very aggressive scroll reset - multiple methods and timing
         st.markdown("""
         <div id="bhajan-start" style="position: relative; top: 0;"></div>
         <style>
@@ -833,34 +840,65 @@ elif st.session_state.page == 'bhajan':
             }
         </style>
         <script>
-            // Immediate scroll reset
-            window.scrollTo(0, 0);
-            document.documentElement.scrollTop = 0;
-            document.body.scrollTop = 0;
-            
-            // Try parent window
-            if (window.parent !== window) {
-                window.parent.scrollTo(0, 0);
-                const main = window.parent.document.querySelector('.main');
-                if (main) main.scrollTop = 0;
-                const body = window.parent.document.body;
-                if (body) body.scrollTop = 0;
+            // Clear any stored scroll position
+            if (typeof(Storage) !== "undefined") {
+                sessionStorage.removeItem('scroll-position');
             }
             
-            // Delayed scroll reset as backup
+            // Immediate scroll reset - multiple attempts
+            function scrollToTop() {
+                // Method 1: Direct window scroll
+                window.scrollTo(0, 0);
+                document.documentElement.scrollTop = 0;
+                document.body.scrollTop = 0;
+                
+                // Method 2: Parent window (Streamlit iframe)
+                if (window.parent !== window) {
+                    window.parent.scrollTo(0, 0);
+                    try {
+                        const parentBody = window.parent.document.body;
+                        if (parentBody) parentBody.scrollTop = 0;
+                        const parentDoc = window.parent.document.documentElement;
+                        if (parentDoc) parentDoc.scrollTop = 0;
+                    } catch(e) {}
+                }
+                
+                // Method 3: Streamlit main container
+                try {
+                    const main = window.parent.document.querySelector('.main');
+                    if (main) {
+                        main.scrollTop = 0;
+                        main.scrollIntoView({block: 'start', behavior: 'instant'});
+                    }
+                    
+                    // Method 4: All possible containers
+                    const containers = window.parent.document.querySelectorAll('[data-testid="stAppViewContainer"], .stApp, [data-testid="block-container"]');
+                    containers.forEach(container => {
+                        if (container) container.scrollTop = 0;
+                    });
+                } catch(e) {}
+            }
+            
+            // Execute immediately
+            scrollToTop();
+            
+            // Execute after DOM ready
+            document.addEventListener('DOMContentLoaded', scrollToTop);
+            
+            // Execute with delays as backup
+            setTimeout(scrollToTop, 10);
+            setTimeout(scrollToTop, 50);
+            setTimeout(scrollToTop, 100);
+            setTimeout(scrollToTop, 200);
+            
+            // Force focus to top element
             setTimeout(function() {
-                window.scrollTo({top: 0, left: 0, behavior: 'instant'});
-                const main = window.parent.document.querySelector('.main');
-                if (main) {
-                    main.scrollTop = 0;
-                    main.scrollIntoView({block: 'start', behavior: 'instant'});
+                const topElement = document.getElementById('bhajan-start');
+                if (topElement) {
+                    topElement.focus();
+                    topElement.scrollIntoView({block: 'start', behavior: 'instant'});
                 }
             }, 50);
-            
-            // Extra backup
-            setTimeout(function() {
-                window.scrollTo(0, 0);
-            }, 200);
         </script>
         """, unsafe_allow_html=True)
         
@@ -873,6 +911,9 @@ elif st.session_state.page == 'bhajan':
             st.rerun()
         
         st.markdown("")  # Small space
+        
+        # Add a visible anchor that we can scroll to
+        st.markdown('<a name="bhajan-top"></a>', unsafe_allow_html=True)
         
         # Title and author
         st.markdown(f"# {bhajan['title']}")
