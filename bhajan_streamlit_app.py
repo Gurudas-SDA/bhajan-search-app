@@ -884,7 +884,7 @@ elif st.session_state.page == 'bhajan':
         
         st.markdown("---")
         
-        # Display verses normally
+        # Display verses with floating TOP button
         sorted_verses = sorted(bhajan['verses'], key=lambda x: x.get('number', 0))
         
         for i, verse in enumerate(sorted_verses):
@@ -911,6 +911,22 @@ elif st.session_state.page == 'bhajan':
                 <div class="{text_class}">{text_content}</div>
             </div>
             """, unsafe_allow_html=True)
+            
+            # Add TOP button after every few verses (where users will see it)
+            if (i + 1) % 5 == 0 or i == len(sorted_verses) - 1:
+                col1, col2, col3 = st.columns([1, 2, 1])
+                with col2:
+                    if st.button(f"⬆️ Go to Top", key=f"top_{i}", use_container_width=True):
+                        st.components.v1.html("""
+                        <script>
+                            window.scrollTo({top: 0, behavior: 'smooth'});
+                            setTimeout(() => {
+                                window.parent.scrollTo({top: 0, behavior: 'smooth'});
+                                const main = window.parent.document.querySelector('.main');
+                                if (main) main.scrollTop = 0;
+                            }, 100);
+                        </script>
+                        """, height=0)
     
     if bhajan:
         # Force query params update to avoid anchor preservation
