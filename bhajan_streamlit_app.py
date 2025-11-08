@@ -820,106 +820,32 @@ elif st.session_state.page == 'author_bhajans':
         st.markdown("")
 
 elif st.session_state.page == 'bhajan':
-    # Bhajan display page  
+    # Bhajan display page
     bhajan = st.session_state.selected_bhajan
     
     if bhajan:
-        # Very aggressive scroll reset - multiple methods and timing
-        st.markdown("""
-        <div id="bhajan-start" style="position: relative; top: 0;"></div>
-        <style>
-            .main { 
-                scroll-behavior: auto !important; 
-            }
-            /* Better font rendering for diacritics */
-            .verse-original, .verse-english, .verse-russian, .verse-latvian {
-                -webkit-font-smoothing: antialiased;
-                -moz-osx-font-smoothing: grayscale;
-                text-rendering: optimizeLegibility;
-                font-feature-settings: "kern" 1, "liga" 1;
-            }
-        </style>
-        <script>
-            // Clear any stored scroll position
-            if (typeof(Storage) !== "undefined") {
-                sessionStorage.removeItem('scroll-position');
-            }
-            
-            // Immediate scroll reset - multiple attempts
-            function scrollToTop() {
-                // Method 1: Direct window scroll
-                window.scrollTo(0, 0);
-                document.documentElement.scrollTop = 0;
-                document.body.scrollTop = 0;
-                
-                // Method 2: Parent window (Streamlit iframe)
-                if (window.parent !== window) {
-                    window.parent.scrollTo(0, 0);
-                    try {
-                        const parentBody = window.parent.document.body;
-                        if (parentBody) parentBody.scrollTop = 0;
-                        const parentDoc = window.parent.document.documentElement;
-                        if (parentDoc) parentDoc.scrollTop = 0;
-                    } catch(e) {}
-                }
-                
-                // Method 3: Streamlit main container
-                try {
-                    const main = window.parent.document.querySelector('.main');
-                    if (main) {
-                        main.scrollTop = 0;
-                        main.scrollIntoView({block: 'start', behavior: 'instant'});
-                    }
-                    
-                    // Method 4: All possible containers
-                    const containers = window.parent.document.querySelectorAll('[data-testid="stAppViewContainer"], .stApp, [data-testid="block-container"]');
-                    containers.forEach(container => {
-                        if (container) container.scrollTop = 0;
-                    });
-                } catch(e) {}
-            }
-            
-            // Execute immediately
-            scrollToTop();
-            
-            // Execute after DOM ready
-            document.addEventListener('DOMContentLoaded', scrollToTop);
-            
-            // Execute with delays as backup
-            setTimeout(scrollToTop, 10);
-            setTimeout(scrollToTop, 50);
-            setTimeout(scrollToTop, 100);
-            setTimeout(scrollToTop, 200);
-            
-            // Force focus to top element
-            setTimeout(function() {
-                const topElement = document.getElementById('bhajan-start');
-                if (topElement) {
-                    topElement.focus();
-                    topElement.scrollIntoView({block: 'start', behavior: 'instant'});
-                }
-            }, 50);
-        </script>
-        """, unsafe_allow_html=True)
+        # Create container at the very top
+        top_container = st.container()
         
-        # Back button at the top
-        if st.button("← Back", key="back_from_bhajan_top"):
-            if hasattr(st.session_state, 'previous_page'):
-                st.session_state.page = st.session_state.previous_page
-            else:
-                st.session_state.page = 'home'
-            st.rerun()
-        
-        st.markdown("")  # Small space
-        
-        # Add a visible anchor that we can scroll to
-        st.markdown('<a name="bhajan-top"></a>', unsafe_allow_html=True)
-        
-        # Title and author
-        st.markdown(f"# {bhajan['title']}")
-        st.markdown(f"**{bhajan['author']}**")
-        st.markdown(f"*Category: {bhajan['category']}*")
-        st.markdown("---")
+        with top_container:
+            # DEBUG: Test if changes are working
+            st.info("🔧 DEBUG: Scroll fix version 3.0 loaded")
+            
+            # Back button at the top
+            if st.button("← Back", key="back_from_bhajan_top"):
+                if hasattr(st.session_state, 'previous_page'):
+                    st.session_state.page = st.session_state.previous_page
+                else:
+                    st.session_state.page = 'home'
+                st.rerun()
+            
+            st.markdown("")  # Small space
+            
+            # Title and author
+            st.markdown(f"# {bhajan['title']}")
+            st.markdown(f"**{bhajan['author']}**")
+            st.markdown(f"*Category: {bhajan['category']}*")
+            st.markdown("---")
         
         # Language toggle
         col1, col2, col3, col4 = st.columns(4)
