@@ -174,7 +174,7 @@ YOUTUBE_IDS = {
     "Jaya Jaya Jagannātha Śacīra-nandana":       "SYvzUOndM_I",
     "Jaya Jaya Sundara Nanda-kumāra":            "BEn4C0zLttU",
     "Jaya Jaya Śrī Guru":                         "yDqZ4SLZnOU",  # YT: Jaya Jaya Sri Guru, Prema-kalpataru
-    "Jaya Nanda-nandana":                         "IAtesIV7ZuE",  # ? YT: Jaya Radha Madhava
+    "Jaya Rādhā-Mādhava, Jaya Kuñja-bihārī":    "IAtesIV7ZuE",
     "Jhūlā Jhūle Rādhā Dāmodara":               "MT65vbuKULc",
     "Kabe Ha'be Bôlô":                           "zFQevqrFYww",  # YT: Kabe Habe Bolo Se-Dina Amar
     "Kali Kukura":                                "GAQqkvMkUkU",
