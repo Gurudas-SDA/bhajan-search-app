@@ -30,31 +30,68 @@ def load_bhajan_data_from_excel(excel_file_path=None):
             df['Latvian'] = df['Latvian'].fillna('') if 'Latvian' in df.columns else ''
             
             # Clean text fields - remove unwanted symbols
+            import re as _re
             def clean_text(text):
                 if pd.isna(text):
                     return ''
                 text = str(text)
-                # Replace Excel line break artifacts with proper newlines
                 text = text.replace('_x000D_\n', '\n')
                 text = text.replace('_x000D_', '\n')
                 text = text.replace('\r\n', '\n')
                 text = text.replace('\r', '\n')
-                # Clean up multiple newlines but preserve single ones
-                import re
-                text = re.sub(r'\n\s*\n', '\n', text)
-                # Clean up whitespace within lines but preserve line structure
+                text = _re.sub(r'\n\s*\n', '\n', text)
                 lines = text.split('\n')
                 cleaned_lines = [' '.join(line.split()) for line in lines]
                 text = '\n'.join(cleaned_lines)
                 return text.strip()
-            
+
+            # Latvian-specific cleaner: removes embedded English lines
+            # (Excel artefact: some cells contain "EN text\tLV text" or EN lines)
+            _latvian_chars = set('ļķģņšžč')
+            _english_markers = {
+                'you', 'don', 'will', 'any', 'this', 'that', 'what', 'are',
+                'doing', 'having', 'achieved', 'human', 'body', 'worship',
+                'fall', 'shameful', 'condition', 'death', 'think', 'about',
+                'your', 'they', 'their', 'these', 'those', 'have', 'been',
+                'would', 'could', 'should', 'which', 'when', 'where', 'rare',
+                'son', 'now', 'into', 'time', 'does', 'not', 'worship'
+            }
+
+            def clean_latvian_text(text):
+                if pd.isna(text):
+                    return ''
+                text = str(text)
+                text = text.replace('_x000D_\n', '\n')
+                text = text.replace('_x000D_', '\n')
+                text = text.replace('\r\n', '\n')
+                text = text.replace('\r', '\n')
+                text = _re.sub(r'\n\s*\n', '\n', text)
+                cleaned_lines = []
+                for line in text.split('\n'):
+                    # TAB separator: "English\tLatvian" → take Latvian part
+                    if '\t' in line:
+                        line = line.split('\t')[-1]
+                    line = ' '.join(line.split())
+                    if not line:
+                        continue
+                    # Lines with uniquely Latvian chars → keep
+                    if any(c in line for c in _latvian_chars):
+                        cleaned_lines.append(line)
+                        continue
+                    # Long lines with English prose markers → skip
+                    words = set(_re.findall(r'\b[a-z]+\b', line.lower()))
+                    if len(words & _english_markers) >= 2 and len(line) > 30:
+                        continue
+                    cleaned_lines.append(line)
+                return '\n'.join(cleaned_lines).strip()
+
             # Apply cleaning to text columns
             df['Original'] = df['Original'].apply(clean_text)
             df['English'] = df['English'].apply(clean_text)
             if 'Russian' in df.columns:
                 df['Russian'] = df['Russian'].apply(clean_text)
             if 'Latvian' in df.columns:
-                df['Latvian'] = df['Latvian'].apply(clean_text)
+                df['Latvian'] = df['Latvian'].apply(clean_latvian_text)
             df['Bhajan_Title'] = df['Bhajan_Title'].apply(clean_text)
             df['Author'] = df['Author'].apply(clean_text)
             df['Category'] = df['Category'].apply(clean_text)

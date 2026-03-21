@@ -29,6 +29,51 @@ def clean_text(text):
     return text.strip()
 
 
+_latvian_chars = set('ļķģņšžč')
+_english_markers = {
+    'you', 'don', 'will', 'any', 'this', 'that', 'what', 'are',
+    'doing', 'having', 'achieved', 'human', 'body', 'worship',
+    'fall', 'shameful', 'condition', 'death', 'think', 'about',
+    'your', 'they', 'their', 'these', 'those', 'have', 'been',
+    'would', 'could', 'should', 'which', 'when', 'where', 'rare',
+    'son', 'now', 'into', 'time', 'does', 'not', 'worship'
+}
+
+
+def clean_latvian_text(text):
+    """Clean Latvian translation field, stripping embedded English lines.
+
+    Excel artefact: some cells contain 'English text\\tLatvian text' on one
+    line, or English-only lines inserted between Latvian paragraphs.
+    """
+    if pd.isna(text):
+        return ''
+    text = str(text)
+    text = text.replace('_x000D_\n', '\n')
+    text = text.replace('_x000D_', '\n')
+    text = text.replace('\r\n', '\n')
+    text = text.replace('\r', '\n')
+    text = re.sub(r'\n\s*\n', '\n', text)
+    cleaned_lines = []
+    for line in text.split('\n'):
+        # TAB separator: "English\tLatvian" → take Latvian part
+        if '\t' in line:
+            line = line.split('\t')[-1]
+        line = ' '.join(line.split())
+        if not line:
+            continue
+        # Lines with uniquely Latvian chars → keep
+        if any(c in line for c in _latvian_chars):
+            cleaned_lines.append(line)
+            continue
+        # Long lines with English prose markers → skip
+        words = set(re.findall(r'\b[a-z]+\b', line.lower()))
+        if len(words & _english_markers) >= 2 and len(line) > 30:
+            continue
+        cleaned_lines.append(line)
+    return '\n'.join(cleaned_lines).strip()
+
+
 def normalize_letter(char):
     """Normalize IAST/Sanskrit first character to ASCII for alphabet grouping."""
     mapping = {
@@ -70,9 +115,10 @@ def load_bhajan_data(excel_path):
         else:
             df[col] = ''
 
-    # Clean all text columns
-    for col in ['Original', 'English', 'Russian', 'Latvian', 'Bhajan_Title', 'Author', 'Category']:
+    # Clean all text columns (Latvian gets special cleaner to strip embedded English)
+    for col in ['Original', 'English', 'Russian', 'Bhajan_Title', 'Author', 'Category']:
         df[col] = df[col].apply(clean_text)
+    df['Latvian'] = df['Latvian'].apply(clean_latvian_text)
 
     # Ensure Verse_Number is numeric
     df['Verse_Number'] = pd.to_numeric(df['Verse_Number'], errors='coerce')
