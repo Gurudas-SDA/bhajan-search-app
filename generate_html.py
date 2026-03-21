@@ -163,7 +163,7 @@ YOUTUBE_IDS = {
     "Anūpama Mādhurī Joḓī":                      "sXwq0P0J3jY",
     "Braja-jana-mana-sukhakārī":                  "Oep65u0erDM",
     "Gaurāṅgera Du'ṭī Pada":                     "3C0T-aco8x8",
-    "Gaurīdāsa-mandire":                          "Vyz48Zp7QN8",
+    "Gaurīdāsa-mandire":                          "6eyyNjXFlYA",  # 2019 > 2018
     "Gopīnātha, Mama Nivedana Śunô":             "NJwEUnTExxA",
     "Gāy Gorā Madhura Svare":                    "h4wvw6co094",
     "Hari Bôlbô Āra Madana-mohana Heribô Go":   "MeBH639cbac",
@@ -192,6 +192,7 @@ YOUTUBE_IDS = {
     "Rādhā-nāma Parama Sukhadāī":               "KtCDa6HkeLk",
     "Sakhe, Kalaya Gauram Udāram":               "JK6zIb89BA0",
     "Udilô Aruṇa":                               "LsZy2yG4afw",
+    "Śrī Vaiṣṇava-vandanā":                       "--UhvixEIV0",  # YT: Vrindavana Vasi Jata Vaishnavera Gana
     "Vande Viśvambhara":                          "8rlqrH31vQc",
     "Yamunā-puline":                              "qEqfEPaguAI",
     "Yaśomatī-nandana":                          "Mb_NAOC5-cM",
