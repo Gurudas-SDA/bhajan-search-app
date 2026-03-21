@@ -156,6 +156,59 @@ def load_bhajan_data(excel_path):
     return result
 
 
+# YouTube video IDs — matched from playlist (newest video wins when duplicates).
+# Questionable matches marked with "# ?" — verify before keeping.
+YOUTUBE_IDS = {
+    "(Kṛṣṇa) Deva! Bhavantaṁ Vande":           "cbHKEN7FVsM",
+    "Anūpama Mādhurī Joḓī":                      "sXwq0P0J3jY",
+    "Braja-jana-mana-sukhakārī":                  "Oep65u0erDM",
+    "Gaurāṅgera Du'ṭī Pada":                     "3C0T-aco8x8",
+    "Gaurīdāsa-mandire":                          "Vyz48Zp7QN8",
+    "Gopīnātha, Mama Nivedana Śunô":             "NJwEUnTExxA",
+    "Gāy Gorā Madhura Svare":                    "h4wvw6co094",
+    "Hari Bôlbô Āra Madana-mohana Heribô Go":   "MeBH639cbac",
+    "Hari Bôle Moder Gaura Elo":                 "4nElJfnMsSY",
+    "Hā Hā Mora Gaura-kiśora":                   "E6-vtYptlh8",
+    "Jaya Jaya Ballava-rāja-kumāra":             "k89PcScU1C0",  # ? YT: Vallabha-Raja-Kumara
+    "Jaya Jaya Harināma":                         "T3M74_5Zbho",
+    "Jaya Jaya Jagannātha Śacīra-nandana":       "SYvzUOndM_I",
+    "Jaya Jaya Sundara Nanda-kumāra":            "BEn4C0zLttU",
+    "Jaya Jaya Śrī Guru":                         "yDqZ4SLZnOU",  # YT: Jaya Jaya Sri Guru, Prema-kalpataru
+    "Jaya Nanda-nandana":                         "IAtesIV7ZuE",  # ? YT: Jaya Radha Madhava
+    "Jhūlā Jhūle Rādhā Dāmodara":               "MT65vbuKULc",
+    "Kabe Ha'be Bôlô":                           "zFQevqrFYww",  # YT: Kabe Habe Bolo Se-Dina Amar
+    "Kali Kukura":                                "GAQqkvMkUkU",
+    "Ke Ĵābi Ke Ĵābi Re Bhāi":                 "IVQpfgw3pWI",
+    "Mama Mana Mandire":                          "35RQmHdbd3I",
+    "Mādhava, Bahuta Minati Kôri Taya":          "q6nlP04UXOk",
+    "Mānasa, Deha, Geha":                        "CTdRROGqGMY",
+    "Nitāi-pada-kamala":                          "yHcWnbQ6oQ0",
+    "Pāra Kareṅge":                              "tH8ZWPx7sxs",
+    "Ramaṇī-śiromaṇi":                           "GXJv2AXlVgU",
+    "Rādhe Jhūlana Padhāro":                     "rb2kE4FQvIE",
+    "Rādhe! Jaya Jaya Mādhava-dayite!":          "3Ie2XfVYbW0",
+    "Rādhā-Kṛṣṇa Prāṇa Mora":                  "28XrHuo6u6k",
+    "Rādhā-kuṇḍa-taṭa":                         "bmfTttLaTfE",
+    "Rādhā-nāma Parama Sukhadāī":               "KtCDa6HkeLk",
+    "Sakhe, Kalaya Gauram Udāram":               "JK6zIb89BA0",
+    "Udilô Aruṇa":                               "LsZy2yG4afw",
+    "Vande Viśvambhara":                          "8rlqrH31vQc",
+    "Yamunā-puline":                              "qEqfEPaguAI",
+    "Yaśomatī-nandana":                          "Mb_NAOC5-cM",
+    "Yaṅ Kali Rūpa Śarīra Na Dharata":          "voAXCiJ04y8",
+    "Ĵadi Gaurāṅga Nahitô":                     "5WaC96E0zSA",
+    "Ĵe Ānilô Prema-dhana":                     "Xg49eKivnPo",
+    "Śrī Daśāvatāra-stotram":                   "v5JjODERFLM",
+    "Śrī Guru-paramparā":                        "WwJ59AaeqvU",
+    "Śrī Gurvāṣṭakam (Bengali Rendition)":      "zyuZRw50XRA",
+    "Śrī Kṛṣṇa Caitanya Prabhu Dayā Karô More": "Y0RAubIT6ms",
+    "Śrī Kṛṣṇa-virahe":                         "ozEAXCMdcGE",
+    "Śrī Maṅgala-gītam":                         "laBce5FeNac",
+    "Śrī Nanda-nandanāṣṭakam":                  "9kJfVC0NM10",
+    "Śrī Rūpa Mañjarī-pada":                    "Byt3YB5ff80",
+}
+
+
 def generate_html(bhajans):
     """Generate the complete HTML string."""
     # Compute stats
@@ -165,6 +218,7 @@ def generate_html(bhajans):
     authors = sorted(set(b['author'] for b in bhajans))
 
     bhajans_json = json.dumps(bhajans, ensure_ascii=False)
+    youtube_ids_json = json.dumps(YOUTUBE_IDS, ensure_ascii=False)
 
     html = f'''<!DOCTYPE html>
 <html lang="en">
@@ -620,11 +674,8 @@ body {{
 <script>
 const BHAJANS = {bhajans_json};
 
-// YouTube video IDs mapped to bhajan titles
-// Add more entries here as you match songs from the playlist
-const YOUTUBE_IDS = {{
-  "Gaur\u0101\u1e45gera Du\u2019\u1e6d\u012b Pada": "3C0T-aco8x8",
-}};
+// YouTube video IDs — matched from playlist
+const YOUTUBE_IDS = {youtube_ids_json};
 
 // Normalize IAST character to ASCII letter
 function normalizeLetter(ch) {{
