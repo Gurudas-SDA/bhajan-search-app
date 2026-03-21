@@ -479,6 +479,21 @@ body {{
   text-decoration: underline;
 }}
 
+/* YouTube embed */
+.yt-embed {{
+  margin: 20px 0;
+  border-radius: 10px;
+  overflow: hidden;
+  aspect-ratio: 16/9;
+  background: #000;
+  max-width: 560px;
+}}
+.yt-embed iframe {{
+  width: 100%;
+  height: 100%;
+  display: block;
+}}
+
 /* Language selector */
 .lang-selector {{
   display: flex;
@@ -604,6 +619,12 @@ body {{
 
 <script>
 const BHAJANS = {bhajans_json};
+
+// YouTube video IDs mapped to bhajan titles
+// Add more entries here as you match songs from the playlist
+const YOUTUBE_IDS = {{
+  "Gaur\u0101\u1e45gera Du\u2019\u1e6d\u012b Pada": "3C0T-aco8x8",
+}};
 
 // Normalize IAST character to ASCII letter
 function normalizeLetter(ch) {{
@@ -939,6 +960,14 @@ function renderBhajan(title) {{
   html += ' &middot; <a href="#" onclick="navigate(\\'category:' + encodeURIComponent(b.category) + '\\'); return false;">' + esc(b.category) + '</a>';
   html += ' &middot; ' + b.verses.length + ' verses';
   html += '</div>';
+
+  // YouTube embed (if available)
+  const ytId = YOUTUBE_IDS[b.title];
+  if (ytId) {{
+    html += '<div class="yt-embed">';
+    html += '<iframe src="https://www.youtube.com/embed/' + ytId + '?rel=0" frameborder="0" allowfullscreen loading="lazy"></iframe>';
+    html += '</div>';
+  }}
 
   // Language selector — single language
   const enc = encodeURIComponent(title);
