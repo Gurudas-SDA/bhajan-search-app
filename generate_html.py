@@ -303,7 +303,7 @@ body {{
   display: inline-block;
   padding: 4px 8px;
   margin: 2px;
-  color: var(--medium-brown);
+  color: #CC2200;
   text-decoration: none;
   font-family: 'Noto Serif', serif;
   font-size: 0.85rem;
