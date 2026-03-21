@@ -482,9 +482,18 @@ body {{
 /* Language selector */
 .lang-selector {{
   display: flex;
-  gap: 8px;
+  flex-direction: column;
+  gap: 6px;
   margin: 20px 0;
+}}
+.lang-group {{
+  display: flex;
+  gap: 6px;
   flex-wrap: wrap;
+}}
+.lang-group-dual {{
+  border-top: 1px solid var(--border-tan);
+  padding-top: 6px;
 }}
 .lang-btn {{
   padding: 8px 16px;
@@ -497,6 +506,12 @@ body {{
   cursor: pointer;
   transition: all 0.2s;
 }}
+.lang-btn.dual {{
+  font-size: 0.78rem;
+  padding: 6px 12px;
+  color: var(--text-secondary);
+  background: var(--cream-light);
+}}
 .lang-btn:hover {{
   border-color: var(--orange);
 }}
@@ -504,6 +519,19 @@ body {{
   background: var(--orange);
   color: white;
   border-color: var(--orange);
+}}
+/* Dual-language verse display */
+.verse-original {{
+  font-weight: 600;
+  font-style: normal;
+  margin-bottom: 10px;
+}}
+.verse-translation {{
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  border-left: 2px solid var(--border-tan);
+  padding-left: 12px;
+  font-style: normal;
 }}
 
 /* Verse */
@@ -713,6 +741,19 @@ function getVerseText(verse, lang) {{
   }}
 }}
 
+// Check if current mode shows two languages
+function isDualLang(lang) {{
+  return lang.startsWith('orig+');
+}}
+
+// Get translation language from dual mode
+function getDualTranslation(verse, lang) {{
+  if (lang === 'orig+english') return verse.english;
+  if (lang === 'orig+russian') return verse.russian;
+  if (lang === 'orig+latvian') return verse.latvian;
+  return '';
+}}
+
 // Compact header for inner pages
 function compactHeader() {{
   return '<div class="compact-header"><h1>\\u015ar\\u012b Gau\\u1e0d\\u012bya G\\u012bti-guccha <span>An Anthology of Gau\\u1e0d\\u012bya Vai\\u1e63\\u1e47ava Songs</span></h1></div>';
@@ -899,23 +940,43 @@ function renderBhajan(title) {{
   html += ' &middot; ' + b.verses.length + ' verses';
   html += '</div>';
 
-  // Language selector
+  // Language selector — single language
+  const enc = encodeURIComponent(title);
   html += '<div class="lang-selector">';
-  html += '<button class="lang-btn' + (currentLang==='original' ? ' active' : '') + '" onclick="switchLang(\\'original\\',\\'' + encodeURIComponent(title) + '\\')">Original</button>';
-  html += '<button class="lang-btn' + (currentLang==='english' ? ' active' : '') + '" onclick="switchLang(\\'english\\',\\'' + encodeURIComponent(title) + '\\')">English</button>';
-  html += '<button class="lang-btn' + (currentLang==='russian' ? ' active' : '') + '" onclick="switchLang(\\'russian\\',\\'' + encodeURIComponent(title) + '\\')">\\u0420\\u0443\\u0441\\u0441\\u043a\\u0438\\u0439</button>';
-  html += '<button class="lang-btn' + (currentLang==='latvian' ? ' active' : '') + '" onclick="switchLang(\\'latvian\\',\\'' + encodeURIComponent(title) + '\\')">Latvie\\u0161u</button>';
+  html += '<div class="lang-group">';
+  html += '<button class="lang-btn' + (currentLang==='original' ? ' active' : '') + '" onclick="switchLang(\\'original\\',\\'' + enc + '\\')">Original</button>';
+  html += '<button class="lang-btn' + (currentLang==='english' ? ' active' : '') + '" onclick="switchLang(\\'english\\',\\'' + enc + '\\')">English</button>';
+  html += '<button class="lang-btn' + (currentLang==='russian' ? ' active' : '') + '" onclick="switchLang(\\'russian\\',\\'' + enc + '\\')">\\u0420\\u0443\\u0441\\u0441\\u043a\\u0438\\u0439</button>';
+  html += '<button class="lang-btn' + (currentLang==='latvian' ? ' active' : '') + '" onclick="switchLang(\\'latvian\\',\\'' + enc + '\\')">Latvie\\u0161u</button>';
+  html += '</div>';
+  // Combined language options
+  html += '<div class="lang-group lang-group-dual">';
+  html += '<button class="lang-btn dual' + (currentLang==='orig+english' ? ' active' : '') + '" onclick="switchLang(\\'orig+english\\',\\'' + enc + '\\')">Original + English</button>';
+  html += '<button class="lang-btn dual' + (currentLang==='orig+latvian' ? ' active' : '') + '" onclick="switchLang(\\'orig+latvian\\',\\'' + enc + '\\')">Original + Latvie\\u0161u</button>';
+  html += '<button class="lang-btn dual' + (currentLang==='orig+russian' ? ' active' : '') + '" onclick="switchLang(\\'orig+russian\\',\\'' + enc + '\\')">Original + \\u0420\\u0443\\u0441\\u0441\\u043a\\u0438\\u0439</button>';
+  html += '</div>';
   html += '</div>';
 
   // Verses
   b.verses.forEach(v => {{
-    const text = getVerseText(v, currentLang);
     html += '<div class="verse">';
     html += '<div class="verse-number">Verse ' + v.number + '</div>';
-    if (text) {{
-      html += '<div class="verse-text">' + esc(text) + '</div>';
+    if (isDualLang(currentLang)) {{
+      const orig = v.original;
+      const trans = getDualTranslation(v, currentLang);
+      if (orig) html += '<div class="verse-text verse-original">' + esc(orig) + '</div>';
+      if (trans) {{
+        html += '<div class="verse-text verse-translation">' + esc(trans) + '</div>';
+      }} else {{
+        html += '<div class="verse-text" style="color:var(--text-secondary);font-style:italic;">Translation not available</div>';
+      }}
     }} else {{
-      html += '<div class="verse-text" style="color:var(--text-secondary);font-style:italic;">Translation not available</div>';
+      const text = getVerseText(v, currentLang);
+      if (text) {{
+        html += '<div class="verse-text">' + esc(text) + '</div>';
+      }} else {{
+        html += '<div class="verse-text" style="color:var(--text-secondary);font-style:italic;">Translation not available</div>';
+      }}
     }}
     html += '</div>';
   }});
