@@ -66,11 +66,13 @@ a3Y_v6G-Gjk|||Bhajan Radhe Jaya Jaya Madhava-Dayite - 2019-01-19 - Sri Prem Pray
 cbHKEN7FVsM|||Bhajan Krishna Deva Bhavantam Vande - 2019-01-19 - Sri Prem Prayojan
 6eyyNjXFlYA|||Bhajan Devadi-Deva Gaurachandra - 2019-01-19 - Sri Prem Prayojan
 sXwq0P0J3jY|||Bhajan Anupama Madhuri Jodi - 2019-01-04 - Sri Prem Prayojan
+9_SZMUako8Q|||Bhajan Sri Madhurashtakam - 2019-01-03 - Sri Prem Prayojan
 dKNFJ5BP_fo|||Bhajan Sri Krishna Chaitanya Prabhu Doya Koro More - 2019-01-03 - Sri Prem Prayojan
 8rlqrH31vQc|||Bhajan Vande Vishvambhara - 2019-01-02 - Sri Prem Prayojan
 W63UGrjJ2Sk|||Bhajan Jaya Radha-Madhava - 2019-01-02 - Sri Prem Prayojan
 Xg49eKivnPo|||Bhajan Je Anilo Prema-Dhana - 2018-12-30 - Sri Prem Prayojan
 Wio_Ebpwa5E|||Bhajan Vande Vishvambhara - 2018-12-30 - Sri Prem Prayojan
+qdzqse1kLSM|||Guru Puja to Srila Narayana Maharaja and Kirtan - 2018-12-30 - Sri Prem Prayojan
 BEn4C0zLttU|||Bhajan Jaya Jaya Sundara Nanda-Kumara - 2018-12-30 - Sri Prem Prayojan
 Vyz48Zp7QN8|||Bhajan Gauridasa-Mandire - 2018-10-06 - Sri Prem Prayojan
 sAanLBcrQxw|||Bhajan Vasatu Mano Mama Madana-Gopale - 2018-08-11 - Sri Prem Prayojan
@@ -98,7 +100,17 @@ OGgPUwgnk4E|||Bhajan Namami-Nanda-Nandanam + Sri Radha-Kripa-Kataksha-Stava-Raja
 xUgLsvBhfk4|||Bhajan Radha-Krishna Prana Mora - 2018-06-27 - Sri Prem Prayojan
 L2-NyMoL2H8|||Bhajan Devadi-Deva Gaurachandra - 2018-06-27 - Sri Prem Prayojan
 zsvAr9PKw_g|||Bhajan Anupama Madhuri Jodi - 2018-06-27 - Sri Prem Prayojan
-Jqk2mHYPT0g|||Bhajan Gopinatha, Mama Nivedana Suno - 2018-06-17 - Sri Prem Prayojan"""
+Jqk2mHYPT0g|||Bhajan Gopinatha, Mama Nivedana Suno - 2018-06-17 - Sri Prem Prayojan
+fV7wz0NC64Y|||Bhajan Jaya Radha-Madhava Kunja-Bihari - 2018-06-16 - Sri Prem Prayojan
+Vybu_oFW2kc|||Bhajan Sri Krishna Chaitanya Prabhu Doya Koro More - 2018-06-16 - Sri Prem Prayojan
+noxBUw1E-Tk|||Bhajan Kali-Kukkura - 2018-03-02 - Sri Prem Prayojan
+JnbwnTmUghI|||Bhajan Sri Mangala-Gitam - 2018-03-02 - Sri Prem Prayojan
+ZzRzC0O2wjI|||Bhajan Kalayati Nayanam - 2018-03-01 - Sri Prem Prayojan
+PSN_GhRqzm0|||Bhajan Radha-Krishna Prana Mora - 2018-03-01 - Sri Prem Prayojan
+3pcnUANhye0|||Bhajan Gauranga Bolite Habe - 2018-02-28 - Sri Prem Prayojan
+PN6U0MIqPu0|||Bhajan Ke Jabe Ke Jabe Bhai - 2018-02-26 - Sri Prem Prayojan
+_9lrbaXnSYg|||Bhajan Ha Ha Mora Goura-Kishora - 2018-02-25 - Sri Prem Prayojan
+tPhQRqzH6QA|||Bhajan Nitai Guna Mani - 2018-02-21 - Sri Prem Prayojan"""
 
 
 def normalize(text):

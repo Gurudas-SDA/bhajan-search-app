@@ -162,7 +162,7 @@ YOUTUBE_IDS = {
     "(Kṛṣṇa) Deva! Bhavantaṁ Vande":           "cbHKEN7FVsM",
     "Anūpama Mādhurī Joḓī":                      "sXwq0P0J3jY",
     "Braja-jana-mana-sukhakārī":                  "Oep65u0erDM",
-    "Gaurāṅgera Du'ṭī Pada":                     "3C0T-aco8x8",
+    "Gaurāṅgera Du\u2019ṭī Pada":                "3C0T-aco8x8",
     "Gaurīdāsa-mandire":                          "6eyyNjXFlYA",  # 2019 > 2018
     "Gopīnātha, Mama Nivedana Śunô":             "NJwEUnTExxA",
     "Gāy Gorā Madhura Svare":                    "h4wvw6co094",
@@ -178,10 +178,13 @@ YOUTUBE_IDS = {
     "Jhūlā Jhūle Rādhā Dāmodara":               "MT65vbuKULc",
     "Kabe Ha'be Bôlô":                           "zFQevqrFYww",  # YT: Kabe Habe Bolo Se-Dina Amar
     "Kali Kukura":                                "GAQqkvMkUkU",
+    "Kalayati Nayanaṁ":                          "ZzRzC0O2wjI",
+
     "Ke Ĵābi Ke Ĵābi Re Bhāi":                 "IVQpfgw3pWI",
     "Mama Mana Mandire":                          "35RQmHdbd3I",
     "Mādhava, Bahuta Minati Kôri Taya":          "q6nlP04UXOk",
     "Mānasa, Deha, Geha":                        "CTdRROGqGMY",
+    "Nitāi Guṇa-maṇi":                           "tPhQRqzH6QA",
     "Nitāi-pada-kamala":                          "yHcWnbQ6oQ0",
     "Pāra Kareṅge":                              "tH8ZWPx7sxs",
     "Ramaṇī-śiromaṇi":                           "GXJv2AXlVgU",
@@ -206,7 +209,9 @@ YOUTUBE_IDS = {
     "Śrī Kṛṣṇa-virahe":                         "ozEAXCMdcGE",
     "Śrī Maṅgala-gītam":                         "laBce5FeNac",
     "Śrī Nanda-nandanāṣṭakam":                  "9kJfVC0NM10",
+    "Śrī Madhurāṣṭakam":                         "9_SZMUako8Q",
     "Śrī Rūpa Mañjarī-pada":                    "Byt3YB5ff80",
+    "'Gaurāṅga' Bôlite Ha'be":                  "3pcnUANhye0",
 }
 
 
@@ -476,6 +481,21 @@ body {{
   font-size: 0.8rem;
   color: var(--text-secondary);
   margin-top: 2px;
+}}
+.video-badge {{
+  display: inline-block;
+  font-size: 0.65rem;
+  font-family: var(--font-ui);
+  font-weight: 600;
+  color: #c0392b;
+  background: #fdf0ef;
+  border: 1px solid #e8b4b0;
+  border-radius: 3px;
+  padding: 1px 5px;
+  margin-left: 6px;
+  vertical-align: middle;
+  letter-spacing: 0.03em;
+  white-space: nowrap;
 }}
 
 /* Category / Author list */
@@ -884,7 +904,7 @@ function renderTitles() {{
     groups[letter].forEach(b => {{
       const safeTitle = esc(b.title).replace(/'/g, '&#39;');
       html += '<div class="bhajan-item" onclick="navigate(\\'bhajan:\\' + decodeURIComponent(\\'' + encodeURIComponent(b.title) + '\\'))">';
-      html += '<div class="b-title">' + esc(b.title) + '</div>';
+      html += '<div class="b-title">' + esc(b.title) + (YOUTUBE_IDS[b.title] ? ' <span class="video-badge">&#9654; Video</span>' : '') + '</div>';
       html += '<div class="b-meta">' + esc(b.author) + ' &middot; ' + esc(b.category) + ' &middot; ' + b.verses.length + ' verses</div>';
       html += '</div>';
     }});
@@ -913,7 +933,7 @@ function renderFirstLine() {{
     groups[letter].forEach(b => {{
       const firstLine = (b.verses.length > 0 && b.verses[0].original) ? b.verses[0].original.split('\\n')[0] : b.title;
       html += '<div class="bhajan-item" onclick="navigate(\\'bhajan:\\' + decodeURIComponent(\\'' + encodeURIComponent(b.title) + '\\'))">';
-      html += '<div class="b-title">' + esc(firstLine) + '</div>';
+      html += '<div class="b-title">' + esc(firstLine) + (YOUTUBE_IDS[b.title] ? ' <span class="video-badge">&#9654; Video</span>' : '') + '</div>';
       html += '<div class="b-meta">' + esc(b.title) + ' &middot; ' + esc(b.author) + '</div>';
       html += '</div>';
     }});
@@ -967,7 +987,7 @@ function renderCategoryView(catName) {{
   html += '<p style="color:var(--text-secondary);margin-bottom:16px;">' + items.length + ' bhajans</p>';
   items.forEach(b => {{
     html += '<div class="bhajan-item" onclick="navigate(\\'bhajan:\\' + decodeURIComponent(\\'' + encodeURIComponent(b.title) + '\\'))">';
-    html += '<div class="b-title">' + esc(b.title) + '</div>';
+    html += '<div class="b-title">' + esc(b.title) + (YOUTUBE_IDS[b.title] ? ' <span class="video-badge">&#9654; Video</span>' : '') + '</div>';
     html += '<div class="b-meta">' + esc(b.author) + ' &middot; ' + b.verses.length + ' verses</div>';
     html += '</div>';
   }});
@@ -987,7 +1007,7 @@ function renderAuthorView(authName) {{
   html += '<p style="color:var(--text-secondary);margin-bottom:16px;">' + items.length + ' bhajans</p>';
   items.forEach(b => {{
     html += '<div class="bhajan-item" onclick="navigate(\\'bhajan:\\' + decodeURIComponent(\\'' + encodeURIComponent(b.title) + '\\'))">';
-    html += '<div class="b-title">' + esc(b.title) + '</div>';
+    html += '<div class="b-title">' + esc(b.title) + (YOUTUBE_IDS[b.title] ? ' <span class="video-badge">&#9654; Video</span>' : '') + '</div>';
     html += '<div class="b-meta">' + esc(b.category) + ' &middot; ' + b.verses.length + ' verses</div>';
     html += '</div>';
   }});
