@@ -317,6 +317,23 @@ body {
   border-radius: 6px;
   outline: none;
 }
+.audio-player audio::-webkit-media-controls-panel {
+  background-color: #fdf3e7;
+  border-radius: 6px;
+}
+.audio-player audio::-webkit-media-controls-play-button {
+  background-color: var(--saffron);
+  border-radius: 50%;
+  color: white;
+}
+.audio-player audio::-webkit-media-controls-timeline {
+  accent-color: var(--saffron);
+}
+.audio-player audio::-webkit-media-controls-current-time-display,
+.audio-player audio::-webkit-media-controls-time-remaining-display {
+  color: var(--saffron-dark);
+  font-weight: 600;
+}
 
 /* Category / Author list */
 .cat-item {
