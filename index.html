@@ -270,6 +270,34 @@ body {
   white-space: nowrap;
 }
 
+.audio-badge {
+  display: inline-block;
+  font-size: 0.65rem;
+  font-family: var(--font-ui);
+  font-weight: 600;
+  color: #1a6b3a;
+  background: #edf7f1;
+  border: 1px solid #a8d5b8;
+  border-radius: 3px;
+  padding: 1px 5px;
+  margin-left: 4px;
+  vertical-align: middle;
+  letter-spacing: 0.03em;
+  white-space: nowrap;
+}
+
+/* Audio embed (Google Drive preview) */
+.audio-embed {
+  margin: 12px 0 20px 0;
+}
+.audio-embed iframe {
+  width: 100%;
+  height: 80px;
+  border: none;
+  border-radius: 8px;
+  display: block;
+}
+
 /* Category / Author list */
 .cat-item {
   display: flex;
@@ -469,6 +497,9 @@ const BHAJANS = [{"title": "Śrī Guru-paramparā", "author": "Śrīla Bhaktisid
 
 // YouTube video IDs — matched from playlist
 const YOUTUBE_IDS = {"(Kṛṣṇa) Deva! Bhavantaṁ Vande": "cbHKEN7FVsM", "Anūpama Mādhurī Joḓī": "sXwq0P0J3jY", "Braja-jana-mana-sukhakārī": "Oep65u0erDM", "Gaurāṅgera Du’ṭī Pada": "3C0T-aco8x8", "Gaurīdāsa-mandire": "6eyyNjXFlYA", "Gopīnātha, Mama Nivedana Śunô": "NJwEUnTExxA", "Gāy Gorā Madhura Svare": "h4wvw6co094", "Hari Bôlbô Āra Madana-mohana Heribô Go": "MeBH639cbac", "Hari Bôle Moder Gaura Elo": "4nElJfnMsSY", "Hā Hā Mora Gaura-kiśora": "E6-vtYptlh8", "Jaya Jaya Ballava-rāja-kumāra": "k89PcScU1C0", "Jaya Jaya Harināma": "T3M74_5Zbho", "Jaya Jaya Jagannātha Śacīra-nandana": "SYvzUOndM_I", "Jaya Jaya Sundara Nanda-kumāra": "BEn4C0zLttU", "Jaya Jaya Śrī Guru": "yDqZ4SLZnOU", "Jaya Rādhā-Mādhava, Jaya Kuñja-bihārī": "IAtesIV7ZuE", "Jhūlā Jhūle Rādhā Dāmodara": "MT65vbuKULc", "Kabe Ha'be Bôlô": "zFQevqrFYww", "Kali Kukura": "GAQqkvMkUkU", "Kalayati Nayanaṁ": "ZzRzC0O2wjI", "Ke Ĵābi Ke Ĵābi Re Bhāi": "IVQpfgw3pWI", "Mama Mana Mandire": "35RQmHdbd3I", "Mādhava, Bahuta Minati Kôri Taya": "q6nlP04UXOk", "Mānasa, Deha, Geha": "CTdRROGqGMY", "Nitāi Guṇa-maṇi": "tPhQRqzH6QA", "Nitāi-pada-kamala": "yHcWnbQ6oQ0", "Pāra Kareṅge": "tH8ZWPx7sxs", "Ramaṇī-śiromaṇi": "GXJv2AXlVgU", "Rādhe Jhūlana Padhāro": "rb2kE4FQvIE", "Rādhe! Jaya Jaya Mādhava-dayite!": "3Ie2XfVYbW0", "Rādhā-Kṛṣṇa Prāṇa Mora": "28XrHuo6u6k", "Rādhā-kuṇḍa-taṭa": "bmfTttLaTfE", "Rādhā-nāma Parama Sukhadāī": "KtCDa6HkeLk", "Sakhe, Kalaya Gauram Udāram": "JK6zIb89BA0", "Udilô Aruṇa": "LsZy2yG4afw", "Śrī Vaiṣṇava-vandanā": "--UhvixEIV0", "Vande Viśvambhara": "8rlqrH31vQc", "Yamunā-puline": "qEqfEPaguAI", "Yaśomatī-nandana": "Mb_NAOC5-cM", "Yaṅ Kali Rūpa Śarīra Na Dharata": "voAXCiJ04y8", "Ĵadi Gaurāṅga Nahitô": "5WaC96E0zSA", "Ĵe Ānilô Prema-dhana": "Xg49eKivnPo", "Śrī Daśāvatāra-stotram": "v5JjODERFLM", "Śrī Guru-paramparā": "WwJ59AaeqvU", "Śrī Gurvāṣṭakam (Bengali Rendition)": "zyuZRw50XRA", "Śrī Kṛṣṇa Caitanya Prabhu Dayā Karô More": "Y0RAubIT6ms", "Śrī Kṛṣṇa-virahe": "ozEAXCMdcGE", "Śrī Maṅgala-gītam": "laBce5FeNac", "Śrī Nanda-nandanāṣṭakam": "9kJfVC0NM10", "Śrī Madhurāṣṭakam": "9_SZMUako8Q", "Śrī Rūpa Mañjarī-pada": "Byt3YB5ff80", "'Gaurāṅga' Bôlite Ha'be": "3pcnUANhye0"};
+
+// Google Drive audio file IDs
+const AUDIO_IDS = {"(Kṛṣṇa) Deva! Bhavantaṁ Vande": "1O8K0Zr_SlF1Jdj4zOj7OgwH_CFfoiaK3", "Anūpama Mādhurī Joḓī": "1-BgDOPgx-_iq1v1njjbz4PvF-8tH42gM", "Braja-jana-mana-sukhakārī": "1pxJfy_X7amzVwTtdfIDi3S_1VSY7M4Mh", "Gaurīdāsa-mandire": "1qTEjGkOqNChuEMIiOhvn1r3mnAtrGlsL", "Baḓô Sukher Khabor Gāi": "1iJmveSV39HFcN9yQBx5EUqih-ePwJfXY", "Gaurāṅga Tumi More": "1776f2GzCrxmrug5Tx7H8v-_ynubKfyRw", "Jaya Jaya Harināma": "1FNrcPfR5bww1B7VCMot4-mgR6X0-OHdp", "Gāy Gorā Madhura Svare": "1-zTXXi0CMgHLl-RKe6IjWQQIi-PxHgHX", "Hari Bôle Moder Gaura Elo": "1Yve9fS2Gi8bpgs61ChloxU8RhrZWyA2x", "Hari Bôlbô Āra Madana-mohana Heribô Go": "1MQsJJfZBgAS-h0yXz4rIBcvaZdzpPAWB", "Hā Hā Mora Gaura-kiśora": "198KrQjZcKoCk3cdbqTYEWLWNGpZCZyHE", "Hari Hari! Kabe Ha'bô Vṛndāvana-vāsī": "1tlEBaXqgPi4kD-c4P7DrpKcG8yfRr5-v", "Ĵadi Gaurāṅga Nahitô": "1Fh8ym3CVBJcMRalw0d4jtfcnYFM4EtBm", "Gopīnātha, Mama Nivedana Śunô": "1b4xZtYFklcefimb-zp8Q88ufiZByjnWU", "Jaya Jaya Jagannātha Śacīra-nandana": "1uIdUnpt2BDdMhiMiBIZqXFxbLKxtDJ6B", "Ātma-nivedana": "1g3oTOcjxR6GjazvypJbSMylYWtsttoeg", "Ĵe Ānilô Prema-dhana": "10B2SQ-1QqGZAhEDKjJuHbjXfNYf1xxET", "Jaya Jaya Ballava-rāja-kumāra": "1nBpXGKLiGIQ6VVliXbyJXYWbNPVbUeFO", "Yaṅ Kali Rūpa Śarīra Na Dharata": "1_J_h6CsKqplBiXRxZiwL_AdyIvCXGwsh", "Jaya Rādhā-Mādhava, Jaya Kuñja-bihārī": "13VLcMfIeduU5J8aWNgklivrSwqAddJnr", "'Gaurāṅga' Bôlite Ha'be": "1BUDVWU-gNOU6AY5VYd4JrzIuNq7silC0", "Jaya Jaya Śrī Guru": "1gapiTDGghwg3JktJf46EKuTy5S5Dhdsy", "Jaya Jaya Sundara Nanda-kumāra": "1mEQUPMYo20TJqBCJ5Tgv5hTpttFXmJKo", "Jhūlā Jhūle Rādhā Dāmodara": "1rQj4TdGuGgPnzNln3kop4dLJlgOoXUIF", "Yamunā-puline": "1DhCcYvuYx51Fb_hu3pF6XDSqGhLmXJe7", "Yaśomatī-nandana": "12Bz9MS2XHH6ZxjpZY4sUmhpOyBFWfxMz"};
 
 // Normalize IAST character to ASCII letter
 function normalizeLetter(ch) {
@@ -676,7 +707,7 @@ function renderTitles() {
     groups[letter].forEach(b => {
       const safeTitle = esc(b.title).replace(/'/g, '&#39;');
       html += '<div class="bhajan-item" onclick="navigate(\'bhajan:\' + decodeURIComponent(\'' + encodeURIComponent(b.title) + '\'))">';
-      html += '<div class="b-title">' + esc(b.title) + (YOUTUBE_IDS[b.title] ? ' <span class="video-badge">&#9654; Video</span>' : '') + '</div>';
+      html += '<div class="b-title">' + esc(b.title) + (YOUTUBE_IDS[b.title] ? ' <span class="video-badge">&#9654; Video</span>' : '') + (AUDIO_IDS[b.title] ? ' <span class="audio-badge">&#9836; Audio</span>' : '') + '</div>';
       html += '<div class="b-meta">' + esc(b.author) + ' &middot; ' + esc(b.category) + ' &middot; ' + b.verses.length + ' verses</div>';
       html += '</div>';
     });
@@ -705,7 +736,7 @@ function renderFirstLine() {
     groups[letter].forEach(b => {
       const firstLine = (b.verses.length > 0 && b.verses[0].original) ? b.verses[0].original.split('\n')[0] : b.title;
       html += '<div class="bhajan-item" onclick="navigate(\'bhajan:\' + decodeURIComponent(\'' + encodeURIComponent(b.title) + '\'))">';
-      html += '<div class="b-title">' + esc(firstLine) + (YOUTUBE_IDS[b.title] ? ' <span class="video-badge">&#9654; Video</span>' : '') + '</div>';
+      html += '<div class="b-title">' + esc(firstLine) + (YOUTUBE_IDS[b.title] ? ' <span class="video-badge">&#9654; Video</span>' : '') + (AUDIO_IDS[b.title] ? ' <span class="audio-badge">&#9836; Audio</span>' : '') + '</div>';
       html += '<div class="b-meta">' + esc(b.title) + ' &middot; ' + esc(b.author) + '</div>';
       html += '</div>';
     });
@@ -759,7 +790,7 @@ function renderCategoryView(catName) {
   html += '<p style="color:var(--text-secondary);margin-bottom:16px;">' + items.length + ' bhajans</p>';
   items.forEach(b => {
     html += '<div class="bhajan-item" onclick="navigate(\'bhajan:\' + decodeURIComponent(\'' + encodeURIComponent(b.title) + '\'))">';
-    html += '<div class="b-title">' + esc(b.title) + (YOUTUBE_IDS[b.title] ? ' <span class="video-badge">&#9654; Video</span>' : '') + '</div>';
+    html += '<div class="b-title">' + esc(b.title) + (YOUTUBE_IDS[b.title] ? ' <span class="video-badge">&#9654; Video</span>' : '') + (AUDIO_IDS[b.title] ? ' <span class="audio-badge">&#9836; Audio</span>' : '') + '</div>';
     html += '<div class="b-meta">' + esc(b.author) + ' &middot; ' + b.verses.length + ' verses</div>';
     html += '</div>';
   });
@@ -779,7 +810,7 @@ function renderAuthorView(authName) {
   html += '<p style="color:var(--text-secondary);margin-bottom:16px;">' + items.length + ' bhajans</p>';
   items.forEach(b => {
     html += '<div class="bhajan-item" onclick="navigate(\'bhajan:\' + decodeURIComponent(\'' + encodeURIComponent(b.title) + '\'))">';
-    html += '<div class="b-title">' + esc(b.title) + (YOUTUBE_IDS[b.title] ? ' <span class="video-badge">&#9654; Video</span>' : '') + '</div>';
+    html += '<div class="b-title">' + esc(b.title) + (YOUTUBE_IDS[b.title] ? ' <span class="video-badge">&#9654; Video</span>' : '') + (AUDIO_IDS[b.title] ? ' <span class="audio-badge">&#9836; Audio</span>' : '') + '</div>';
     html += '<div class="b-meta">' + esc(b.category) + ' &middot; ' + b.verses.length + ' verses</div>';
     html += '</div>';
   });
@@ -810,6 +841,14 @@ function renderBhajan(title) {
   if (ytId) {
     html += '<div class="yt-embed">';
     html += '<iframe src="https://www.youtube.com/embed/' + ytId + '?rel=0" frameborder="0" allowfullscreen loading="lazy"></iframe>';
+    html += '</div>';
+  }
+
+  // Audio embed (Google Drive, if available)
+  const audioId = AUDIO_IDS[b.title];
+  if (audioId) {
+    html += '<div class="audio-embed">';
+    html += '<iframe src="https://drive.google.com/file/d/' + audioId + '/preview" allow="autoplay" loading="lazy"></iframe>';
     html += '</div>';
   }
 
