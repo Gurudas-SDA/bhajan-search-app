@@ -286,7 +286,7 @@ body {
   white-space: nowrap;
 }
 
-/* Audio player */
+/* Audio player — custom */
 .audio-player {
   background: linear-gradient(135deg, #fdf8f2, #f8ead8);
   border: 1px solid var(--border-tan);
@@ -300,39 +300,56 @@ body {
   display: flex;
   align-items: center;
   gap: 7px;
-  margin-bottom: 8px;
+  margin-bottom: 10px;
   color: var(--saffron-dark);
   font-size: 0.72rem;
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
-.audio-player-header svg {
-  flex-shrink: 0;
-  opacity: 0.85;
+.audio-player-header svg { flex-shrink: 0; opacity: 0.85; }
+.audio-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
-.audio-player audio {
-  width: 100%;
-  height: 36px;
-  border-radius: 6px;
-  outline: none;
-}
-.audio-player audio::-webkit-media-controls-panel {
-  background-color: #fdf3e7;
-  border-radius: 6px;
-}
-.audio-player audio::-webkit-media-controls-play-button {
-  background-color: var(--saffron);
+.ap-play-btn {
+  width: 34px; height: 34px;
   border-radius: 50%;
-  color: white;
+  background: var(--saffron);
+  border: none;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  transition: background 0.15s;
 }
-.audio-player audio::-webkit-media-controls-timeline {
-  accent-color: var(--saffron);
-}
-.audio-player audio::-webkit-media-controls-current-time-display,
-.audio-player audio::-webkit-media-controls-time-remaining-display {
+.ap-play-btn:hover { background: var(--saffron-dark); }
+.ap-play-btn svg { fill: white; }
+.ap-time {
+  font-size: 0.78rem;
   color: var(--saffron-dark);
   font-weight: 600;
+  white-space: nowrap;
+  min-width: 80px;
+  font-family: var(--font-ui, monospace);
+}
+.ap-seek {
+  flex: 1;
+  -webkit-appearance: none;
+  appearance: none;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--border-tan);
+  outline: none;
+  cursor: pointer;
+}
+.ap-seek::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 14px; height: 14px;
+  border-radius: 50%;
+  background: var(--saffron);
+  cursor: pointer;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.2);
 }
 
 /* Category / Author list */
@@ -884,13 +901,18 @@ function renderBhajan(title) {
   // Audio player (local GitHub Pages files)
   const audioSrc = AUDIO_IDS[b.title];
   if (audioSrc) {
+    const apId = 'ap_' + Math.random().toString(36).slice(2,8);
     html += '<div class="audio-player">';
     html += '<div class="audio-player-header">';
     html += '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>';
-    html += 'Audio Saṅkīrtana';
-    html += '</div>';
-    html += '<audio controls preload="none" src="' + audioSrc + '" style="width:100%;height:36px;border-radius:6px;"></audio>';
-    html += '</div>';
+    html += 'Audio Saṅkīrtana</div>';
+    html += '<audio id="' + apId + '" preload="none" src="' + audioSrc + '" style="display:none"></audio>';
+    html += '<div class="audio-controls">';
+    html += '<button class="ap-play-btn" onclick="apToggle(\'' + apId + '\')" id="btn_' + apId + '">';
+    html += '<svg width="12" height="14" viewBox="0 0 12 14"><polygon points="0,0 12,7 0,14"/></svg></button>';
+    html += '<span class="ap-time" id="time_' + apId + '">0:00 / 0:00</span>';
+    html += '<input type="range" class="ap-seek" id="seek_' + apId + '" value="0" min="0" max="100" step="0.1" oninput="apSeek(\'' + apId + '\')">';
+    html += '</div></div>';
   }
 
   // Language selector — single language
@@ -980,6 +1002,58 @@ function render(route, preserveScroll) {
   } else {
     window.scrollTo(0, 0);
   }
+  initAudioPlayers();
+}
+
+// Custom audio player
+function apFmt(s) {
+  if (!isFinite(s)) return '0:00';
+  const m = Math.floor(s/60), sec = Math.floor(s%60);
+  return m + ':' + String(sec).padStart(2,'0');
+}
+function apToggle(id) {
+  const a = document.getElementById(id);
+  const btn = document.getElementById('btn_' + id);
+  if (!a) return;
+  if (a.paused) {
+    // pause all others
+    document.querySelectorAll('audio').forEach(x => { if (x !== a) x.pause(); });
+    a.play();
+  } else {
+    a.pause();
+  }
+}
+function apSeek(id) {
+  const a = document.getElementById(id);
+  const seek = document.getElementById('seek_' + id);
+  if (a && a.duration) a.currentTime = (seek.value / 100) * a.duration;
+}
+function apSetup(id) {
+  const a = document.getElementById(id);
+  const seek = document.getElementById('seek_' + id);
+  const timeEl = document.getElementById('time_' + id);
+  const btn = document.getElementById('btn_' + id);
+  if (!a || !seek || !timeEl || !btn) return;
+  const playIcon = '<svg width="12" height="14" viewBox="0 0 12 14"><polygon points="0,0 12,7 0,14" fill="white"/></svg>';
+  const pauseIcon = '<svg width="12" height="12" viewBox="0 0 12 12"><rect x="0" y="0" width="4" height="12" fill="white"/><rect x="8" y="0" width="4" height="12" fill="white"/></svg>';
+  a.addEventListener('play', () => btn.innerHTML = pauseIcon);
+  a.addEventListener('pause', () => btn.innerHTML = playIcon);
+  a.addEventListener('ended', () => btn.innerHTML = playIcon);
+  a.addEventListener('timeupdate', () => {
+    if (a.duration) seek.value = (a.currentTime / a.duration) * 100;
+    timeEl.textContent = apFmt(a.currentTime) + ' / ' + apFmt(a.duration);
+  });
+  a.addEventListener('loadedmetadata', () => {
+    timeEl.textContent = '0:00 / ' + apFmt(a.duration);
+  });
+  // style seek fill
+  seek.addEventListener('input', () => {
+    seek.style.background = 'linear-gradient(to right, var(--saffron) ' + seek.value + '%, var(--border-tan) ' + seek.value + '%)';
+  });
+}
+// Initialize all audio players after render
+function initAudioPlayers() {
+  document.querySelectorAll('audio[id^="ap_"]').forEach(a => apSetup(a.id));
 }
 
 // Hash listener
