@@ -102,6 +102,51 @@ async function cacheFirst(request, cacheName, storeOnMiss) {
   return response;
 }
 
+// Media elements issue Range requests (Range: bytes=start-end). The Cache API
+// stores a full 200 response; returning that 200 to a Range request works in
+// desktop Chrome but is rejected by several mobile browsers, so offline
+// playback silently fails. This serves audio from cache with proper 206
+// Partial Content slicing when a Range header is present.
+async function serveAudio(request) {
+  const cache = await caches.open(MEDIA_CACHE);
+  let cached = await cache.match(request);
+
+  if (!cached) {
+    // Cache miss: fetch from network, store the full response for next time,
+    // and let the network response (which supports Range) satisfy this request.
+    try {
+      const response = await fetch(request);
+      if (response && (response.ok || response.status === 206)) {
+        // Re-fetch a full copy to cache (the network 206 can't be cached whole).
+        fetch(request.url, { cache: 'no-store' })
+          .then((full) => { if (full && full.ok) cache.put(request.url, full.clone()); })
+          .catch(() => {});
+      }
+      return response;
+    } catch (err) {
+      return new Response('', { status: 504, statusText: 'Offline and not cached' });
+    }
+  }
+
+  const rangeHeader = request.headers.get('range');
+  if (!rangeHeader) return cached;
+
+  // Slice the cached full body to satisfy the Range request with a 206.
+  const buf = await cached.arrayBuffer();
+  const total = buf.byteLength;
+  const m = /bytes=(\d+)-(\d*)/.exec(rangeHeader);
+  let start = m ? parseInt(m[1], 10) : 0;
+  let end = m && m[2] ? parseInt(m[2], 10) : total - 1;
+  if (isNaN(start) || start >= total) start = 0;
+  if (isNaN(end) || end >= total) end = total - 1;
+  const chunk = buf.slice(start, end + 1);
+  const headers = new Headers(cached.headers);
+  headers.set('Content-Range', 'bytes ' + start + '-' + end + '/' + total);
+  headers.set('Content-Length', String(chunk.byteLength));
+  headers.set('Accept-Ranges', 'bytes');
+  return new Response(chunk, { status: 206, statusText: 'Partial Content', headers: headers });
+}
+
 self.addEventListener('fetch', (event) => {
   const request = event.request;
   if (request.method !== 'GET') return;
@@ -121,10 +166,9 @@ self.addEventListener('fetch', (event) => {
     return;
   }
   if (isAudioRequest(url)) {
-    // Cache-first; on a cache miss this also lazily populates media-v1 as a
-    // side-benefit of normal playback (explicit DOWNLOAD_ASSETS remains the
-    // primary way listeners build a full offline library).
-    event.respondWith(cacheFirst(request, MEDIA_CACHE, true));
+    // Serve audio with proper Range (206) support from cache; falls back to
+    // network + lazy caching on a miss. See serveAudio for why 206 matters.
+    event.respondWith(serveAudio(request));
     return;
   }
   if (isShellStaticAsset(url)) {
