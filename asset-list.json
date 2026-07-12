@@ -2,164 +2,164 @@
   "version": 1,
   "assets": [
     {
-      "url": "audio/gauranga_bolite_habe.mp3",
-      "hash": "037ef0e82aebc725dede554d1f8b6ef95f067497663834d5b005b036fd72b030",
-      "size": 9107514
+      "url": "audio/anupama_madhuri_jodi.ogg?v=bd23034c",
+      "hash": "bd23034c67e41e009cbdf0dc400e1aeae01d2d43541a295d9266b01041aa440a",
+      "size": 2946810
     },
     {
-      "url": "audio/krsna_deva_bhavantam_vande.mp3",
-      "hash": "5e0d739febfb65f1e9965ce68b16ab5b589cd0bb988334c29193faef5afbe901",
-      "size": 6423835
+      "url": "audio/atma_nivedana.ogg?v=270057ff",
+      "hash": "270057ffed3784516a87751c005d09e6d93395e0e50b2241fc549187af61bd64",
+      "size": 2401015
     },
     {
-      "url": "audio/anupama_madhuri_jodi.mp3",
-      "hash": "ebc9552d6abded7d4aea44d7620f3df1120074e4288c19c5d664d464f757760e",
-      "size": 5316548
+      "url": "audio/bado_sukher_khabor_gai.ogg?v=6a030106",
+      "hash": "6a0301063b3d5faad324a46568bf011647d06cbdbe94ec5bb0f1802813e49f22",
+      "size": 3545211
     },
     {
-      "url": "audio/boro_sukher_khabor_gai.mp3",
-      "hash": "169c97e6b559debbb769b06dd724aff4cc9dd9be6fb0af19253acb44ea8c4a56",
-      "size": 6560562
+      "url": "audio/brajajanamanasukhakari.ogg?v=b93cb94e",
+      "hash": "b93cb94ee7f59daf007fdf3c26339b44a895e8f14ea8e444e6777959bc65b849",
+      "size": 3285365
     },
     {
-      "url": "audio/brajajanamanasukhakari.mp3",
-      "hash": "4354427caad568bc83478635b4c0a627a14328807e07e92208634fb2d8d77325",
-      "size": 6275660
+      "url": "audio/gauranga_bolite_habe.ogg?v=1858c4e0",
+      "hash": "1858c4e0941b9fc5ab0af9b373379834ab388ea3239195c27dc995e4de3f765f",
+      "size": 5074555
     },
     {
-      "url": "audio/gauranga_tumi_more.mp3",
-      "hash": "416cb9dc4bdd117a83a44413afd63344a02f1d06a14332f962b57ff76de66f1d",
-      "size": 5466344
+      "url": "audio/gauranga_tumi_more.ogg?v=cff3138c",
+      "hash": "cff3138cc137667a46779a3b3e0ee50e59d0a8d2ad7b5d4e016cf51f096d1299",
+      "size": 3063216
     },
     {
-      "url": "audio/gauridasamandire.mp3",
-      "hash": "9b4050f896cc1877ab597bb151b79773e3666ad4b723498ac946f6e3dfc61591",
-      "size": 3922006
+      "url": "audio/gauridasamandire.ogg?v=8760b423",
+      "hash": "8760b423c770524b6d3e96be6ddce23efda6931e140e46cc5aeabd3a5790996c",
+      "size": 2113060
     },
     {
-      "url": "audio/gopinatha_mama_nivedana_suno.mp3",
-      "hash": "fae0e31641afb7a5b3d9bfb3fd373fe78fa6b68fc988d38a82a6bec3f66447ec",
-      "size": 6196248
+      "url": "audio/gay_gora_madhura_svare.ogg?v=7d291659",
+      "hash": "7d29165917ee73ec6c107ffa688b16c42317269eb4f1b125a25fc9dc2877bc3e",
+      "size": 2815220
     },
     {
-      "url": "audio/gay_gora_madhura_svare.mp3",
-      "hash": "f472ab8aa5f18eb062d51f65f173733f29f47f5637072ae03a0f8ffae9b2687e",
-      "size": 4670225
+      "url": "audio/gopinatha_mama_nivedana_suno.ogg?v=4d1e7f38",
+      "hash": "4d1e7f381d1b3fbb313c52ee24ee820ed45fff747149a3899470d4d13d3e3011",
+      "size": 3134306
     },
     {
-      "url": "audio/hari_bolbo_ara_madanamohana_heribo_go.mp3",
-      "hash": "2be25ef2f00b48a3993cb2f84b71cc4d4014b2a498d5d66f3e0dc4f8766140cf",
-      "size": 6881596
+      "url": "audio/ha_ha_mora_gaurakisora.ogg?v=84552c8c",
+      "hash": "84552c8cf0c83a6eec4239edacb25b59fc357d6d1447acfa5aaa83b55cb05324",
+      "size": 3129119
     },
     {
-      "url": "audio/hari_bole_moder_gaura_elo.mp3",
-      "hash": "e9342a7205073e9e122c41a47ccdf062098d25161db88973a1dbd86469965326",
-      "size": 6186568
+      "url": "audio/hari_bolbo_ara_madanamohana_heribo_go.ogg?v=b3bcd9e6",
+      "hash": "b3bcd9e6db5bc59c6fa9fab79467296511959f66b3ac16b86b9a39db44204b84",
+      "size": 3382978
     },
     {
-      "url": "audio/hari_hari_kabe_habo_vrndavanavasi.mp3",
-      "hash": "dba46458458a4937f0e39c9af1f0987fe8f0424bfb546c7899d1b490b56fd44f",
-      "size": 3985954
+      "url": "audio/hari_bole_moder_gaura_elo.ogg?v=104fba5a",
+      "hash": "104fba5a6b6e64863b1d2e9e337506102b59904d960cfabcee4155b65a658e3c",
+      "size": 3145215
     },
     {
-      "url": "audio/harinama_tuwa_aneka_svarupa.mp3",
-      "hash": "f991fbd4092509e4ca00620c86743a04dafbc191ffb626c65e7425631351e39a",
-      "size": 6949912
+      "url": "audio/hari_hari_kabe_habo_vrndavanavasi.ogg?v=31029ad6",
+      "hash": "31029ad662afbc48a504a17dcba9b8bd62694bf4eba0662d48768a3db7f1eb3f",
+      "size": 2041345
     },
     {
-      "url": "audio/ha_ha_mora_gaurakisora.mp3",
-      "hash": "8fc2ad8bbfd2456ac0eafeb207a6ec857f69dce7f0f8b12155c47933b77103be",
-      "size": 5497256
+      "url": "audio/harinama_tuwa_aneka_svarupa.ogg?v=ca4c3bd4",
+      "hash": "ca4c3bd4a9ce617169fadc70bdccd2420a3732a894c29d57b53aeaf74bccc29f",
+      "size": 3617817
     },
     {
-      "url": "audio/jaya_jaya_ballavarajakumara.mp3",
-      "hash": "5be640ea9cffea9b41f3181d3b7ad9e710b4769d80ace6c226568d857a74d7cc",
-      "size": 4959761
+      "url": "audio/jadi_gauranga_nahito.ogg?v=a69197a9",
+      "hash": "a69197a97cb5fb92b44d8c028d05878ce3ad90f1ae37d4a61ec4190b5bd65a2e",
+      "size": 2027150
     },
     {
-      "url": "audio/jaya_jaya_harinama.mp3",
-      "hash": "0ec38a7793239dd73c77aa4f6a9f8ab81a6a7b2b52204bf20617d22c3bd133f4",
-      "size": 4426817
+      "url": "audio/jaya_jaya_ballavarajakumara.ogg?v=8324b44b",
+      "hash": "8324b44be9202b1d63eb1114b2715b5f2d646b3cb2efd813fa90984e8a94cf5f",
+      "size": 2802003
     },
     {
-      "url": "audio/jaya_jaya_jagannatha_saciranandana.mp3",
-      "hash": "b3c025349235376d4c261485c66d55c5b88a76fe9b10658848b64c16af5aeefb",
-      "size": 7764457
+      "url": "audio/jaya_jaya_harinama.ogg?v=b9fdee1e",
+      "hash": "b9fdee1e77915cd76a3e6e6057c90230fee178bf780967c3c2754c3c1fe46478",
+      "size": 2209551
     },
     {
-      "url": "audio/jaya_jaya_sundara_nanda_kumara.mp3",
-      "hash": "eb4d4697962496da0f3df17261474493531fa26c79e8dea4afd711289f6185fd",
-      "size": 4864003
+      "url": "audio/jaya_jaya_jagannatha_saciranandana.ogg?v=e192623a",
+      "hash": "e192623a001acaf37d91ad2a7a8de74373b0d5f7325082404ce55d848daced98",
+      "size": 5163621
     },
     {
-      "url": "audio/jaya_jaya_sri_guru.mp3",
-      "hash": "56772be38751716f9fcaa87adf291309aac25b6a5fe9fdd3d76621b46348fcfd",
-      "size": 4235160
+      "url": "audio/jaya_jaya_sri_guru.ogg?v=ea9dbef8",
+      "hash": "ea9dbef8ddd920ee3b6a351d296bf4d6a5040a7964644ed6513740eb2340f2f2",
+      "size": 2206576
     },
     {
-      "url": "audio/jaya_radhamadhava_jaya_kunjabihari.mp3",
-      "hash": "51e23c2e3787fa5b6c99302ccc22b9e2b5a93d7835b3b29272ac82cb36c3800b",
-      "size": 6462989
+      "url": "audio/jaya_jaya_sundara_nanda_kumara.ogg?v=2c06bce0",
+      "hash": "2c06bce05a96bcfe4a267bc4a311c367be6554237d77cd085a239c1c6e83e595",
+      "size": 2394422
     },
     {
-      "url": "audio/jhula_jhule_radha_damodara.mp3",
-      "hash": "b5d7a2abb1de6a0e8c019a4fba3ca0fdfe7a6ff15d928d50e1713f0cc1c61359",
-      "size": 3335938
+      "url": "audio/jaya_radhamadhava_jaya_kunjabihari.ogg?v=05658f96",
+      "hash": "05658f966382aafb082aec2972214ed2085cdfca733e499a11d82277d2ba5257",
+      "size": 3394949
     },
     {
-      "url": "audio/mangalacarana.mp3",
-      "hash": "149f6feb4854bb6ebcac7386c8f4fc464e0af46f5cc9be37b92c4cd5879fef8b",
-      "size": 4001439
+      "url": "audio/je_anilo_premadhana.ogg?v=75b3c177",
+      "hash": "75b3c1772999d2a0205e946786b103dc17b2713224269989116a29d2c21b57dd",
+      "size": 2464546
     },
     {
-      "url": "audio/sakhe_kalaya_gauram_udaram.mp3",
-      "hash": "7c4abd8095bda1a592051d9a36a61dd50dd23cd20de8f25c2b7e122962db0f97",
-      "size": 4713642
+      "url": "audio/jhula_jhule_radha_damodara.ogg?v=74d06b7e",
+      "hash": "74d06b7e39a7fad3d76b60fedb0ca62766e243256946b7f2abe50146a4a2e0c4",
+      "size": 1854549
     },
     {
-      "url": "audio/vrsabhanusuta.mp3",
-      "hash": "4daf26ff1690f2b9c2a3bc8a864ed888ebf1fbbc2cd894344dd6ca446a548d45",
-      "size": 6323412
+      "url": "audio/krsna_deva_bhavantam_vande.ogg?v=ffb0cc33",
+      "hash": "ffb0cc33f7ef0beddb5a63ebf9ed45f8fa941579f849cca7704f1dbdb7e70378",
+      "size": 3235539
     },
     {
-      "url": "audio/yamunapuline.mp3",
-      "hash": "3e69dc504fbcfbee9b423d56d1082f1cd80530b9c0a75eb242b860c2aa85fc8a",
-      "size": 5079252
+      "url": "audio/mangalacarana.ogg?v=b539c7d9",
+      "hash": "b539c7d9aefbb14ffcd5135046ef171a3e756edd6083909e4a89de13e36a3ae0",
+      "size": 2262278
     },
     {
-      "url": "audio/yashomati_nandana.mp3",
-      "hash": "0db79789e91deb3da5b1df42a9429c60679b9da394646fc1af8fc4f12d1f56de",
-      "size": 5823085
+      "url": "audio/sakhe_kalaya_gauram_udaram.ogg?v=2f2b1096",
+      "hash": "2f2b10962e055c2d01b24ec3d762da939e90def8f448e6287bd456fe853593f2",
+      "size": 2488449
     },
     {
-      "url": "audio/yan_kali_rupa_sarira_na_dharata.mp3",
-      "hash": "070ec1f79cd8ea7d6104158af5e68a68c24211378c7422f1cc263d6f4bc0ff8f",
-      "size": 4875729
+      "url": "audio/sri_guruparampara.ogg?v=3ad7d7a1",
+      "hash": "3ad7d7a1403506ddb3be92821e480ea35ad87a513e9be1966a6103f81e4c339c",
+      "size": 1207325
     },
     {
-      "url": "audio/atma_nivedana.mp3",
-      "hash": "52acbb6eb10f2802fdb459ff6105ac0f34af959ca8f39aa4b9d5f6d47ea5fbbd",
-      "size": 5005189
+      "url": "audio/sri_vaisnavavandana.ogg?v=f1b7da13",
+      "hash": "f1b7da136c02605e675b5cb6be144bcd01360d32760c62747b963961616577c2",
+      "size": 1069423
     },
     {
-      "url": "audio/jadi_gauranga_nahito.mp3",
-      "hash": "36baac7a0c777aaff01de4e98bcd2246dcd3909a0bf8704e41a16f1d751e9f1e",
-      "size": 3938704
+      "url": "audio/vrsabhanusuta.ogg?v=98d90a6e",
+      "hash": "98d90a6e7b2b711d9a0338204120b09f261e354be1b5ee66fbbca96435c20cea",
+      "size": 3160482
     },
     {
-      "url": "audio/je_anilo_premadhana.mp3",
-      "hash": "761fc7541a433920b7572551399218f033e9dbc4f54e996324631cf6affcd9ae",
-      "size": 5157473
+      "url": "audio/yamunapuline.ogg?v=4da223c7",
+      "hash": "4da223c7e797256271ab70693f5416d3bb751ccfdbcb36efd17dd4a5a60129f9",
+      "size": 2663474
     },
     {
-      "url": "audio/sri_guruparampara.mp3",
-      "hash": "b356ced328a0df2812d1f0c1b8ef7c200bfaa05148a0b8234d3c902e7f2c2677",
-      "size": 2244548
+      "url": "audio/yan_kali_rupa_sarira_na_dharata.ogg?v=4a295a53",
+      "hash": "4a295a53a1eacb550c081cbd85394e8d43fd5c60e25ac35a49419da5edd1e689",
+      "size": 2980827
     },
     {
-      "url": "audio/sri_vaisnavavandana.mp3",
-      "hash": "91e9f51143922de59c4f28361a6625bc1f817e5cb3a9670ed96ed8840cc07b2d",
-      "size": 2006938
+      "url": "audio/yashomati_nandana.ogg?v=96ef225a",
+      "hash": "96ef225a6eb31c96683b1b4fcb658d42333150e54ee99a1d5add1cedad0e1993",
+      "size": 3228148
     }
   ]
 }
