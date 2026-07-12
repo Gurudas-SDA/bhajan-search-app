@@ -440,6 +440,30 @@ body {
 #breadcrumb a:hover { opacity: 1; text-decoration: underline; }
 #breadcrumb .sep { margin: 0 8px; opacity: 0.5; }
 #breadcrumb .current { opacity: 1; font-weight: 600; }
+#breadcrumb-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  max-width: 900px;
+  margin: 0 auto;
+}
+#breadcrumb-trail { flex: 1; min-width: 0; }
+.lang-header-btn {
+  flex-shrink: 0;
+  background: rgba(255,255,255,0.18);
+  border: 1px solid rgba(255,255,255,0.4);
+  color: #fff;
+  border-radius: 8px;
+  padding: 6px 12px;
+  font-family: 'Noto Serif', serif;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  min-height: 32px;
+  transition: background 0.2s;
+}
+.lang-header-btn:hover { background: rgba(255,255,255,0.32); }
 
 /* Alphabet nav */
 #alpha-nav {
@@ -805,24 +829,16 @@ body {
   display: block;
 }
 
-/* Language selector */
+/* Language selector — single row */
 .lang-selector {
   display: flex;
-  flex-direction: column;
-  gap: 6px;
+  gap: 8px;
+  flex-wrap: wrap;
   margin: 20px 0;
 }
-.lang-group {
-  display: flex;
-  gap: 6px;
-  flex-wrap: wrap;
-}
-.lang-group-dual {
-  border-top: 1px solid var(--border-tan);
-  padding-top: 6px;
-}
 .lang-btn {
-  padding: 8px 16px;
+  padding: 10px 16px;
+  min-height: 44px;
   border: 1px solid var(--border-tan);
   border-radius: 8px;
   background: white;
@@ -832,12 +848,6 @@ body {
   cursor: pointer;
   transition: all 0.2s;
 }
-.lang-btn.dual {
-  font-size: 0.78rem;
-  padding: 6px 12px;
-  color: var(--text-secondary);
-  background: var(--cream-light);
-}
 .lang-btn:hover {
   border-color: var(--orange);
 }
@@ -845,6 +855,66 @@ body {
   background: var(--orange);
   color: white;
   border-color: var(--orange);
+}
+
+/* Language choice screen */
+.lang-choice-screen {
+  max-width: 560px;
+  margin: 0 auto;
+  padding: 40px 20px;
+  text-align: center;
+}
+.lang-choice-screen h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.9rem;
+  color: var(--dark-brown);
+  margin-bottom: 6px;
+}
+.lang-choice-screen .lc-subtitle {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.05rem;
+  color: var(--medium-brown);
+  font-style: italic;
+  margin-bottom: 28px;
+}
+.lang-choice-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+.lang-choice-btn {
+  min-height: 64px;
+  padding: 14px 16px;
+  background: white;
+  border: 1px solid var(--border-tan);
+  border-radius: 12px;
+  color: var(--dark-brown);
+  font-family: 'Crimson Text', serif;
+  font-size: 1.15rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+}
+.lang-choice-btn:hover {
+  border-color: var(--orange);
+  box-shadow: 0 4px 16px rgba(234,88,12,0.12);
+  transform: translateY(-2px);
+}
+.lang-choice-back {
+  margin-top: 24px;
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  font-family: 'Noto Serif', serif;
+  font-size: 0.85rem;
+  cursor: pointer;
+  text-decoration: underline;
+  min-height: 44px;
+  padding: 6px 12px;
+}
+@media (max-width: 480px) {
+  .lang-choice-grid { grid-template-columns: 1fr; }
 }
 /* Dual-language verse display */
 .verse-original {
@@ -937,6 +1007,231 @@ const YOUTUBE_IDS = {{YOUTUBE_IDS_JSON}};
 // Google Drive audio file IDs
 const AUDIO_IDS = {{AUDIO_IDS_JSON}};
 
+// ---- Language UX (Phase 4) ----
+
+// workingLang -> verse field name
+const LANG_FIELD = {
+  en: 'english',
+  lv: 'latvian',
+  ru: 'russian',
+  es: 'spanish',
+  it: 'italian',
+  fr: 'french',
+};
+
+// Native display names for the language-choice screen
+const LANG_NAMES = {
+  en: 'English',
+  lv: 'Latviešu',
+  ru: 'Русский',
+  es: 'Español',
+  it: 'Italiano',
+  fr: 'Français',
+};
+
+// UI chrome strings — 6 languages
+const UI_STRINGS = {
+  en: {
+    songIndex: 'Song Index',
+    byFirstLine: 'By First Line',
+    byCategory: 'By Category',
+    byAuthor: 'By Author',
+    home: 'Home',
+    categories: 'Categories',
+    authors: 'Authors',
+    verses: 'verses',
+    verseWord: 'Verse',
+    bhajans: 'bhajans',
+    translationNotAvailable: 'Translation not available',
+    audioSankirtana: 'Audio Saṅkīrtana',
+    original: 'Original',
+    langChoiceTitle: 'Choose your language',
+    langChoiceSubtitle: 'You can change this anytime from the header button',
+    langChoiceBack: 'Cancel',
+    langHeaderAriaLabel: 'Change language',
+    bhajanNotFound: 'Bhajan not found.',
+    footer: 'Devotional Songbook',
+    updateAvailable: 'Update available (~{size})',
+    updateNow: 'Update now',
+    updateLater: 'Later',
+    downloadOffline: 'Download for offline use (~{size})',
+    downloading: 'Downloading {done} / {total}',
+    downloadComplete: 'Download complete',
+    storageError: 'Not enough storage space on this device',
+    offlineReady: 'Ready for offline use',
+  },
+  lv: {
+    songIndex: 'Dziesmu saraksts',
+    byFirstLine: 'Pēc pirmās rindas',
+    byCategory: 'Pēc kategorijas',
+    byAuthor: 'Pēc autora',
+    home: 'Sākums',
+    categories: 'Kategorijas',
+    authors: 'Autori',
+    verses: 'panti',
+    verseWord: 'Pants',
+    bhajans: 'bhadžani',
+    translationNotAvailable: 'Tulkojums nav pieejams',
+    audioSankirtana: 'Audio Saṅkīrtana',
+    original: 'Oriģināls',
+    langChoiceTitle: 'Izvēlies valodu',
+    langChoiceSubtitle: 'To vari mainīt jebkurā brīdī ar pogu galvenē',
+    langChoiceBack: 'Atcelt',
+    langHeaderAriaLabel: 'Mainīt valodu',
+    bhajanNotFound: 'Bhadžans nav atrasts.',
+    footer: 'Dievbijīga dziesmu grāmata',
+    updateAvailable: 'Pieejams atjauninājums (~{size})',
+    updateNow: 'Atjaunināt tagad',
+    updateLater: 'Vēlāk',
+    downloadOffline: 'Lejupielādēt bezsaistes lietošanai (~{size})',
+    downloading: 'Lejupielāde {done} / {total}',
+    downloadComplete: 'Lejupielāde pabeigta',
+    storageError: 'Ierīcē nepietiek brīvas vietas',
+    offlineReady: 'Gatavs bezsaistes lietošanai',
+  },
+  ru: {
+    songIndex: 'Указатель песен',
+    byFirstLine: 'По первой строке',
+    byCategory: 'По категории',
+    byAuthor: 'По автору',
+    home: 'Главная',
+    categories: 'Категории',
+    authors: 'Авторы',
+    verses: 'стихов',
+    verseWord: 'Стих',
+    bhajans: 'бхаджанов',
+    translationNotAvailable: 'Перевод недоступен',
+    audioSankirtana: 'Аудио Санкиртана',
+    original: 'Оригинал',
+    langChoiceTitle: 'Выберите язык',
+    langChoiceSubtitle: 'Вы можете изменить это в любой момент кнопкой в шапке',
+    langChoiceBack: 'Отмена',
+    langHeaderAriaLabel: 'Сменить язык',
+    bhajanNotFound: 'Бхаджан не найден.',
+    footer: 'Сборник духовных песен',
+    updateAvailable: 'Доступно обновление (~{size})',
+    updateNow: 'Обновить сейчас',
+    updateLater: 'Позже',
+    downloadOffline: 'Скачать для автономного использования (~{size})',
+    downloading: 'Загрузка {done} / {total}',
+    downloadComplete: 'Загрузка завершена',
+    storageError: 'На устройстве недостаточно места',
+    offlineReady: 'Готово для автономного использования',
+  },
+  es: {
+    songIndex: 'Índice de canciones',
+    byFirstLine: 'Por primera línea',
+    byCategory: 'Por categoría',
+    byAuthor: 'Por autor',
+    home: 'Inicio',
+    categories: 'Categorías',
+    authors: 'Autores',
+    verses: 'versos',
+    verseWord: 'Verso',
+    bhajans: 'bhajans',
+    translationNotAvailable: 'Traducción no disponible',
+    audioSankirtana: 'Audio Saṅkīrtana',
+    original: 'Original',
+    langChoiceTitle: 'Elige tu idioma',
+    langChoiceSubtitle: 'Puedes cambiarlo en cualquier momento con el botón del encabezado',
+    langChoiceBack: 'Cancelar',
+    langHeaderAriaLabel: 'Cambiar idioma',
+    bhajanNotFound: 'Bhajan no encontrado.',
+    footer: 'Cancionero devocional',
+    updateAvailable: 'Actualización disponible (~{size})',
+    updateNow: 'Actualizar ahora',
+    updateLater: 'Más tarde',
+    downloadOffline: 'Descargar para uso sin conexión (~{size})',
+    downloading: 'Descargando {done} / {total}',
+    downloadComplete: 'Descarga completa',
+    storageError: 'No hay suficiente espacio de almacenamiento en este dispositivo',
+    offlineReady: 'Listo para uso sin conexión',
+  },
+  it: {
+    songIndex: 'Indice dei canti',
+    byFirstLine: 'Per prima riga',
+    byCategory: 'Per categoria',
+    byAuthor: 'Per autore',
+    home: 'Home',
+    categories: 'Categorie',
+    authors: 'Autori',
+    verses: 'versi',
+    verseWord: 'Verso',
+    bhajans: 'bhajan',
+    translationNotAvailable: 'Traduzione non disponibile',
+    audioSankirtana: 'Audio Saṅkīrtana',
+    original: 'Originale',
+    langChoiceTitle: 'Scegli la tua lingua',
+    langChoiceSubtitle: 'Puoi cambiarla in qualsiasi momento dal pulsante nell’intestazione',
+    langChoiceBack: 'Annulla',
+    langHeaderAriaLabel: 'Cambia lingua',
+    bhajanNotFound: 'Bhajan non trovato.',
+    footer: 'Innario devozionale',
+    updateAvailable: 'Aggiornamento disponibile (~{size})',
+    updateNow: 'Aggiorna ora',
+    updateLater: 'Più tardi',
+    downloadOffline: 'Scarica per l’uso offline (~{size})',
+    downloading: 'Download {done} / {total}',
+    downloadComplete: 'Download completato',
+    storageError: 'Spazio di archiviazione insufficiente su questo dispositivo',
+    offlineReady: 'Pronto per l’uso offline',
+  },
+  fr: {
+    songIndex: 'Index des chants',
+    byFirstLine: 'Par premier vers',
+    byCategory: 'Par catégorie',
+    byAuthor: 'Par auteur',
+    home: 'Accueil',
+    categories: 'Catégories',
+    authors: 'Auteurs',
+    verses: 'versets',
+    verseWord: 'Verset',
+    bhajans: 'bhajans',
+    translationNotAvailable: 'Traduction non disponible',
+    audioSankirtana: 'Audio Saṅkīrtana',
+    original: 'Original',
+    langChoiceTitle: 'Choisissez votre langue',
+    langChoiceSubtitle: 'Vous pouvez la changer à tout moment via le bouton d’en-tête',
+    langChoiceBack: 'Annuler',
+    langHeaderAriaLabel: 'Changer de langue',
+    bhajanNotFound: 'Bhajan introuvable.',
+    footer: 'Recueil de chants dévotionnels',
+    updateAvailable: 'Mise à jour disponible (~{size})',
+    updateNow: 'Mettre à jour',
+    updateLater: 'Plus tard',
+    downloadOffline: 'Télécharger pour une utilisation hors ligne (~{size})',
+    downloading: 'Téléchargement {done} / {total}',
+    downloadComplete: 'Téléchargement terminé',
+    storageError: 'Espace de stockage insuffisant sur cet appareil',
+    offlineReady: 'Prêt pour une utilisation hors ligne',
+  },
+};
+
+function getWorkingLang() {
+  const stored = localStorage.getItem('workingLang');
+  if (stored && UI_STRINGS[stored]) return stored;
+  return null;
+}
+
+function setWorkingLang(code) {
+  localStorage.setItem('workingLang', code);
+  // Reset the single-language view to the new language whenever workingLang changes
+  currentLang = (code === 'en') ? 'english' : LANG_FIELD[code];
+  localStorage.setItem('currentLang', currentLang);
+}
+
+function t(key, params) {
+  const lang = getWorkingLang() || 'en';
+  const dict = UI_STRINGS[lang] || UI_STRINGS.en;
+  let str = dict[key] !== undefined ? dict[key] : (UI_STRINGS.en[key] || key);
+  if (params) {
+    Object.keys(params).forEach(p => {
+      str = str.replace('{' + p + '}', params[p]);
+    });
+  }
+  return str;
+}
+
 // Normalize IAST character to ASCII letter
 function normalizeLetter(ch) {
   const map = {
@@ -992,22 +1287,67 @@ function esc(s) {
 }
 
 // State
-let currentLang = 'original';
+let currentLang = localStorage.getItem('currentLang') || 'original';
 
 // Breadcrumb
 function setBreadcrumb(parts) {
   // parts: [{"label":"...", "hash":"..."}, ...]
   const bc = document.getElementById('breadcrumb');
-  let html = '<a href="#home" onclick="navigate(\'home\')">Home</a>';
+  let trail = '<a href="#home" onclick="navigate(\'home\')">' + esc(t('home')) + '</a>';
   parts.forEach(p => {
-    html += '<span class="sep">\u203a</span>';
+    trail += '<span class="sep">\u203a</span>';
     if (p.hash) {
-      html += '<a href="#' + p.hash + '" onclick="navigate(\'' + p.hash.replace(/'/g, "\\'") + '\')">' + esc(p.label) + '</a>';
+      trail += '<a href="#' + p.hash + '" onclick="navigate(\'' + p.hash.replace(/'/g, "\\'") + '\')">' + esc(p.label) + '</a>';
     } else {
-      html += '<span class="current">' + esc(p.label) + '</span>';
+      trail += '<span class="current">' + esc(p.label) + '</span>';
     }
   });
-  bc.innerHTML = html;
+  const wl = getWorkingLang() || 'en';
+  const langBtn = '<button class="lang-header-btn" aria-label="' + esc(t('langHeaderAriaLabel')) + '" onclick="openLangChoice()">' + wl.toUpperCase() + ' \u25be</button>';
+  bc.innerHTML = '<div id="breadcrumb-inner"><div id="breadcrumb-trail">' + trail + '</div>' + langBtn + '</div>';
+}
+
+// ---- Language choice screen ----
+
+let langChoiceReturnRoute = null;
+
+function openLangChoice() {
+  langChoiceReturnRoute = window.location.hash.substring(1) || 'home';
+  render('langchoice');
+}
+
+function renderLanguageChoice(isFirstLaunch) {
+  document.getElementById('breadcrumb').style.display = 'none';
+  document.getElementById('alpha-nav').style.display = 'none';
+  const order = ['en', 'lv', 'ru', 'es', 'it', 'fr'];
+  let html = '<div class="lang-choice-screen">';
+  html += '<h1>\u015ar\u012b Gau\u1e0d\u012bya G\u012bti-guccha</h1>';
+  html += '<div class="lc-subtitle">' + esc(t('langChoiceTitle')) + '</div>';
+  html += '<div class="lang-choice-grid" role="group" aria-label="' + esc(t('langChoiceTitle')) + '">';
+  order.forEach(code => {
+    html += '<button class="lang-choice-btn" onclick="chooseLang(\'' + code + '\')">' + esc(LANG_NAMES[code]) + '</button>';
+  });
+  html += '</div>';
+  if (!isFirstLaunch) {
+    html += '<button class="lang-choice-back" onclick="cancelLangChoice()">' + esc(t('langChoiceBack')) + '</button>';
+  }
+  html += '</div>';
+  return html;
+}
+
+function chooseLang(code) {
+  setWorkingLang(code);
+  const back = langChoiceReturnRoute || 'home';
+  langChoiceReturnRoute = null;
+  window.location.hash = back;
+  render(back);
+}
+
+function cancelLangChoice() {
+  const back = langChoiceReturnRoute || 'home';
+  langChoiceReturnRoute = null;
+  window.location.hash = back;
+  render(back);
 }
 
 // Alpha nav
@@ -1069,6 +1409,9 @@ function getVerseText(verse, lang) {
     case 'english': return verse.english;
     case 'russian': return verse.russian;
     case 'latvian': return verse.latvian;
+    case 'spanish': return verse.spanish;
+    case 'italian': return verse.italian;
+    case 'french': return verse.french;
     default: return verse.original;
   }
 }
@@ -1080,10 +1423,9 @@ function isDualLang(lang) {
 
 // Get translation language from dual mode
 function getDualTranslation(verse, lang) {
-  if (lang === 'orig+english') return verse.english;
-  if (lang === 'orig+russian') return verse.russian;
-  if (lang === 'orig+latvian') return verse.latvian;
-  return '';
+  if (!isDualLang(lang)) return '';
+  const field = lang.substring(5); // strip 'orig+'
+  return getVerseText(verse, field) || '';
 }
 
 // Compact header for inner pages
@@ -1112,40 +1454,40 @@ function renderHome() {
       <div class="stat"><div class="stat-number">${authCount}</div><div class="stat-label">Authors</div></div>
     </div>
     <div class="nav-grid">
-      <a class="nav-btn" onclick="navigate('titles')">
-        <span class="label">Song Index</span>
+      <a class="nav-btn" href="#titles" onclick="navigate('titles'); return false;">
+        <span class="label">${esc(t('songIndex'))}</span>
       </a>
-      <a class="nav-btn" onclick="navigate('firstline')">
-        <span class="label">By First Line</span>
+      <a class="nav-btn" href="#firstline" onclick="navigate('firstline'); return false;">
+        <span class="label">${esc(t('byFirstLine'))}</span>
       </a>
-      <a class="nav-btn" onclick="navigate('categories')">
-        <span class="label">By Category</span>
+      <a class="nav-btn" href="#categories" onclick="navigate('categories'); return false;">
+        <span class="label">${esc(t('byCategory'))}</span>
       </a>
-      <a class="nav-btn" onclick="navigate('authors')">
-        <span class="label">By Author</span>
+      <a class="nav-btn" href="#authors" onclick="navigate('authors'); return false;">
+        <span class="label">${esc(t('byAuthor'))}</span>
       </a>
     </div>
-    <div class="footer">\u015ar\u012b Gau\u1e0d\u012bya G\u012bti-guccha &middot; Devotional Songbook</div>
+    <div class="footer">\u015ar\u012b Gau\u1e0d\u012bya G\u012bti-guccha &middot; ${esc(t('footer'))}</div>
   `;
 }
 
 function renderTitles() {
-  setBreadcrumb([{label: 'Song Index', hash: null}]);
+  setBreadcrumb([{label: t('songIndex'), hash: null}]);
   const groups = groupByLetter(BHAJANS, b => b.title);
   const letters = Object.keys(groups);
   setAlphaNav(letters, 'title');
 
   let html = compactHeader();
   html += '<div class="list-section">';
-  html += '<h2 class="page-title">Song Index</h2>';
+  html += '<h2 class="page-title">' + esc(t('songIndex')) + '</h2>';
   for (const letter of letters) {
     html += '<div class="letter-heading" id="title-' + letter + '">' + letter + '</div>';
     groups[letter].forEach(b => {
       const safeTitle = esc(b.title).replace(/'/g, '&#39;');
-      html += '<div class="bhajan-item" onclick="navigate(\'bhajan:\' + decodeURIComponent(\'' + encodeURIComponent(b.title) + '\'))">';
+      html += '<a class="bhajan-item" href="#bhajan:' + encodeURIComponent(b.title) + '" onclick="navigate(\'bhajan:\' + decodeURIComponent(\'' + encodeURIComponent(b.title) + '\')); return false;">';
       html += '<div class="b-title">' + esc(b.title) + (YOUTUBE_IDS[b.title] ? ' <span class="video-badge">&#9654; Video</span>' : '') + (AUDIO_IDS[b.title] ? ' <span class="audio-badge">&#9836; Audio</span>' : '') + '</div>';
-      html += '<div class="b-meta">' + esc(b.author) + ' &middot; ' + esc(b.category) + ' &middot; ' + b.verses.length + ' verses</div>';
-      html += '</div>';
+      html += '<div class="b-meta">' + esc(b.author) + ' &middot; ' + esc(b.category) + ' &middot; ' + b.verses.length + ' ' + esc(t('verses')) + '</div>';
+      html += '</a>';
     });
   }
   html += '</div>';
@@ -1153,7 +1495,7 @@ function renderTitles() {
 }
 
 function renderFirstLine() {
-  setBreadcrumb([{label: 'By First Line', hash: null}]);
+  setBreadcrumb([{label: t('byFirstLine'), hash: null}]);
   // Group by first line of first verse (original)
   const groups = groupByLetter(BHAJANS, b => {
     if (b.verses.length > 0 && b.verses[0].original) {
@@ -1166,15 +1508,15 @@ function renderFirstLine() {
 
   let html = compactHeader();
   html += '<div class="list-section">';
-  html += '<h2 class="page-title">By First Line</h2>';
+  html += '<h2 class="page-title">' + esc(t('byFirstLine')) + '</h2>';
   for (const letter of letters) {
     html += '<div class="letter-heading" id="fl-' + letter + '">' + letter + '</div>';
     groups[letter].forEach(b => {
       const firstLine = (b.verses.length > 0 && b.verses[0].original) ? b.verses[0].original.split('\n')[0] : b.title;
-      html += '<div class="bhajan-item" onclick="navigate(\'bhajan:\' + decodeURIComponent(\'' + encodeURIComponent(b.title) + '\'))">';
+      html += '<a class="bhajan-item" href="#bhajan:' + encodeURIComponent(b.title) + '" onclick="navigate(\'bhajan:\' + decodeURIComponent(\'' + encodeURIComponent(b.title) + '\')); return false;">';
       html += '<div class="b-title">' + esc(firstLine) + (YOUTUBE_IDS[b.title] ? ' <span class="video-badge">&#9654; Video</span>' : '') + (AUDIO_IDS[b.title] ? ' <span class="audio-badge">&#9836; Audio</span>' : '') + '</div>';
       html += '<div class="b-meta">' + esc(b.title) + ' &middot; ' + esc(b.author) + '</div>';
-      html += '</div>';
+      html += '</a>';
     });
   }
   html += '</div>';
@@ -1182,40 +1524,40 @@ function renderFirstLine() {
 }
 
 function renderCategories() {
-  setBreadcrumb([{label: 'Categories', hash: null}]);
+  setBreadcrumb([{label: t('categories'), hash: null}]);
   setAlphaNav(null);
   const cats = getCategoryCounts();
 
   let html = compactHeader();
-  html += '<h2 class="page-title">Categories</h2>';
+  html += '<h2 class="page-title">' + esc(t('categories')) + '</h2>';
   cats.forEach(([name, count]) => {
-    html += '<div class="cat-item" onclick="navigate(\'category:\' + decodeURIComponent(\'' + encodeURIComponent(name) + '\'))">';
+    html += '<a class="cat-item" href="#category:' + encodeURIComponent(name) + '" onclick="navigate(\'category:\' + decodeURIComponent(\'' + encodeURIComponent(name) + '\')); return false;">';
     html += '<span class="cat-name">' + esc(name) + '</span>';
     html += '<span class="cat-count">' + count + '</span>';
-    html += '</div>';
+    html += '</a>';
   });
   return html;
 }
 
 function renderAuthors() {
-  setBreadcrumb([{label: 'Authors', hash: null}]);
+  setBreadcrumb([{label: t('authors'), hash: null}]);
   setAlphaNav(null);
   const auths = getAuthorCounts();
 
   let html = compactHeader();
-  html += '<h2 class="page-title">Authors</h2>';
+  html += '<h2 class="page-title">' + esc(t('authors')) + '</h2>';
   auths.forEach(([name, count]) => {
-    html += '<div class="cat-item" onclick="navigate(\'author:\' + decodeURIComponent(\'' + encodeURIComponent(name) + '\'))">';
+    html += '<a class="cat-item" href="#author:' + encodeURIComponent(name) + '" onclick="navigate(\'author:\' + decodeURIComponent(\'' + encodeURIComponent(name) + '\')); return false;">';
     html += '<span class="cat-name">' + esc(name) + '</span>';
     html += '<span class="cat-count">' + count + '</span>';
-    html += '</div>';
+    html += '</a>';
   });
   return html;
 }
 
 function renderCategoryView(catName) {
   setBreadcrumb([
-    {label: 'Categories', hash: 'categories'},
+    {label: t('categories'), hash: 'categories'},
     {label: catName, hash: null}
   ]);
   setAlphaNav(null);
@@ -1223,19 +1565,19 @@ function renderCategoryView(catName) {
 
   let html = compactHeader();
   html += '<h2 class="page-title">' + esc(catName) + '</h2>';
-  html += '<p style="color:var(--text-secondary);margin-bottom:16px;">' + items.length + ' bhajans</p>';
+  html += '<p style="color:var(--text-secondary);margin-bottom:16px;">' + items.length + ' ' + esc(t('bhajans')) + '</p>';
   items.forEach(b => {
-    html += '<div class="bhajan-item" onclick="navigate(\'bhajan:\' + decodeURIComponent(\'' + encodeURIComponent(b.title) + '\'))">';
+    html += '<a class="bhajan-item" href="#bhajan:' + encodeURIComponent(b.title) + '" onclick="navigate(\'bhajan:\' + decodeURIComponent(\'' + encodeURIComponent(b.title) + '\')); return false;">';
     html += '<div class="b-title">' + esc(b.title) + (YOUTUBE_IDS[b.title] ? ' <span class="video-badge">&#9654; Video</span>' : '') + (AUDIO_IDS[b.title] ? ' <span class="audio-badge">&#9836; Audio</span>' : '') + '</div>';
-    html += '<div class="b-meta">' + esc(b.author) + ' &middot; ' + b.verses.length + ' verses</div>';
-    html += '</div>';
+    html += '<div class="b-meta">' + esc(b.author) + ' &middot; ' + b.verses.length + ' ' + esc(t('verses')) + '</div>';
+    html += '</a>';
   });
   return html;
 }
 
 function renderAuthorView(authName) {
   setBreadcrumb([
-    {label: 'Authors', hash: 'authors'},
+    {label: t('authors'), hash: 'authors'},
     {label: authName, hash: null}
   ]);
   setAlphaNav(null);
@@ -1243,19 +1585,75 @@ function renderAuthorView(authName) {
 
   let html = compactHeader();
   html += '<h2 class="page-title">' + esc(authName) + '</h2>';
-  html += '<p style="color:var(--text-secondary);margin-bottom:16px;">' + items.length + ' bhajans</p>';
+  html += '<p style="color:var(--text-secondary);margin-bottom:16px;">' + items.length + ' ' + esc(t('bhajans')) + '</p>';
   items.forEach(b => {
-    html += '<div class="bhajan-item" onclick="navigate(\'bhajan:\' + decodeURIComponent(\'' + encodeURIComponent(b.title) + '\'))">';
+    html += '<a class="bhajan-item" href="#bhajan:' + encodeURIComponent(b.title) + '" onclick="navigate(\'bhajan:\' + decodeURIComponent(\'' + encodeURIComponent(b.title) + '\')); return false;">';
     html += '<div class="b-title">' + esc(b.title) + (YOUTUBE_IDS[b.title] ? ' <span class="video-badge">&#9654; Video</span>' : '') + (AUDIO_IDS[b.title] ? ' <span class="audio-badge">&#9836; Audio</span>' : '') + '</div>';
-    html += '<div class="b-meta">' + esc(b.category) + ' &middot; ' + b.verses.length + ' verses</div>';
+    html += '<div class="b-meta">' + esc(b.category) + ' &middot; ' + b.verses.length + ' ' + esc(t('verses')) + '</div>';
+    html += '</a>';
+  });
+  return html;
+}
+
+// Build the single row of language buttons for the bhajan view.
+// workingLang===en -> 3 buttons: Original | English | English + Original
+// otherwise -> 4 buttons: Original | EN | {native} | {native} + Original
+function renderLangButtons(enc) {
+  const wl = getWorkingLang() || 'en';
+  const field = LANG_FIELD[wl];
+  const nativeName = LANG_NAMES[wl];
+  const btn = (mode, label) =>
+    '<button class="lang-btn' + (currentLang === mode ? ' active' : '') + '" ' +
+    'aria-pressed="' + (currentLang === mode ? 'true' : 'false') + '" ' +
+    'onclick="switchLang(\'' + mode + '\',\'' + enc + '\')">' + esc(label) + '</button>';
+
+  let html = '<div class="lang-selector" role="group">';
+  html += btn('original', t('original'));
+  if (wl === 'en') {
+    html += btn('english', 'English');
+    html += btn('orig+english', 'English + ' + t('original'));
+  } else {
+    html += btn('english', 'EN');
+    html += btn(field, nativeName);
+    html += btn('orig+' + field, nativeName + ' + ' + t('original'));
+  }
+  html += '</div>';
+  return html;
+}
+
+function renderVersesContainer(b) {
+  let html = '<div id="verses-container">';
+  const wl = getWorkingLang() || 'en';
+  b.verses.forEach(v => {
+    html += '<div class="verse">';
+    html += '<div class="verse-number">' + esc(t('verseWord')) + ' ' + v.number + '</div>';
+    if (isDualLang(currentLang)) {
+      const orig = v.original;
+      const trans = getDualTranslation(v, currentLang);
+      if (orig) html += '<div class="verse-text verse-original" lang="sa">' + esc(orig) + '</div>';
+      if (trans) {
+        html += '<div class="verse-text verse-translation" lang="' + wl + '">' + esc(trans) + '</div>';
+      } else {
+        html += '<div class="verse-text" style="color:var(--text-secondary);font-style:italic;">' + esc(t('translationNotAvailable')) + '</div>';
+      }
+    } else {
+      const text = getVerseText(v, currentLang);
+      const langAttr = currentLang === 'original' ? 'sa' : (currentLang === 'english' ? 'en' : wl);
+      if (text) {
+        html += '<div class="verse-text" lang="' + langAttr + '">' + esc(text) + '</div>';
+      } else {
+        html += '<div class="verse-text" style="color:var(--text-secondary);font-style:italic;">' + esc(t('translationNotAvailable')) + '</div>';
+      }
+    }
     html += '</div>';
   });
+  html += '</div>';
   return html;
 }
 
 function renderBhajan(title) {
   const b = findBhajan(title);
-  if (!b) return '<p>Bhajan not found.</p>';
+  if (!b) return '<p>' + esc(t('bhajanNotFound')) + '</p>';
 
   setBreadcrumb([
     {label: b.category, hash: 'category:' + encodeURIComponent(b.category)},
@@ -1267,16 +1665,19 @@ function renderBhajan(title) {
   html += '<div class="bhajan-view">';
   html += '<h2>' + esc(b.title) + '</h2>';
   html += '<div class="bv-meta">';
-  html += 'by <a href="#" onclick="navigate(\'author:' + encodeURIComponent(b.author) + '\'); return false;">' + esc(b.author) + '</a>';
-  html += ' &middot; <a href="#" onclick="navigate(\'category:' + encodeURIComponent(b.category) + '\'); return false;">' + esc(b.category) + '</a>';
-  html += ' &middot; ' + b.verses.length + ' verses';
+  html += 'by <a href="#author:' + encodeURIComponent(b.author) + '" onclick="navigate(\'author:' + encodeURIComponent(b.author) + '\'); return false;">' + esc(b.author) + '</a>';
+  html += ' &middot; <a href="#category:' + encodeURIComponent(b.category) + '" onclick="navigate(\'category:' + encodeURIComponent(b.category) + '\'); return false;">' + esc(b.category) + '</a>';
+  html += ' &middot; ' + b.verses.length + ' ' + esc(t('verses'));
   html += '</div>';
+
+  // Audio player wrapper — rendered ONCE, never touched by switchLang re-renders (M1 fix)
+  html += '<div id="audio-player-wrapper">';
 
   // YouTube embed (if available)
   const ytId = YOUTUBE_IDS[b.title];
   if (ytId) {
     html += '<div class="yt-embed">';
-    html += '<iframe src="https://www.youtube.com/embed/' + ytId + '?rel=0" frameborder="0" allowfullscreen loading="lazy"></iframe>';
+    html += '<iframe src="https://www.youtube.com/embed/' + ytId + '?rel=0" frameborder="0" allowfullscreen loading="lazy" title="' + esc(b.title) + '"></iframe>';
     html += '</div>';
   }
 
@@ -1287,64 +1688,44 @@ function renderBhajan(title) {
     html += '<div class="audio-player">';
     html += '<div class="audio-player-header">';
     html += '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>';
-    html += 'Audio Saṅkīrtana</div>';
+    html += esc(t('audioSankirtana')) + '</div>';
     html += '<audio id="' + apId + '" preload="none" src="' + audioSrc + '" style="display:none"></audio>';
     html += '<div class="audio-controls">';
-    html += '<button class="ap-play-btn" onclick="apToggle(\'' + apId + '\')" id="btn_' + apId + '">';
+    html += '<button class="ap-play-btn" aria-label="Play/Pause" onclick="apToggle(\'' + apId + '\')" id="btn_' + apId + '">';
     html += '<svg width="12" height="14" viewBox="0 0 12 14"><polygon points="0,0 12,7 0,14"/></svg></button>';
     html += '<span class="ap-time" id="time_' + apId + '">0:00 / 0:00</span>';
-    html += '<input type="range" class="ap-seek" id="seek_' + apId + '" value="0" min="0" max="100" step="0.1" oninput="apSeek(\'' + apId + '\')">';
+    html += '<input type="range" class="ap-seek" aria-label="Seek" id="seek_' + apId + '" value="0" min="0" max="100" step="0.1" oninput="apSeek(\'' + apId + '\')">';
     html += '</div></div>';
   }
+  html += '</div>'; // #audio-player-wrapper
 
-  // Language selector — single language
+  // Language selector — single row (4 buttons, or 3 for English working language)
   const enc = encodeURIComponent(title);
-  html += '<div class="lang-selector">';
-  html += '<div class="lang-group">';
-  html += '<button class="lang-btn' + (currentLang==='original' ? ' active' : '') + '" onclick="switchLang(\'original\',\'' + enc + '\')">Original</button>';
-  html += '<button class="lang-btn' + (currentLang==='english' ? ' active' : '') + '" onclick="switchLang(\'english\',\'' + enc + '\')">English</button>';
-  html += '<button class="lang-btn' + (currentLang==='latvian' ? ' active' : '') + '" onclick="switchLang(\'latvian\',\'' + enc + '\')">Latvie\u0161u</button>';
-  html += '<button class="lang-btn' + (currentLang==='russian' ? ' active' : '') + '" onclick="switchLang(\'russian\',\'' + enc + '\')">\u0420\u0443\u0441\u0441\u043a\u0438\u0439</button>';
-  html += '</div>';
-  // Combined language options
-  html += '<div class="lang-group lang-group-dual">';
-  html += '<button class="lang-btn dual' + (currentLang==='orig+english' ? ' active' : '') + '" onclick="switchLang(\'orig+english\',\'' + enc + '\')">Original + English</button>';
-  html += '<button class="lang-btn dual' + (currentLang==='orig+latvian' ? ' active' : '') + '" onclick="switchLang(\'orig+latvian\',\'' + enc + '\')">Original + Latvie\u0161u</button>';
-  html += '<button class="lang-btn dual' + (currentLang==='orig+russian' ? ' active' : '') + '" onclick="switchLang(\'orig+russian\',\'' + enc + '\')">Original + \u0420\u0443\u0441\u0441\u043a\u0438\u0439</button>';
-  html += '</div>';
-  html += '</div>';
+  html += renderLangButtons(enc);
 
-  // Verses
-  b.verses.forEach(v => {
-    html += '<div class="verse">';
-    html += '<div class="verse-number">Verse ' + v.number + '</div>';
-    if (isDualLang(currentLang)) {
-      const orig = v.original;
-      const trans = getDualTranslation(v, currentLang);
-      if (orig) html += '<div class="verse-text verse-original">' + esc(orig) + '</div>';
-      if (trans) {
-        html += '<div class="verse-text verse-translation">' + esc(trans) + '</div>';
-      } else {
-        html += '<div class="verse-text" style="color:var(--text-secondary);font-style:italic;">Translation not available</div>';
-      }
-    } else {
-      const text = getVerseText(v, currentLang);
-      if (text) {
-        html += '<div class="verse-text">' + esc(text) + '</div>';
-      } else {
-        html += '<div class="verse-text" style="color:var(--text-secondary);font-style:italic;">Translation not available</div>';
-      }
-    }
-    html += '</div>';
-  });
+  // Verses — isolated in their own container so switchLang can re-render
+  // just this part without disturbing the audio player (M1 fix)
+  html += renderVersesContainer(b);
   html += '</div>';
   return html;
 }
 
 function switchLang(lang, encodedTitle) {
   currentLang = lang;
+  localStorage.setItem('currentLang', currentLang);
   const title = decodeURIComponent(encodedTitle);
-  render('bhajan:' + title, true);
+  const b = findBhajan(title);
+  if (!b) return;
+  // Re-render ONLY the verses container and the language button row —
+  // the audio player (and any playing audio) is left untouched.
+  const versesEl = document.getElementById('verses-container');
+  if (versesEl) {
+    versesEl.outerHTML = renderVersesContainer(b);
+  }
+  const selectorEl = document.querySelector('.bhajan-view .lang-selector');
+  if (selectorEl) {
+    selectorEl.outerHTML = renderLangButtons(encodedTitle);
+  }
 }
 
 // Router
@@ -1356,7 +1737,25 @@ function render(route, preserveScroll) {
   const app = document.getElementById('app');
   const scrollPos = preserveScroll ? window.pageYOffset : 0;
 
-  if (!route || route === 'home') {
+  // First launch (or explicit navigation to the chooser) — full-screen language pick
+  if (!getWorkingLang() && route !== 'langchoice') {
+    if (route && route !== 'home' && langChoiceReturnRoute === null) {
+      langChoiceReturnRoute = route; // preserve deep link through first-launch chooser
+    }
+    document.getElementById('breadcrumb').style.display = 'none';
+    document.getElementById('alpha-nav').style.display = 'none';
+    app.innerHTML = renderLanguageChoice(true);
+    window.scrollTo(0, 0);
+    return;
+  }
+  document.getElementById('breadcrumb').style.display = '';
+
+  if (route === 'langchoice') {
+    document.getElementById('alpha-nav').style.display = 'none';
+    app.innerHTML = renderLanguageChoice(!getWorkingLang());
+    window.scrollTo(0, 0);
+    return;
+  } else if (!route || route === 'home') {
     app.innerHTML = renderHome();
   } else if (route === 'titles') {
     app.innerHTML = renderTitles();
