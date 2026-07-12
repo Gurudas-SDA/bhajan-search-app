@@ -1513,6 +1513,76 @@ body.offline .video-badge {
   white-space: nowrap;
 }
 
+/* Share a set (renderSetDetail) — URL fallback box + copy confirmation */
+.set-share-box {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  margin: -8px 0 20px;
+  background: var(--surface);
+  border: 1px solid var(--border-tan);
+  border-radius: 8px;
+}
+.set-share-input {
+  flex: 1;
+  min-width: 180px;
+  min-height: 40px;
+  padding: 8px 12px;
+  border: 1px solid var(--border-tan);
+  border-radius: 8px;
+  background: var(--warm-white);
+  color: var(--dark-brown);
+  font-family: var(--font-ui);
+  font-size: 0.85rem;
+}
+.set-share-copied {
+  color: var(--gold);
+  font-size: 0.85rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* Import preview (#set-import: route) */
+.set-import-name {
+  font-family: 'Crimson Text', serif;
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--dark-brown);
+  margin: 0 0 4px;
+}
+.set-import-count {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  margin: 0 0 4px;
+}
+.set-import-found-count {
+  color: var(--maroon);
+  font-size: 0.85rem;
+  margin: 0 0 16px;
+}
+.set-import-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 14px;
+  margin: 4px 0;
+  background: var(--surface);
+  border: 1px solid var(--border-tan);
+  border-radius: 8px;
+}
+.set-import-row-missing {
+  opacity: 0.6;
+}
+.set-import-missing-badge {
+  flex-shrink: 0;
+  color: var(--maroon);
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
 /* Namahatta sticky nav bar — sequential set playback (setplay: route) */
 .set-nav-bar {
   position: sticky;
@@ -1759,6 +1829,14 @@ const UI_STRINGS = {
     removeFavorite: 'Remove from favorites',
     noFavorites: 'You have no favorites yet. Tap the star on a bhajan to add it.',
     favoritesCount: '{n} favorites',
+    shareSet: 'Share',
+    shareSetText: 'Check out my bhajan set "{name}"',
+    linkCopied: 'Link copied',
+    importSetTitle: 'Import bhajan set',
+    importConfirm: 'Import',
+    importCancel: 'Cancel',
+    importError: 'This link could not be read. It may be broken or from an older version of the app.',
+    importFoundCount: '{found} of {total} bhajans found',
   },
   lv: {
     songIndex: 'Dziesmu saraksts',
@@ -1830,6 +1908,14 @@ const UI_STRINGS = {
     removeFavorite: 'Izņemt no iecienītajiem',
     noFavorites: 'Tev vēl nav iecienītu bhadžanu. Pieskaries zvaigznītei pie bhadžana, lai to pievienotu.',
     favoritesCount: '{n} iecienīti',
+    shareSet: 'Dalīties',
+    shareSetText: 'Aplūko manu bhadžanu setu "{name}"',
+    linkCopied: 'Saite nokopēta',
+    importSetTitle: 'Importēt bhadžanu setu',
+    importConfirm: 'Importēt',
+    importCancel: 'Atcelt',
+    importError: 'Šo saiti nevarēja nolasīt. Tā var būt bojāta vai no vecākas lietotnes versijas.',
+    importFoundCount: 'Atrasti {found} no {total} bhadžaniem',
   },
   ru: {
     songIndex: 'Указатель песен',
@@ -1901,6 +1987,14 @@ const UI_STRINGS = {
     removeFavorite: 'Удалить из избранного',
     noFavorites: 'У вас пока нет избранного. Нажмите на звёздочку у бхаджана, чтобы добавить его.',
     favoritesCount: '{n} в избранном',
+    shareSet: 'Поделиться',
+    shareSetText: 'Посмотрите мою подборку бхаджанов «{name}»',
+    linkCopied: 'Ссылка скопирована',
+    importSetTitle: 'Импортировать подборку',
+    importConfirm: 'Импортировать',
+    importCancel: 'Отмена',
+    importError: 'Не удалось прочитать эту ссылку. Возможно, она повреждена или из более старой версии приложения.',
+    importFoundCount: 'Найдено {found} из {total} бхаджанов',
   },
   es: {
     songIndex: 'Índice de canciones',
@@ -1972,6 +2066,14 @@ const UI_STRINGS = {
     removeFavorite: 'Quitar de favoritos',
     noFavorites: 'Aún no tienes favoritos. Toca la estrella de un bhajan para añadirlo.',
     favoritesCount: '{n} favoritos',
+    shareSet: 'Compartir',
+    shareSetText: 'Mira mi lista de bhajans "{name}"',
+    linkCopied: 'Enlace copiado',
+    importSetTitle: 'Importar lista de bhajans',
+    importConfirm: 'Importar',
+    importCancel: 'Cancelar',
+    importError: 'No se pudo leer este enlace. Puede estar dañado o ser de una versión anterior de la app.',
+    importFoundCount: '{found} de {total} bhajans encontrados',
   },
   it: {
     songIndex: 'Indice dei canti',
@@ -2043,6 +2145,14 @@ const UI_STRINGS = {
     removeFavorite: 'Rimuovi dai preferiti',
     noFavorites: 'Non hai ancora preferiti. Tocca la stella su un bhajan per aggiungerlo.',
     favoritesCount: '{n} preferiti',
+    shareSet: 'Condividi',
+    shareSetText: 'Guarda il mio set di bhajan "{name}"',
+    linkCopied: 'Link copiato',
+    importSetTitle: 'Importa set di bhajan',
+    importConfirm: 'Importa',
+    importCancel: 'Annulla',
+    importError: 'Impossibile leggere questo link. Potrebbe essere danneggiato o provenire da una versione precedente dell\'app.',
+    importFoundCount: '{found} di {total} bhajan trovati',
   },
   fr: {
     songIndex: 'Index des chants',
@@ -2114,6 +2224,14 @@ const UI_STRINGS = {
     removeFavorite: 'Retirer des favoris',
     noFavorites: 'Vous n’avez pas encore de favoris. Touchez l’étoile d’un bhajan pour l’ajouter.',
     favoritesCount: '{n} favoris',
+    shareSet: 'Partager',
+    shareSetText: 'Découvrez ma liste de bhajans « {name} »',
+    linkCopied: 'Lien copié',
+    importSetTitle: 'Importer une liste de bhajans',
+    importConfirm: 'Importer',
+    importCancel: 'Annuler',
+    importError: 'Ce lien n\'a pas pu être lu. Il est peut-être corrompu ou provient d\'une ancienne version de l\'application.',
+    importFoundCount: '{found} bhajans trouvés sur {total}',
   },
 };
 
@@ -3276,9 +3394,77 @@ function renderSetDetail(id) {
   html += '<div class="set-detail-actions">';
   html += '<button class="set-action-btn" onclick="startRenameSetDetail(\'' + id + '\')">' + esc(t('renameSet')) + '</button>';
   html += '<a class="set-action-btn" href="#setadd:' + encodeURIComponent(id) + '" onclick="navigate(\'setadd:' + encodeURIComponent(id) + '\'); return false;">＋ ' + esc(t('addBhajans')) + '</a>';
+  html += '<button class="set-action-btn" id="set-share-btn" onclick="shareSet(\'' + id + '\')">🔗 ' + esc(t('shareSet')) + '</button>';
   html += '</div>';
+  html += '<div id="set-share-box"></div>';
   html += '<div id="set-bhajan-list" class="list-section">' + renderSetBhajanRows(s) + '</div>';
   return html;
+}
+
+// ---- Shareable sets: encode/decode a set into a URL fragment ----
+//
+// Payload shape (compact keys to keep the URL short): { n: <setName>,
+// t: [<title>, ...] }. Encoding path: JSON -> UTF-8 bytes (TextEncoder,
+// Unicode-safe for IAST diacritics) -> base64 (btoa) -> percent-encoding
+// (encodeURIComponent, so it's safe inside a URL hash). Decoding reverses
+// each step. Plain btoa(JSON.stringify(...)) would throw on non-Latin1
+// characters — the TextEncoder/TextDecoder round trip is required.
+
+function encodeSetSharePayload(set) {
+  const payload = { n: set.name, t: set.titles };
+  const json = JSON.stringify(payload);
+  const bytes = new TextEncoder().encode(json);
+  let bin = '';
+  bytes.forEach(b => { bin += String.fromCharCode(b); });
+  return encodeURIComponent(btoa(bin));
+}
+
+function decodeSetSharePayload(encoded) {
+  try {
+    const bin = atob(decodeURIComponent(encoded));
+    const bytes = Uint8Array.from(bin, c => c.charCodeAt(0));
+    const json = new TextDecoder().decode(bytes);
+    const obj = JSON.parse(json);
+    if (!obj || typeof obj.n !== 'string' || !Array.isArray(obj.t)) return null;
+    const titles = obj.t.filter(x => typeof x === 'string');
+    return { n: obj.n, t: titles };
+  } catch (e) {
+    return null;
+  }
+}
+
+function buildSetShareUrl(set) {
+  return location.origin + location.pathname + '#set-import:' + encodeSetSharePayload(set);
+}
+
+function renderSetShareBox(url) {
+  return '<div class="set-share-box">' +
+    '<input type="text" class="set-share-input" id="set-share-url-input" value="' + esc(url) + '" readonly ' +
+    'aria-label="' + esc(t('shareSet')) + '" onclick="this.select()" onfocus="this.select()">' +
+    '<span class="set-share-copied" id="set-share-copied-msg" style="display:none">✓ ' + esc(t('linkCopied')) + '</span>' +
+    '</div>';
+}
+
+function showSetShareCopiedMessage() {
+  const msg = document.getElementById('set-share-copied-msg');
+  if (!msg) return;
+  msg.style.display = 'inline';
+  setTimeout(() => { msg.style.display = 'none'; }, 2000);
+}
+
+function shareSet(id) {
+  const s = getSet(id);
+  if (!s) return;
+  const url = buildSetShareUrl(s);
+  if (navigator.share) {
+    navigator.share({ title: s.name, text: t('shareSetText', { name: s.name }), url: url }).catch(() => {});
+    return;
+  }
+  const box = document.getElementById('set-share-box');
+  if (box) box.innerHTML = renderSetShareBox(url);
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(url).then(showSetShareCopiedMessage).catch(() => {});
+  }
 }
 
 // ---- #setadd:<id> — search/browse picker to add bhajans to a set ----
@@ -3412,6 +3598,75 @@ function renderSetPlay(id, idx) {
   });
 }
 
+// ---- #set-import:<encoded> — preview + confirm import of a shared set ----
+// Holds the decoded payload for the currently rendered import preview so
+// confirmSetImport() doesn't need to re-decode (and can't be tricked by a
+// stale encoded string passed through an onclick attribute).
+let pendingSetImport = null;
+
+function renderSetImport(encoded) {
+  setBreadcrumb([{ label: t('mySets'), hash: 'sets' }, { label: t('importSetTitle'), hash: null }]);
+  setAlphaNav(null);
+  const decoded = decodeSetSharePayload(encoded);
+  pendingSetImport = decoded;
+
+  let html = compactHeader();
+  if (!decoded) {
+    html += '<h2 class="page-title" id="main-heading" tabindex="-1">' + esc(t('importError')) + '</h2>';
+    html += '<div class="set-detail-actions"><a class="set-action-btn" href="#home" onclick="navigate(\'home\'); return false;">' + esc(t('home')) + '</a></div>';
+    return html;
+  }
+
+  const total = decoded.t.length;
+  const foundTitles = decoded.t.filter(title => !!findBhajan(title));
+  const found = foundTitles.length;
+
+  html += '<h2 class="page-title" id="main-heading" tabindex="-1">' + esc(t('importSetTitle')) + '</h2>';
+  html += '<p class="set-import-name">' + esc(decoded.n || t('newSet')) + '</p>';
+  html += '<p class="set-import-count">' + esc(t('setCount', { n: total })) + '</p>';
+  if (found < total) {
+    html += '<p class="set-import-found-count">' + esc(t('importFoundCount', { found: found, total: total })) + '</p>';
+  }
+  html += '<div id="set-import-list" class="list-section">';
+  if (!decoded.t.length) {
+    html += '<p class="empty-msg">' + esc(t('emptySet')) + '</p>';
+  } else {
+    decoded.t.forEach(title => {
+      const exists = !!findBhajan(title);
+      html += '<div class="set-import-row' + (exists ? '' : ' set-import-row-missing') + '">';
+      html += '<span class="b-title">' + esc(title) + '</span>';
+      if (!exists) html += '<span class="set-import-missing-badge">✕</span>';
+      html += '</div>';
+    });
+  }
+  html += '</div>';
+  html += '<div class="set-detail-actions">';
+  html += '<button class="set-action-btn" onclick="confirmSetImport()">' + esc(t('importConfirm')) + '</button>';
+  html += '<a class="set-action-btn" href="#home" onclick="navigate(\'home\'); return false;">' + esc(t('importCancel')) + '</a>';
+  html += '</div>';
+  return html;
+}
+
+function confirmSetImport() {
+  const decoded = pendingSetImport;
+  if (!decoded) return;
+  const existingNames = getSets().map(s => s.name);
+  let name = (decoded.n && decoded.n.trim()) || t('newSet');
+  if (existingNames.indexOf(name) !== -1) {
+    let i = 2;
+    while (existingNames.indexOf(name + ' (' + i + ')') !== -1) i++;
+    name = name + ' (' + i + ')';
+  }
+  const id = createSet(name);
+  decoded.t.forEach(title => {
+    if (findBhajan(title)) addToSet(id, title);
+  });
+  pendingSetImport = null;
+  // Clear the import hash so a reload doesn't re-trigger the prompt, then
+  // navigate to the newly created set.
+  navigate('set:' + encodeURIComponent(id));
+}
+
 // ---- Add-to-set control on a bhajan page ----
 
 function renderAddToSetControl(encTitle) {
@@ -3502,6 +3757,7 @@ function announceRoute(route) {
   else if (route.indexOf('bhajan:') === 0) label = safeDecodeURIComponent(route.substring(7).split(':')[0], route);
   else if (route.indexOf('setadd:') === 0) label = t('addBhajans');
   else if (route.indexOf('setplay:') === 0) label = t('inSet');
+  else if (route.indexOf('set-import:') === 0) label = t('importSetTitle');
   else if (route.indexOf('set:') === 0) { const s = getSet(safeDecodeURIComponent(route.substring(4), '')); label = s ? s.name : t('mySets'); }
   el.textContent = t('navigatedTo', { page: label });
 }
@@ -3573,6 +3829,10 @@ function render(route, preserveScroll) {
     } else {
       app.innerHTML = renderSetPlay(setId, idx);
     }
+  } else if (route.indexOf('set-import:') === 0) {
+    currentRoute = route;
+    const encoded = route.substring(11);
+    app.innerHTML = renderSetImport(encoded);
   } else if (route.indexOf('set:') === 0) {
     currentRoute = route;
     const id = safeDecodeURIComponent(route.substring(4), null);
