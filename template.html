@@ -8,6 +8,23 @@
 <meta name="theme-color" content="#c86b1f">
 <link rel="apple-touch-icon" href="icons/gg-192.png">
 <link rel="icon" href="icons/gg-192.png">
+<script>
+(function () {
+  try {
+    var stored = localStorage.getItem('theme');
+    var theme = stored === 'dark' || stored === 'light'
+      ? stored
+      : (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    document.documentElement.dataset.theme = theme;
+    if (theme === 'dark') {
+      document.addEventListener('DOMContentLoaded', function () {
+        var meta = document.querySelector('meta[name="theme-color"]');
+        if (meta) meta.setAttribute('content', '#17120e');
+      });
+    }
+  } catch (e) {}
+})();
+</script>
 <style>
 /* Self-hosted fonts from Google Fonts */
 
@@ -404,6 +421,12 @@
   --accent: #c86b1f;
   --accent-dark: #a0541a;
   --accent-light: #f8e8d4;
+  /* Text-only accent role (headings, small labels, links): kept distinct
+     from --accent/--accent-dark because those double as BACKGROUND fills
+     (buttons, nav bars) under --on-accent text — a single shade cannot
+     satisfy both "light text on top of it" and "itself as text on --bg"
+     contrast requirements at once, especially in dark mode. */
+  --accent-text: #a0541a;
   --gold-accent: #8f7318;
   --maroon-accent: #7a2e2e;
   --alpha-link: #cc2200;
@@ -440,6 +463,32 @@
   --soft-orange: var(--soft-saffron);
 }
 
+:root[data-theme="dark"] {
+  --bg: #17120e;
+  --surface: #241c15;
+  --surface-2: #2e241b;
+  --surface-3: #2a2015;
+  --text: #f0e6d8;
+  --text-muted: #c3b298;
+  --border: #3a2e22;
+  --on-accent: #fdf8f2;
+  --accent: #a15e21;
+  --accent-dark: #7f4a1a;
+  --accent-light: #4a3420;
+  --accent-text: #d88941;
+  --gold-accent: #d4af5a;
+  --maroon-accent: #d98a8a;
+  --alpha-link: #ff8a65;
+  --badge-audio-fg: #8fd9ac;
+  --badge-audio-bg: #1c3324;
+  --badge-audio-border: #3a6b4d;
+  --badge-video-fg: #f2a89e;
+  --badge-video-bg: #3a211f;
+  --badge-video-border: #6b3733;
+  --shadow-color: 0,0,0;
+  --shadow-soft: rgba(0,0,0,0.35);
+  --shadow-medium: rgba(0,0,0,0.5);
+}
 
 html { scroll-behavior: smooth; }
 
@@ -480,6 +529,12 @@ body {
   margin: 0 auto;
 }
 #breadcrumb-trail { flex: 1; min-width: 0; }
+.breadcrumb-actions {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
 .lang-header-btn {
   flex-shrink: 0;
   background: rgba(255,255,255,0.18);
@@ -495,6 +550,21 @@ body {
   transition: background 0.2s;
 }
 .lang-header-btn:hover { background: rgba(255,255,255,0.32); }
+.theme-toggle-btn {
+  flex-shrink: 0;
+  background: rgba(255,255,255,0.18);
+  border: 1px solid rgba(255,255,255,0.4);
+  color: var(--on-accent);
+  border-radius: 8px;
+  padding: 6px 10px;
+  font-size: 0.95rem;
+  line-height: 1;
+  cursor: pointer;
+  min-width: 32px;
+  min-height: 32px;
+  transition: background 0.2s;
+}
+.theme-toggle-btn:hover { background: rgba(255,255,255,0.32); }
 
 /* Alphabet nav */
 #alpha-nav {
@@ -640,7 +710,7 @@ body {
 .stat-number {
   font-family: 'Playfair Display', serif;
   font-size: 1.5rem;
-  color: var(--orange);
+  color: var(--accent-text);
   font-weight: 700;
 }
 .stat-label {
@@ -693,7 +763,7 @@ body {
 .letter-heading {
   font-family: 'Playfair Display', serif;
   font-size: 1.5rem;
-  color: var(--orange);
+  color: var(--accent-text);
   border-bottom: 2px solid var(--border-tan);
   padding-bottom: 4px;
   margin: 32px 0 12px;
@@ -844,7 +914,7 @@ body.offline .video-badge {
   align-items: center;
   gap: 7px;
   margin-bottom: 10px;
-  color: var(--saffron-dark);
+  color: var(--accent-text);
   font-size: 0.72rem;
   font-weight: 700;
   letter-spacing: 0.08em;
@@ -870,7 +940,7 @@ body.offline .video-badge {
 .ap-play-btn svg { fill: var(--on-accent); }
 .ap-time {
   font-size: 0.88rem;
-  color: var(--saffron-dark);
+  color: var(--accent-text);
   font-weight: 600;
   white-space: nowrap;
   min-width: 88px;
@@ -945,7 +1015,7 @@ body.offline .video-badge {
   margin-bottom: 20px;
 }
 .bhajan-view .bv-meta a {
-  color: var(--orange);
+  color: var(--accent-text);
   text-decoration: none;
 }
 .bhajan-view .bv-meta a:hover {
@@ -1080,7 +1150,7 @@ body.offline .video-badge {
 .verse-number {
   font-family: 'Playfair Display', serif;
   font-size: 0.8rem;
-  color: var(--orange);
+  color: var(--accent-text);
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 1px;
@@ -1506,7 +1576,7 @@ body.offline .video-badge {
   border-top: 1px solid var(--border-tan);
   margin-top: 4px;
   padding-top: 12px;
-  color: var(--orange);
+  color: var(--accent-text);
   font-weight: 600;
 }
 
@@ -1598,6 +1668,7 @@ const UI_STRINGS = {
     langChoiceSubtitle: 'You can change this anytime from the header button',
     langChoiceBack: 'Cancel',
     langHeaderAriaLabel: 'Change language',
+    toggleTheme: 'Toggle dark mode',
     bhajanNotFound: 'Bhajan not found.',
     footer: 'Devotional Songbook',
     statBhajans: 'Bhajans', statVerses: 'Verses', statCategories: 'Categories', statAuthors: 'Authors',
@@ -1663,6 +1734,7 @@ const UI_STRINGS = {
     langChoiceSubtitle: 'To vari mainīt jebkurā brīdī ar pogu galvenē',
     langChoiceBack: 'Atcelt',
     langHeaderAriaLabel: 'Mainīt valodu',
+    toggleTheme: 'Pārslēgt tumšo režīmu',
     bhajanNotFound: 'Bhadžans nav atrasts.',
     footer: 'Dievu slavinoša dziesmu grāmata',
     statBhajans: 'Bhadžani', statVerses: 'Panti', statCategories: 'Kategorijas', statAuthors: 'Autori',
@@ -1728,6 +1800,7 @@ const UI_STRINGS = {
     langChoiceSubtitle: 'Вы можете изменить это в любой момент кнопкой в шапке',
     langChoiceBack: 'Отмена',
     langHeaderAriaLabel: 'Сменить язык',
+    toggleTheme: 'Переключить тёмную тему',
     bhajanNotFound: 'Бхаджан не найден.',
     footer: 'Сборник духовных песен',
     statBhajans: 'Бхаджаны', statVerses: 'Стихи', statCategories: 'Категории', statAuthors: 'Авторы',
@@ -1793,6 +1866,7 @@ const UI_STRINGS = {
     langChoiceSubtitle: 'Puedes cambiarlo en cualquier momento con el botón del encabezado',
     langChoiceBack: 'Cancelar',
     langHeaderAriaLabel: 'Cambiar idioma',
+    toggleTheme: 'Alternar modo oscuro',
     bhajanNotFound: 'Bhajan no encontrado.',
     footer: 'Cancionero devocional',
     statBhajans: 'Bhajans', statVerses: 'Versos', statCategories: 'Categorías', statAuthors: 'Autores',
@@ -1858,6 +1932,7 @@ const UI_STRINGS = {
     langChoiceSubtitle: 'Puoi cambiarla in qualsiasi momento dal pulsante nell’intestazione',
     langChoiceBack: 'Annulla',
     langHeaderAriaLabel: 'Cambia lingua',
+    toggleTheme: 'Attiva/disattiva modalità scura',
     bhajanNotFound: 'Bhajan non trovato.',
     footer: 'Innario devozionale',
     statBhajans: 'Bhajan', statVerses: 'Versi', statCategories: 'Categorie', statAuthors: 'Autori',
@@ -1923,6 +1998,7 @@ const UI_STRINGS = {
     langChoiceSubtitle: 'Vous pouvez la changer à tout moment via le bouton d’en-tête',
     langChoiceBack: 'Annuler',
     langHeaderAriaLabel: 'Changer de langue',
+    toggleTheme: 'Basculer le mode sombre',
     bhajanNotFound: 'Bhajan introuvable.',
     footer: 'Recueil de chants dévotionnels',
     statBhajans: 'Bhajans', statVerses: 'Versets', statCategories: 'Catégories', statAuthors: 'Auteurs',
@@ -2244,7 +2320,31 @@ function setBreadcrumb(parts) {
   });
   const wl = getWorkingLang() || 'en';
   const langBtn = '<button class="lang-header-btn" aria-label="' + esc(t('langHeaderAriaLabel')) + '" onclick="openLangChoice()">' + wl.toUpperCase() + ' \u25be</button>';
-  bc.innerHTML = '<div id="breadcrumb-inner"><div id="breadcrumb-trail">' + trail + '</div>' + langBtn + '</div>';
+  const themeBtn = '<button class="theme-toggle-btn" id="theme-toggle-btn" aria-label="' + esc(t('toggleTheme')) + '" onclick="toggleTheme()">' + (isDarkTheme() ? '\u2600\ufe0f' : '\ud83c\udf19') + '</button>';
+  bc.innerHTML = '<div id="breadcrumb-inner"><div id="breadcrumb-trail">' + trail + '</div><div class="breadcrumb-actions">' + themeBtn + langBtn + '</div></div>';
+}
+
+// ---- Theme (dark mode) ----
+
+function isDarkTheme() {
+  return document.documentElement.dataset.theme === 'dark';
+}
+
+function applyTheme(theme) {
+  document.documentElement.dataset.theme = theme;
+  const meta = document.querySelector('meta[name="theme-color"]');
+  if (meta) meta.setAttribute('content', theme === 'dark' ? '#17120e' : '#c86b1f');
+  const btn = document.getElementById('theme-toggle-btn');
+  if (btn) {
+    btn.textContent = theme === 'dark' ? '\u2600\ufe0f' : '\ud83c\udf19';
+    btn.setAttribute('aria-label', t('toggleTheme'));
+  }
+}
+
+function toggleTheme() {
+  const next = isDarkTheme() ? 'light' : 'dark';
+  try { localStorage.setItem('theme', next); } catch (e) {}
+  applyTheme(next);
 }
 
 // ---- Language choice screen ----
