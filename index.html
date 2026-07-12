@@ -2197,7 +2197,7 @@ function renderBhajan(title) {
     html += '<div class="audio-player-header">';
     html += '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>';
     html += esc(t('audioSankirtana')) + '</div>';
-    html += '<audio id="' + apId + '" preload="none" src="' + audioSrc + '" style="display:none"></audio>';
+    html += '<audio id="' + apId + '" preload="none" data-src="' + audioSrc + '" style="display:none"></audio>';
     html += '<div class="audio-controls">';
     html += '<button class="ap-play-btn" aria-label="Play/Pause" onclick="apToggle(\'' + apId + '\')" id="btn_' + apId + '">';
     html += '<svg width="12" height="14" viewBox="0 0 12 14"><polygon points="0,0 12,7 0,14"/></svg></button>';
@@ -2370,13 +2370,41 @@ function apFmt(s) {
   const m = Math.floor(s/60), sec = Math.floor(s%60);
   return m + ':' + String(sec).padStart(2,'0');
 }
+// Resolve an audio element's real source. If the file is in the offline cache,
+// load it as a blob: URL and play from that — this bypasses a Chrome bug where
+// media served by the service worker from cache fails offline (error 4). If not
+// cached, fall back to the network URL (works online).
+var _apBlobUrl = null; // currently-held blob URL (revoked when a new one is made)
+async function apResolveSource(a) {
+  if (a.dataset.resolved === '1') return; // already set (blob or network)
+  const url = a.getAttribute('data-src');
+  if (!url) return;
+  try {
+    if (self.caches) {
+      const cache = await caches.open('media-v1');
+      const resp = await cache.match(url);
+      if (resp) {
+        const blob = await resp.blob();
+        if (_apBlobUrl) { try { URL.revokeObjectURL(_apBlobUrl); } catch (e) {} }
+        const blobUrl = URL.createObjectURL(blob);
+        _apBlobUrl = blobUrl;
+        a.src = blobUrl;
+        a.dataset.resolved = '1';
+        return;
+      }
+    }
+  } catch (e) { /* fall through to network */ }
+  a.src = url; // not cached — stream from network (online)
+  a.dataset.resolved = '1';
+}
+
 function apToggle(id) {
   const a = document.getElementById(id);
   if (!a) return;
   if (a.paused) {
     // pause all others
     document.querySelectorAll('audio').forEach(x => { if (x !== a) x.pause(); });
-    a.play().catch(() => {});
+    apResolveSource(a).then(() => a.play().catch(() => {}));
   } else {
     a.pause();
   }
