@@ -15,16 +15,30 @@ template.html's three placeholders. YOUTUBE_IDS and AUDIO_IDS are loaded
 from data/youtube_map.json and data/audio_map.json (single source of truth)
 and re-injected into the template.
 
+Phase 5 adds the service worker / offline media build step: build.py also
+copies tools/sw_template.js to sw.js (repo root), injecting the shell cache
+version and the enumerated shell asset list, and appends a content-hash
+query string (?v={sha256[:8]}) to every audio URL emitted in AUDIO_IDS and
+asset-list.json so the two-tier cache (shell-v{N} / media-v1, see plan doc
+architecture decision (c)) can address exact file versions.
+
 Emits:
     index.html        - rebuilt page (from template.html)
+    sw.js               - service worker (from tools/sw_template.js)
     version.json       - {"version": N, "date": "...", "notes": ""}
     asset-list.json     - {"version": N, "assets": [{url, hash, size}, ...]}
                           for the 32 .ogg files actually referenced by AUDIO_IDS.
-                          Includes sha256 hash and size for integrity verification.
+                          `url` carries the ?v={hash8} query string; `hash` is
+                          the full sha256 for integrity verification.
 
 Usage:
     python build.py [--source-html index.html] [--template template.html]
                      [--xlsx Bhajans.xlsx] [--out index.html]
+                     [--version N | --bump] [--notes "..."]
+
+Version handling: by default the version number is carried over unchanged
+from the existing version.json (or starts at 1 if none exists). Pass --bump
+to increment it by one, or --version N to set it explicitly.
 """
 import argparse
 import hashlib
@@ -204,30 +218,93 @@ def load_youtube_map(youtube_map_path):
 
 
 # ---------------------------------------------------------------------------
-# Asset list (referenced MP3s only)
+# Asset list + versioned AUDIO_IDS (referenced .ogg files only)
 # ---------------------------------------------------------------------------
 
 
-def build_asset_list(audio_ids, audio_dir, version):
-    assets = []
-    seen = set()
-    for title, path in sorted(audio_ids.items()):
-        if path in seen:
-            continue
-        seen.add(path)
+def compute_audio_assets(audio_ids):
+    """De-duplicate + hash the audio files referenced by AUDIO_IDS.
+
+    Returns (versioned_audio_ids, assets):
+      versioned_audio_ids: title -> 'audio/x.ogg?v={hash8}' (same set of keys
+        as the input audio_ids; the query string lets the service worker and
+        the page address an exact file version as a single cache key).
+      assets: de-duplicated by underlying path, sorted by path, each entry
+        {"url": <versioned url, matches audio_ids values>, "hash": <full
+        sha256>, "size": <bytes>} - this is what ships in asset-list.json and
+        what DOWNLOAD_ASSETS/PRUNE operate on.
+    """
+    versioned = {}
+    by_path = {}
+    for title, path in audio_ids.items():
         full_path = REPO_ROOT / path
         if not full_path.exists():
             print(f"WARNING: audio asset referenced but missing on disk: {path}")
+            versioned[title] = path
             continue
-        data = full_path.read_bytes()
-        assets.append(
-            {
-                "url": path,
-                "hash": hashlib.sha256(data).hexdigest(),
+        if path not in by_path:
+            data = full_path.read_bytes()
+            digest = hashlib.sha256(data).hexdigest()
+            by_path[path] = {
+                "url": f"{path}?v={digest[:8]}",
+                "hash": digest,
                 "size": len(data),
             }
-        )
-    return {"version": version, "assets": assets}
+        versioned[title] = by_path[path]["url"]
+    assets = [by_path[p] for p in sorted(by_path.keys())]
+    return versioned, assets
+
+
+# ---------------------------------------------------------------------------
+# Service worker generation (Phase 5)
+# ---------------------------------------------------------------------------
+
+
+def enumerate_shell_assets():
+    """Shell precache list: page shell + manifest + icons + self-hosted fonts.
+
+    Deliberately excludes audio/*.ogg (media-v1 territory, never precached)
+    and data/asset-list.json/version.json (fetched no-store by the page).
+    """
+    assets = ["./", "index.html", "manifest.json"]
+    icons_dir = REPO_ROOT / "icons"
+    if icons_dir.exists():
+        for p in sorted(icons_dir.iterdir()):
+            if p.is_file():
+                assets.append(f"icons/{p.name}")
+    fonts_dir = REPO_ROOT / "fonts"
+    if fonts_dir.exists():
+        for p in sorted(fonts_dir.glob("*.woff2")):
+            assets.append(f"fonts/{p.name}")
+    return assets
+
+
+def build_service_worker(version, sw_template_path, out_path):
+    template = sw_template_path.read_text(encoding="utf-8")
+    shell_assets = enumerate_shell_assets()
+    out_text = template.replace("{{SW_VERSION}}", str(version))
+    out_text = out_text.replace(
+        "{{SHELL_ASSETS}}", json.dumps(shell_assets, ensure_ascii=False)
+    )
+    out_path.write_text(out_text, encoding="utf-8", newline="")
+    return shell_assets
+
+
+def resolve_version(explicit_version, bump):
+    """Version carry-over logic: keep the existing version.json value unless
+    --bump (increment by one) or --version N (explicit override) is given."""
+    version_path = REPO_ROOT / "version.json"
+    existing = 1
+    if version_path.exists():
+        try:
+            existing = int(json.loads(version_path.read_text(encoding="utf-8")).get("version", 1))
+        except (json.JSONDecodeError, TypeError, ValueError):
+            existing = 1
+    if explicit_version is not None:
+        return explicit_version
+    if bump:
+        return existing + 1
+    return existing
 
 
 # ---------------------------------------------------------------------------
@@ -242,9 +319,11 @@ def build(source_html, template_path, xlsx_path, out_path, version=1, notes=""):
     youtube_ids = load_youtube_map(REPO_ROOT / "data" / "youtube_map.json")
     audio_ids = load_audio_map(REPO_ROOT / "data" / "audio_map.json")
 
+    versioned_audio_ids, assets = compute_audio_assets(audio_ids)
+
     bhajans_json = json.dumps(bhajans, ensure_ascii=False)
     youtube_json = json.dumps(youtube_ids, ensure_ascii=False)
-    audio_json = json.dumps(audio_ids, ensure_ascii=False)
+    audio_json = json.dumps(versioned_audio_ids, ensure_ascii=False)
 
     out_text = template_text.replace("{{BHAJANS_JSON}}", bhajans_json, 1)
     out_text = out_text.replace("{{YOUTUBE_IDS_JSON}}", youtube_json, 1)
@@ -261,13 +340,19 @@ def build(source_html, template_path, xlsx_path, out_path, version=1, notes=""):
         json.dumps(version_json, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
     )
 
-    asset_list = build_asset_list(audio_ids, REPO_ROOT / "audio", version)
+    asset_list = {"version": version, "assets": assets}
     (REPO_ROOT / "asset-list.json").write_text(
         json.dumps(asset_list, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
     )
 
+    shell_assets = build_service_worker(
+        version, REPO_ROOT / "tools" / "sw_template.js", REPO_ROOT / "sw.js"
+    )
+
     print(f"Built {out_path}: {len(bhajans)} bhajans, {len(youtube_ids)} youtube ids, "
-          f"{len(audio_ids)} audio ids, {len(asset_list['assets'])} referenced assets.")
+          f"{len(audio_ids)} audio ids, {len(assets)} referenced media assets.")
+    print(f"Built sw.js: version={version}, shell-v{version} ({len(shell_assets)} shell assets), "
+          f"media-v1 untouched by build (managed via DOWNLOAD_ASSETS/PRUNE at runtime).")
 
 
 def main():
@@ -277,16 +362,21 @@ def main():
     ap.add_argument("--template", default="template.html")
     ap.add_argument("--xlsx", default="Bhajans.xlsx")
     ap.add_argument("--out", default="index.html")
-    ap.add_argument("--version", type=int, default=1)
+    ap.add_argument("--version", type=int, default=None,
+                     help="explicit version override (default: carry over from version.json)")
+    ap.add_argument("--bump", action="store_true",
+                     help="increment version number by one from the existing version.json")
     ap.add_argument("--notes", default="")
     args = ap.parse_args()
+
+    version = resolve_version(args.version, args.bump)
 
     build(
         source_html=REPO_ROOT / args.source_html,
         template_path=REPO_ROOT / args.template,
         xlsx_path=REPO_ROOT / args.xlsx,
         out_path=REPO_ROOT / args.out,
-        version=args.version,
+        version=version,
         notes=args.notes,
     )
 
