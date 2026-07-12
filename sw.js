@@ -1,7 +1,7 @@
 // sw_template.js - source template for the generated sw.js.
 //
 // build.py copies this file to sw.js at the repo root, replacing:
-//   8    -> integer version number from version.json (drives the shell cache name)
+//   10    -> integer version number from version.json (drives the shell cache name)
 //   ["./", "index.html", "manifest.json", "icons/gg-192.png", "icons/gg-512.png", "icons/gg-maskable-512.png", "fonts/cormorant-garamond-cyrillic-400-italic.woff2", "fonts/cormorant-garamond-cyrillic-700.woff2", "fonts/cormorant-garamond-cyrillic-ext-400-italic.woff2", "fonts/cormorant-garamond-cyrillic-ext-700.woff2", "fonts/cormorant-garamond-latin-400-italic.woff2", "fonts/cormorant-garamond-latin-700.woff2", "fonts/cormorant-garamond-latin-ext-400-italic.woff2", "fonts/cormorant-garamond-latin-ext-700.woff2", "fonts/cormorant-garamond-vietnamese-400-italic.woff2", "fonts/cormorant-garamond-vietnamese-700.woff2", "fonts/crimson-text-latin-400-italic.woff2", "fonts/crimson-text-latin-400.woff2", "fonts/crimson-text-latin-600.woff2", "fonts/crimson-text-latin-700.woff2", "fonts/crimson-text-latin-ext-400-italic.woff2", "fonts/crimson-text-latin-ext-400.woff2", "fonts/crimson-text-latin-ext-600.woff2", "fonts/crimson-text-latin-ext-700.woff2", "fonts/crimson-text-vietnamese-400-italic.woff2", "fonts/crimson-text-vietnamese-400.woff2", "fonts/crimson-text-vietnamese-600.woff2", "fonts/crimson-text-vietnamese-700.woff2", "fonts/noto-serif-cyrillic-400-italic.woff2", "fonts/noto-serif-cyrillic-700.woff2", "fonts/noto-serif-cyrillic-ext-400-italic.woff2", "fonts/noto-serif-cyrillic-ext-700.woff2", "fonts/noto-serif-greek-400-italic.woff2", "fonts/noto-serif-greek-700.woff2", "fonts/noto-serif-greek-ext-400-italic.woff2", "fonts/noto-serif-greek-ext-700.woff2", "fonts/noto-serif-latin-400-italic.woff2", "fonts/noto-serif-latin-700.woff2", "fonts/noto-serif-latin-ext-400-italic.woff2", "fonts/noto-serif-latin-ext-700.woff2", "fonts/noto-serif-math-400-italic.woff2", "fonts/noto-serif-math-700.woff2", "fonts/noto-serif-vietnamese-400-italic.woff2", "fonts/noto-serif-vietnamese-700.woff2", "fonts/playfair-display-cyrillic-700.woff2", "fonts/playfair-display-latin-700.woff2", "fonts/playfair-display-latin-ext-700.woff2", "fonts/playfair-display-vietnamese-700.woff2"]  -> JSON array of shell asset URLs (./  index.html  manifest.json
 //                         icons/*  fonts/*.woff2)
 //
@@ -12,7 +12,7 @@
 //                    only ever grows/shrinks via explicit DOWNLOAD_ASSETS / PRUNE
 //                    messages from the page, or lazily on first play while online.
 
-const SW_VERSION = '8';
+const SW_VERSION = '10';
 const SHELL_CACHE = 'shell-v' + SW_VERSION;
 const MEDIA_CACHE = 'media-v1';
 const SHELL_ASSETS = ["./", "index.html", "manifest.json", "icons/gg-192.png", "icons/gg-512.png", "icons/gg-maskable-512.png", "fonts/cormorant-garamond-cyrillic-400-italic.woff2", "fonts/cormorant-garamond-cyrillic-700.woff2", "fonts/cormorant-garamond-cyrillic-ext-400-italic.woff2", "fonts/cormorant-garamond-cyrillic-ext-700.woff2", "fonts/cormorant-garamond-latin-400-italic.woff2", "fonts/cormorant-garamond-latin-700.woff2", "fonts/cormorant-garamond-latin-ext-400-italic.woff2", "fonts/cormorant-garamond-latin-ext-700.woff2", "fonts/cormorant-garamond-vietnamese-400-italic.woff2", "fonts/cormorant-garamond-vietnamese-700.woff2", "fonts/crimson-text-latin-400-italic.woff2", "fonts/crimson-text-latin-400.woff2", "fonts/crimson-text-latin-600.woff2", "fonts/crimson-text-latin-700.woff2", "fonts/crimson-text-latin-ext-400-italic.woff2", "fonts/crimson-text-latin-ext-400.woff2", "fonts/crimson-text-latin-ext-600.woff2", "fonts/crimson-text-latin-ext-700.woff2", "fonts/crimson-text-vietnamese-400-italic.woff2", "fonts/crimson-text-vietnamese-400.woff2", "fonts/crimson-text-vietnamese-600.woff2", "fonts/crimson-text-vietnamese-700.woff2", "fonts/noto-serif-cyrillic-400-italic.woff2", "fonts/noto-serif-cyrillic-700.woff2", "fonts/noto-serif-cyrillic-ext-400-italic.woff2", "fonts/noto-serif-cyrillic-ext-700.woff2", "fonts/noto-serif-greek-400-italic.woff2", "fonts/noto-serif-greek-700.woff2", "fonts/noto-serif-greek-ext-400-italic.woff2", "fonts/noto-serif-greek-ext-700.woff2", "fonts/noto-serif-latin-400-italic.woff2", "fonts/noto-serif-latin-700.woff2", "fonts/noto-serif-latin-ext-400-italic.woff2", "fonts/noto-serif-latin-ext-700.woff2", "fonts/noto-serif-math-400-italic.woff2", "fonts/noto-serif-math-700.woff2", "fonts/noto-serif-vietnamese-400-italic.woff2", "fonts/noto-serif-vietnamese-700.woff2", "fonts/playfair-display-cyrillic-700.woff2", "fonts/playfair-display-latin-700.woff2", "fonts/playfair-display-latin-ext-700.woff2", "fonts/playfair-display-vietnamese-700.woff2"];
@@ -198,8 +198,14 @@ function toPathKey(u) {
   }
 }
 
-async function downloadAssets(assets, client) {
+async function downloadAssets(assets, client, keepUrls) {
   const cache = await caches.open(MEDIA_CACHE);
+  // Self-cleaning: remove any stale entries (old versions, interrupted
+  // downloads, superseded ?v= hashes) BEFORE downloading, so the offline
+  // library never accumulates beyond the current asset set.
+  if (keepUrls && keepUrls.length) {
+    try { await pruneMedia(keepUrls); } catch (e) { /* best-effort */ }
+  }
   const total = assets.length;
   let done = 0;
   let bytesDone = 0;
@@ -260,7 +266,7 @@ self.addEventListener('message', (event) => {
   const data = event.data;
   if (!data || !data.type) return;
   if (data.type === 'DOWNLOAD_ASSETS') {
-    event.waitUntil(downloadAssets(data.assets || [], event.source));
+    event.waitUntil(downloadAssets(data.assets || [], event.source, data.keepUrls || []));
   } else if (data.type === 'PRUNE') {
     event.waitUntil(pruneMedia(data.keepUrls || []));
   }

@@ -2497,12 +2497,10 @@ updateOnlineUI();
       return; // offline or unreachable - nothing to offer
     }
 
-    const installedVersion = localStorage.getItem('installedMediaVersion');
     const cachedUrls = await getCachedMediaUrls();
-    if (installedVersion === String(versionInfo.version) && cachedUrls.size > 0) {
-      return; // fast path: already fully installed at this version
-    }
 
+    // asset-list.json is tiny (a few KB) so we always fetch it — this lets us
+    // clean up stale cache entries on every load, not just when a download runs.
     let manifest;
     try {
       const res2 = await fetch('asset-list.json', { cache: 'no-store' });
@@ -2510,6 +2508,15 @@ updateOnlineUI();
       manifest = await res2.json();
     } catch (e) {
       return;
+    }
+
+    // Self-cleaning: drop any cached media not in the current manifest
+    // (stale ?v= hashes, files removed between versions, interrupted state)
+    // so the offline library never grows past the current asset set.
+    const keepKeys = new Set(manifest.assets.map((a) => toPathKey(a.url)));
+    const stillCached = [...cachedUrls].filter((k) => keepKeys.has(k));
+    if (stillCached.length !== cachedUrls.size) {
+      sendToSW({ type: 'PRUNE', keepUrls: manifest.assets.map((a) => a.url) });
     }
 
     const missing = manifest.assets.filter((a) => !cachedUrls.has(toPathKey(a.url)));
@@ -2576,7 +2583,7 @@ updateOnlineUI();
       window.location.reload();
       return;
     }
-    if (!sendToSW({ type: 'DOWNLOAD_ASSETS', assets: currentAssets.assets })) {
+    if (!sendToSW({ type: 'DOWNLOAD_ASSETS', assets: currentAssets.assets, keepUrls: currentAssets.allAssets.map((a) => a.url) })) {
       showTransientMessage(t('storageError'), 4000);
     }
   }

@@ -198,8 +198,14 @@ function toPathKey(u) {
   }
 }
 
-async function downloadAssets(assets, client) {
+async function downloadAssets(assets, client, keepUrls) {
   const cache = await caches.open(MEDIA_CACHE);
+  // Self-cleaning: remove any stale entries (old versions, interrupted
+  // downloads, superseded ?v= hashes) BEFORE downloading, so the offline
+  // library never accumulates beyond the current asset set.
+  if (keepUrls && keepUrls.length) {
+    try { await pruneMedia(keepUrls); } catch (e) { /* best-effort */ }
+  }
   const total = assets.length;
   let done = 0;
   let bytesDone = 0;
@@ -260,7 +266,7 @@ self.addEventListener('message', (event) => {
   const data = event.data;
   if (!data || !data.type) return;
   if (data.type === 'DOWNLOAD_ASSETS') {
-    event.waitUntil(downloadAssets(data.assets || [], event.source));
+    event.waitUntil(downloadAssets(data.assets || [], event.source, data.keepUrls || []));
   } else if (data.type === 'PRUNE') {
     event.waitUntil(pruneMedia(data.keepUrls || []));
   }
