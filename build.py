@@ -11,17 +11,16 @@ Reads Bhajans.xlsx (sheet "Lapa1"; columns Category, Bhajan_Title, Author,
 Verse_Number, Original, English, Russian, Latvian, and optionally Spanish,
 Italian, French) with pandas, ports the clean_text / clean_latvian_text
 logic from generate_html.py, and injects the resulting JSON into
-template.html's three placeholders. YOUTUBE_IDS and AUDIO_IDS are extracted
-verbatim from the deployed index.html (they get a real data source in a
-later phase) and re-injected unchanged.
+template.html's three placeholders. YOUTUBE_IDS and AUDIO_IDS are loaded
+from data/youtube_map.json and data/audio_map.json (single source of truth)
+and re-injected into the template.
 
 Emits:
     index.html        - rebuilt page (from template.html)
     version.json       - {"version": N, "date": "...", "notes": ""}
     asset-list.json     - {"version": N, "assets": [{url, hash, size}, ...]}
-                          for the 32 MP3s actually referenced by AUDIO_IDS
-                          (4 of the 36 files in audio/ are unreferenced and
-                          excluded).
+                          for the 32 .ogg files actually referenced by AUDIO_IDS.
+                          Includes sha256 hash and size for integrity verification.
 
 Usage:
     python build.py [--source-html index.html] [--template template.html]
@@ -177,30 +176,31 @@ def load_bhajan_data(xlsx_path):
 
 
 # ---------------------------------------------------------------------------
-# Extraction of YOUTUBE_IDS / AUDIO_IDS verbatim from a deployed index.html
+# Load YOUTUBE_IDS / AUDIO_IDS from data/ JSON files
 # ---------------------------------------------------------------------------
 
-_VAR_LINE_RE = {
-    "BHAJANS": re.compile(r"^\s*const BHAJANS = (.*);\s*$"),
-    "YOUTUBE_IDS": re.compile(r"^\s*const YOUTUBE_IDS = (.*);\s*$"),
-    "AUDIO_IDS": re.compile(r"^\s*const AUDIO_IDS = (.*);\s*$"),
-}
+def load_audio_map(audio_map_path):
+    """Load AUDIO_IDS from data/audio_map.json.
 
-
-def extract_js_literal(html_path, varname):
-    """Extract and json-parse a `const NAME = <json>;` literal from an HTML file.
-
-    Locates the line by content anchor (line starting with `const NAME = `),
-    not by a hard line number.
+    This replaces the old verbatim extraction from index.html,
+    providing a single source of truth for audio mappings.
     """
-    prefix = f"const {varname} = "
-    with open(html_path, "r", encoding="utf-8") as f:
-        for line in f:
-            stripped = line.strip()
-            if stripped.startswith(prefix):
-                json_str = stripped[len(prefix):].rstrip(";")
-                return json.loads(json_str)
-    raise SystemExit(f"ERROR: could not find `const {varname} = ` in {html_path}")
+    if not audio_map_path.exists():
+        raise SystemExit(f"ERROR: {audio_map_path} not found. Run audio pipeline first.")
+    with open(audio_map_path, "r", encoding="utf-8") as f:
+        return json.load(f)
+
+
+def load_youtube_map(youtube_map_path):
+    """Load YOUTUBE_IDS from data/youtube_map.json.
+
+    This replaces the old verbatim extraction from index.html,
+    providing a single source of truth for YouTube video mappings.
+    """
+    if not youtube_map_path.exists():
+        raise SystemExit(f"ERROR: {youtube_map_path} not found. Run audio pipeline first.")
+    with open(youtube_map_path, "r", encoding="utf-8") as f:
+        return json.load(f)
 
 
 # ---------------------------------------------------------------------------
@@ -239,8 +239,8 @@ def build(source_html, template_path, xlsx_path, out_path, version=1, notes=""):
     template_text = template_path.read_text(encoding="utf-8")
 
     bhajans = load_bhajan_data(xlsx_path)
-    youtube_ids = extract_js_literal(source_html, "YOUTUBE_IDS")
-    audio_ids = extract_js_literal(source_html, "AUDIO_IDS")
+    youtube_ids = load_youtube_map(REPO_ROOT / "data" / "youtube_map.json")
+    audio_ids = load_audio_map(REPO_ROOT / "data" / "audio_map.json")
 
     bhajans_json = json.dumps(bhajans, ensure_ascii=False)
     youtube_json = json.dumps(youtube_ids, ensure_ascii=False)
