@@ -396,14 +396,16 @@
   --saffron: #c86b1f;
   --saffron-dark: #a0541a;
   --saffron-light: #f8e8d4;
-  --gold: #b8941f;
+  --gold: #8f7318;
   --medium-brown: #6b5340;
   --warm-white: #fdf8f2;
   --light-tan: #f5efe5;
   --border-tan: #e4d5c3;
   --soft-saffron: #fef5eb;
-  --text-secondary: #8b7355;
+  --text-secondary: #6f5a40;
   --maroon: #7a2e2e;
+  --font-ui: 'Noto Serif', serif;
+  --verse-scale: 1;
   /* Legacy aliases */
   --orange: var(--saffron);
   --soft-orange: var(--soft-saffron);
@@ -434,12 +436,11 @@ body {
 #breadcrumb a {
   color: #fff;
   text-decoration: none;
-  opacity: 0.85;
-  transition: opacity 0.2s;
+  transition: text-decoration 0.2s;
 }
-#breadcrumb a:hover { opacity: 1; text-decoration: underline; }
-#breadcrumb .sep { margin: 0 8px; opacity: 0.5; }
-#breadcrumb .current { opacity: 1; font-weight: 600; }
+#breadcrumb a:hover, #breadcrumb a:focus { text-decoration: underline; }
+#breadcrumb .sep { margin: 0 8px; opacity: 0.7; }
+#breadcrumb .current { font-weight: 600; }
 #breadcrumb-inner {
   display: flex;
   align-items: center;
@@ -468,7 +469,7 @@ body {
 /* Alphabet nav */
 #alpha-nav {
   position: sticky;
-  top: 40px;
+  top: 40px; /* JS (updateAlphaNavOffset) overrides this with the real breadcrumb height */
   z-index: 99;
   background: var(--light-tan);
   border-bottom: 1px solid var(--border-tan);
@@ -487,6 +488,16 @@ body {
   font-weight: 600;
   border-radius: 4px;
   transition: all 0.2s;
+}
+@media (max-width: 600px) {
+  #alpha-nav a {
+    min-width: 40px;
+    min-height: 40px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px;
+  }
 }
 #alpha-nav a:hover, #alpha-nav a.active {
   background: var(--orange);
@@ -950,11 +961,33 @@ body {
 }
 .verse-text {
   font-family: 'Crimson Text', serif;
-  font-size: 1.15rem;
+  font-size: calc(1.15rem * var(--verse-scale, 1));
   line-height: 1.9;
   white-space: pre-line;
   color: var(--dark-brown);
 }
+
+/* Font size control (M6) */
+.font-size-control {
+  display: flex;
+  gap: 8px;
+  margin: 4px 0 20px;
+}
+.fs-btn {
+  min-width: 40px;
+  min-height: 40px;
+  border: 1px solid var(--border-tan);
+  border-radius: 8px;
+  background: white;
+  color: var(--medium-brown);
+  font-family: var(--font-ui);
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.fs-btn:hover { border-color: var(--orange); }
+.fs-btn:disabled { opacity: 0.4; cursor: default; }
 
 /* Page title for list pages */
 .page-title {
@@ -972,6 +1005,93 @@ body {
   font-size: 0.8rem;
   border-top: 1px solid var(--border-tan);
   margin-top: 40px;
+}
+
+/* Skip link (H3) */
+.skip-link {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  background: var(--saffron-dark);
+  color: #fff;
+  padding: 10px 16px;
+  z-index: 1000;
+  border-radius: 0 0 8px 0;
+  text-decoration: none;
+  font-family: var(--font-ui);
+  font-size: 0.9rem;
+}
+.skip-link:focus {
+  left: 0;
+}
+
+/* Visually hidden (H3 aria-live announcer) */
+.visually-hidden {
+  position: absolute !important;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Search (H1) */
+.search-box {
+  margin: 16px 0 24px;
+}
+.search-input {
+  width: 100%;
+  padding: 12px 16px;
+  min-height: 44px;
+  border: 1px solid var(--border-tan);
+  border-radius: 10px;
+  background: white;
+  color: var(--dark-brown);
+  font-family: var(--font-ui);
+  font-size: 1rem;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+}
+.search-input:focus {
+  outline: none;
+  border-color: var(--orange);
+  box-shadow: 0 0 0 3px rgba(200,107,31,0.15);
+}
+.search-results {
+  margin-top: 8px;
+}
+.search-count {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  margin: 8px 0 6px;
+}
+.search-empty {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  font-style: italic;
+  padding: 8px 0;
+}
+.search-result-item {
+  display: block;
+  padding: 10px 14px;
+  margin: 4px 0;
+  background: white;
+  border: 1px solid var(--border-tan);
+  border-radius: 8px;
+  text-decoration: none;
+  color: var(--dark-brown);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.search-result-item:hover {
+  border-color: var(--orange);
+  background: var(--soft-orange);
+}
+.search-match-field {
+  color: var(--gold);
+  font-weight: 600;
 }
 
 /* Responsive */
