@@ -1,7 +1,7 @@
 // sw_template.js - source template for the generated sw.js.
 //
 // build.py copies this file to sw.js at the repo root, replacing:
-//   10    -> integer version number from version.json (drives the shell cache name)
+//   11    -> integer version number from version.json (drives the shell cache name)
 //   ["./", "index.html", "manifest.json", "icons/gg-192.png", "icons/gg-512.png", "icons/gg-maskable-512.png", "fonts/cormorant-garamond-cyrillic-400-italic.woff2", "fonts/cormorant-garamond-cyrillic-700.woff2", "fonts/cormorant-garamond-cyrillic-ext-400-italic.woff2", "fonts/cormorant-garamond-cyrillic-ext-700.woff2", "fonts/cormorant-garamond-latin-400-italic.woff2", "fonts/cormorant-garamond-latin-700.woff2", "fonts/cormorant-garamond-latin-ext-400-italic.woff2", "fonts/cormorant-garamond-latin-ext-700.woff2", "fonts/cormorant-garamond-vietnamese-400-italic.woff2", "fonts/cormorant-garamond-vietnamese-700.woff2", "fonts/crimson-text-latin-400-italic.woff2", "fonts/crimson-text-latin-400.woff2", "fonts/crimson-text-latin-600.woff2", "fonts/crimson-text-latin-700.woff2", "fonts/crimson-text-latin-ext-400-italic.woff2", "fonts/crimson-text-latin-ext-400.woff2", "fonts/crimson-text-latin-ext-600.woff2", "fonts/crimson-text-latin-ext-700.woff2", "fonts/crimson-text-vietnamese-400-italic.woff2", "fonts/crimson-text-vietnamese-400.woff2", "fonts/crimson-text-vietnamese-600.woff2", "fonts/crimson-text-vietnamese-700.woff2", "fonts/noto-serif-cyrillic-400-italic.woff2", "fonts/noto-serif-cyrillic-700.woff2", "fonts/noto-serif-cyrillic-ext-400-italic.woff2", "fonts/noto-serif-cyrillic-ext-700.woff2", "fonts/noto-serif-greek-400-italic.woff2", "fonts/noto-serif-greek-700.woff2", "fonts/noto-serif-greek-ext-400-italic.woff2", "fonts/noto-serif-greek-ext-700.woff2", "fonts/noto-serif-latin-400-italic.woff2", "fonts/noto-serif-latin-700.woff2", "fonts/noto-serif-latin-ext-400-italic.woff2", "fonts/noto-serif-latin-ext-700.woff2", "fonts/noto-serif-math-400-italic.woff2", "fonts/noto-serif-math-700.woff2", "fonts/noto-serif-vietnamese-400-italic.woff2", "fonts/noto-serif-vietnamese-700.woff2", "fonts/playfair-display-cyrillic-700.woff2", "fonts/playfair-display-latin-700.woff2", "fonts/playfair-display-latin-ext-700.woff2", "fonts/playfair-display-vietnamese-700.woff2"]  -> JSON array of shell asset URLs (./  index.html  manifest.json
 //                         icons/*  fonts/*.woff2)
 //
@@ -12,7 +12,7 @@
 //                    only ever grows/shrinks via explicit DOWNLOAD_ASSETS / PRUNE
 //                    messages from the page, or lazily on first play while online.
 
-const SW_VERSION = '10';
+const SW_VERSION = '11';
 const SHELL_CACHE = 'shell-v' + SW_VERSION;
 const MEDIA_CACHE = 'media-v1';
 const SHELL_ASSETS = ["./", "index.html", "manifest.json", "icons/gg-192.png", "icons/gg-512.png", "icons/gg-maskable-512.png", "fonts/cormorant-garamond-cyrillic-400-italic.woff2", "fonts/cormorant-garamond-cyrillic-700.woff2", "fonts/cormorant-garamond-cyrillic-ext-400-italic.woff2", "fonts/cormorant-garamond-cyrillic-ext-700.woff2", "fonts/cormorant-garamond-latin-400-italic.woff2", "fonts/cormorant-garamond-latin-700.woff2", "fonts/cormorant-garamond-latin-ext-400-italic.woff2", "fonts/cormorant-garamond-latin-ext-700.woff2", "fonts/cormorant-garamond-vietnamese-400-italic.woff2", "fonts/cormorant-garamond-vietnamese-700.woff2", "fonts/crimson-text-latin-400-italic.woff2", "fonts/crimson-text-latin-400.woff2", "fonts/crimson-text-latin-600.woff2", "fonts/crimson-text-latin-700.woff2", "fonts/crimson-text-latin-ext-400-italic.woff2", "fonts/crimson-text-latin-ext-400.woff2", "fonts/crimson-text-latin-ext-600.woff2", "fonts/crimson-text-latin-ext-700.woff2", "fonts/crimson-text-vietnamese-400-italic.woff2", "fonts/crimson-text-vietnamese-400.woff2", "fonts/crimson-text-vietnamese-600.woff2", "fonts/crimson-text-vietnamese-700.woff2", "fonts/noto-serif-cyrillic-400-italic.woff2", "fonts/noto-serif-cyrillic-700.woff2", "fonts/noto-serif-cyrillic-ext-400-italic.woff2", "fonts/noto-serif-cyrillic-ext-700.woff2", "fonts/noto-serif-greek-400-italic.woff2", "fonts/noto-serif-greek-700.woff2", "fonts/noto-serif-greek-ext-400-italic.woff2", "fonts/noto-serif-greek-ext-700.woff2", "fonts/noto-serif-latin-400-italic.woff2", "fonts/noto-serif-latin-700.woff2", "fonts/noto-serif-latin-ext-400-italic.woff2", "fonts/noto-serif-latin-ext-700.woff2", "fonts/noto-serif-math-400-italic.woff2", "fonts/noto-serif-math-700.woff2", "fonts/noto-serif-vietnamese-400-italic.woff2", "fonts/noto-serif-vietnamese-700.woff2", "fonts/playfair-display-cyrillic-700.woff2", "fonts/playfair-display-latin-700.woff2", "fonts/playfair-display-latin-ext-700.woff2", "fonts/playfair-display-vietnamese-700.woff2"];
@@ -210,43 +210,58 @@ async function downloadAssets(assets, client, keepUrls) {
   let done = 0;
   let bytesDone = 0;
 
-  for (const asset of assets) {
-    try {
-      const existing = await cache.match(asset.url);
-      if (existing) {
+  // Download with a small concurrency pool instead of strictly sequentially.
+  // Each file is a separate HTTPS request to GitHub Pages; running several in
+  // parallel hides per-request latency and is dramatically faster on mobile.
+  const CONCURRENCY = 6;
+  let index = 0;
+
+  async function worker() {
+    while (index < assets.length) {
+      const asset = assets[index++];
+      try {
+        const existing = await cache.match(asset.url);
+        if (existing) {
+          done++;
+          bytesDone += asset.size || 0;
+          postToClient(client, { type: 'PROGRESS', done, total, bytesDone });
+          continue;
+        }
+        const response = await fetch(asset.url);
+        if (!response || !response.ok) {
+          throw new Error('HTTP ' + (response && response.status));
+        }
+        try {
+          await cache.put(asset.url, response.clone());
+        } catch (quotaErr) {
+          postToClient(client, {
+            type: 'DOWNLOAD_ERROR',
+            url: asset.url,
+            reason: 'quota',
+            remaining: total - done,
+          });
+          continue;
+        }
         done++;
         bytesDone += asset.size || 0;
         postToClient(client, { type: 'PROGRESS', done, total, bytesDone });
-        continue;
-      }
-      const response = await fetch(asset.url);
-      if (!response || !response.ok) {
-        throw new Error('HTTP ' + (response && response.status));
-      }
-      try {
-        await cache.put(asset.url, response.clone());
-      } catch (quotaErr) {
+      } catch (err) {
         postToClient(client, {
           type: 'DOWNLOAD_ERROR',
           url: asset.url,
-          reason: 'quota',
-          remaining: total - done - 1,
+          reason: 'network',
+          remaining: total - done,
         });
-        continue;
+        // Keep going with the rest of the batch.
       }
-      done++;
-      bytesDone += asset.size || 0;
-      postToClient(client, { type: 'PROGRESS', done, total, bytesDone });
-    } catch (err) {
-      postToClient(client, {
-        type: 'DOWNLOAD_ERROR',
-        url: asset.url,
-        reason: 'network',
-        remaining: total - done - 1,
-      });
-      // Keep going with the rest of the batch.
     }
   }
+
+  const workers = [];
+  for (let i = 0; i < Math.min(CONCURRENCY, assets.length); i++) {
+    workers.push(worker());
+  }
+  await Promise.all(workers);
 
   postToClient(client, { type: 'DOWNLOAD_COMPLETE', done, total });
 }

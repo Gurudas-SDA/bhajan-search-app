@@ -210,43 +210,58 @@ async function downloadAssets(assets, client, keepUrls) {
   let done = 0;
   let bytesDone = 0;
 
-  for (const asset of assets) {
-    try {
-      const existing = await cache.match(asset.url);
-      if (existing) {
+  // Download with a small concurrency pool instead of strictly sequentially.
+  // Each file is a separate HTTPS request to GitHub Pages; running several in
+  // parallel hides per-request latency and is dramatically faster on mobile.
+  const CONCURRENCY = 6;
+  let index = 0;
+
+  async function worker() {
+    while (index < assets.length) {
+      const asset = assets[index++];
+      try {
+        const existing = await cache.match(asset.url);
+        if (existing) {
+          done++;
+          bytesDone += asset.size || 0;
+          postToClient(client, { type: 'PROGRESS', done, total, bytesDone });
+          continue;
+        }
+        const response = await fetch(asset.url);
+        if (!response || !response.ok) {
+          throw new Error('HTTP ' + (response && response.status));
+        }
+        try {
+          await cache.put(asset.url, response.clone());
+        } catch (quotaErr) {
+          postToClient(client, {
+            type: 'DOWNLOAD_ERROR',
+            url: asset.url,
+            reason: 'quota',
+            remaining: total - done,
+          });
+          continue;
+        }
         done++;
         bytesDone += asset.size || 0;
         postToClient(client, { type: 'PROGRESS', done, total, bytesDone });
-        continue;
-      }
-      const response = await fetch(asset.url);
-      if (!response || !response.ok) {
-        throw new Error('HTTP ' + (response && response.status));
-      }
-      try {
-        await cache.put(asset.url, response.clone());
-      } catch (quotaErr) {
+      } catch (err) {
         postToClient(client, {
           type: 'DOWNLOAD_ERROR',
           url: asset.url,
-          reason: 'quota',
-          remaining: total - done - 1,
+          reason: 'network',
+          remaining: total - done,
         });
-        continue;
+        // Keep going with the rest of the batch.
       }
-      done++;
-      bytesDone += asset.size || 0;
-      postToClient(client, { type: 'PROGRESS', done, total, bytesDone });
-    } catch (err) {
-      postToClient(client, {
-        type: 'DOWNLOAD_ERROR',
-        url: asset.url,
-        reason: 'network',
-        remaining: total - done - 1,
-      });
-      // Keep going with the rest of the batch.
     }
   }
+
+  const workers = [];
+  for (let i = 0; i < Math.min(CONCURRENCY, assets.length); i++) {
+    workers.push(worker());
+  }
+  await Promise.all(workers);
 
   postToClient(client, { type: 'DOWNLOAD_COMPLETE', done, total });
 }
