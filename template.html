@@ -1290,6 +1290,11 @@ body.offline .video-badge {
   font-size: 1rem;
   box-shadow: 0 1px 3px var(--shadow-soft);
 }
+.search-input::placeholder,
+.set-name-input::placeholder {
+  color: var(--text-muted);
+  opacity: 1; /* Firefox lowers placeholder opacity by default */
+}
 .search-input:focus {
   outline: none;
   border-color: var(--orange);
