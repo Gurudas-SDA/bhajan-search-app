@@ -40,7 +40,7 @@ def make(size, maskable=False, radius_ratio=0.22):
     return img
 
 os.makedirs(OUT, exist_ok=True)
-make(192).save(os.path.join(OUT, 'icon-192.png'))
-make(512).save(os.path.join(OUT, 'icon-512.png'))
-make(512, maskable=True).save(os.path.join(OUT, 'maskable-512.png'))
-print('Icons written: icon-192.png, icon-512.png, maskable-512.png')
+make(192).save(os.path.join(OUT, 'gg-192.png'))
+make(512).save(os.path.join(OUT, 'gg-512.png'))
+make(512, maskable=True).save(os.path.join(OUT, 'gg-maskable-512.png'))
+print('Icons written: gg-192.png, gg-512.png, gg-maskable-512.png')
