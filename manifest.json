@@ -1,11 +1,17 @@
 {
+  "id": "/bhajan-search-app/",
   "name": "Śrī Gauḍīya Gīti-guccha",
   "short_name": "Gīti-guccha",
+  "description": "A Gauḍīya Vaiṣṇava songbook: 259 bhajans with translations in six languages, offline audio, and search. In Bengali, Sanskrit, Hindi and Oriya with English, Latvian, Russian, Spanish, Italian and French translations.",
+  "lang": "en",
+  "dir": "ltr",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
+  "orientation": "any",
   "theme_color": "#c86b1f",
   "background_color": "#fdf8f2",
+  "categories": ["music", "books", "lifestyle"],
   "icons": [
     {
       "src": "icons/gg-192.png",
