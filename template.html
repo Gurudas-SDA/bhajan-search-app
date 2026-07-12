@@ -3888,6 +3888,7 @@ function render(route, preserveScroll) {
   applyFontScale();
   updateAlphaNavOffset();
   updateOnlineUI();
+  refreshWakeLock();
 
   if (!preserveScroll) {
     announceRoute(currentRoute);
@@ -3946,29 +3947,40 @@ function apSeek(id) {
   const seek = document.getElementById('seek_' + id);
   if (a && a.duration) a.currentTime = (seek.value / 100) * a.duration;
 }
-// ---- Screen Wake Lock: keep the screen on while a bhajan is playing so
-// devotees can sing along without the display auto-dimming. Silent no-op on
-// browsers that lack the API (e.g. older iOS Safari). ----
+// ---- Screen Wake Lock: keep the screen on while a bhajan is open (reading the
+// words to sing) OR audio is playing, so devotees can sing along without the
+// display auto-dimming. Silent no-op on browsers that lack the API (older iOS
+// Safari). Released automatically when leaving the bhajan and audio stops. ----
 let wakeLock = null;
 function anyAudioPlaying() {
   return [...document.querySelectorAll('audio')].some(a => !a.paused && !a.ended);
+}
+function isBhajanView() {
+  return !!currentRoute && (currentRoute.indexOf('bhajan:') === 0 || currentRoute.indexOf('setplay:') === 0);
+}
+function shouldKeepAwake() {
+  return isBhajanView() || anyAudioPlaying();
 }
 async function acquireWakeLock() {
   if (!('wakeLock' in navigator) || wakeLock) return;
   try {
     wakeLock = await navigator.wakeLock.request('screen');
     wakeLock.addEventListener('release', () => { wakeLock = null; });
-  } catch (e) { wakeLock = null; /* rejected (tab hidden/unsupported) — ignore */ }
+  } catch (e) { wakeLock = null; /* rejected (tab hidden/unfocused/unsupported) — ignore */ }
 }
 async function releaseWakeLock() {
   if (!wakeLock) return;
   try { await wakeLock.release(); } catch (e) { /* ignore */ }
   wakeLock = null;
 }
+// Central point: hold the lock iff we should keep the screen awake right now.
+function refreshWakeLock() {
+  if (shouldKeepAwake()) acquireWakeLock(); else releaseWakeLock();
+}
 // The browser auto-releases the lock when the tab is hidden; re-acquire it on
-// return if audio is still playing (the lock does NOT restore by itself).
+// return if we still should keep awake (the lock does NOT restore by itself).
 document.addEventListener('visibilitychange', () => {
-  if (document.visibilityState === 'visible' && anyAudioPlaying()) acquireWakeLock();
+  if (document.visibilityState === 'visible') refreshWakeLock();
 });
 
 function apSetup(id) {
@@ -3979,9 +3991,9 @@ function apSetup(id) {
   if (!a || !seek || !timeEl || !btn) return;
   const playIcon = '<svg width="12" height="14" viewBox="0 0 12 14"><polygon points="0,0 12,7 0,14" fill="white"/></svg>';
   const pauseIcon = '<svg width="12" height="12" viewBox="0 0 12 12"><rect x="0" y="0" width="4" height="12" fill="white"/><rect x="8" y="0" width="4" height="12" fill="white"/></svg>';
-  a.addEventListener('play', () => { btn.innerHTML = pauseIcon; acquireWakeLock(); });
-  a.addEventListener('pause', () => { btn.innerHTML = playIcon; if (!anyAudioPlaying()) releaseWakeLock(); });
-  a.addEventListener('ended', () => { btn.innerHTML = playIcon; if (!anyAudioPlaying()) releaseWakeLock(); });
+  a.addEventListener('play', () => { btn.innerHTML = pauseIcon; refreshWakeLock(); });
+  a.addEventListener('pause', () => { btn.innerHTML = playIcon; refreshWakeLock(); });
+  a.addEventListener('ended', () => { btn.innerHTML = playIcon; refreshWakeLock(); });
   a.addEventListener('timeupdate', () => {
     if (a.duration) seek.value = (a.currentTime / a.duration) * 100;
     timeEl.textContent = apFmt(a.currentTime) + ' / ' + apFmt(a.duration);
