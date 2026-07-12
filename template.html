@@ -1468,8 +1468,178 @@ function esc(s) {
   return d.innerHTML;
 }
 
+// Safe decodeURIComponent — never throws; falls back to a caller-supplied value (L1)
+function safeDecodeURIComponent(s, fallback) {
+  try {
+    return decodeURIComponent(s);
+  } catch (e) {
+    return fallback;
+  }
+}
+
+// ---- Search (H1) ----
+
+// Diacritic-insensitive normalization: NFD-decompose then strip all combining
+// marks (U+0300-U+036F). "krsna" must match "kṛṣṇa"; Baḓô -> "bado".
+function normalizeSearch(s) {
+  if (!s) return '';
+  return s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
+}
+
+function firstLineOf(b) {
+  if (b.verses.length > 0 && b.verses[0].original) {
+    return b.verses[0].original.split('\n')[0];
+  }
+  return '';
+}
+
+// Built lazily on first search, then cached.
+let SEARCH_INDEX = null;
+function buildSearchIndex() {
+  if (SEARCH_INDEX) return SEARCH_INDEX;
+  SEARCH_INDEX = BHAJANS.map(b => ({
+    b,
+    title: normalizeSearch(b.title),
+    author: normalizeSearch(b.author),
+    firstLine: normalizeSearch(firstLineOf(b)),
+    verseText: normalizeSearch(b.verses.map(v => v.original || '').join(' \n ')),
+  }));
+  return SEARCH_INDEX;
+}
+
+// Match priority: title starts-with > title contains > first-line contains >
+// verse-text contains. Capped at 50 results.
+function searchBhajans(query) {
+  const q = normalizeSearch((query || '').trim());
+  if (!q) return [];
+  const index = buildSearchIndex();
+  const results = [];
+  index.forEach(entry => {
+    let rank = -1;
+    let field = null;
+    if (entry.title.startsWith(q)) { rank = 0; field = 'title'; }
+    else if (entry.title.includes(q)) { rank = 1; field = 'title'; }
+    else if (entry.firstLine.includes(q)) { rank = 2; field = 'firstLine'; }
+    else if (entry.verseText.includes(q)) { rank = 3; field = 'verseText'; }
+    if (rank >= 0) results.push({ b: entry.b, rank, field });
+  });
+  results.sort((a, b) => a.rank - b.rank || a.b.title.localeCompare(b.b.title));
+  return results.slice(0, 50);
+}
+
+function searchFieldLabel(field) {
+  if (field === 'title') return t('matchTitle');
+  if (field === 'firstLine') return t('matchFirstLine');
+  return t('matchVerseText');
+}
+
+function renderSearchBox() {
+  return '<div class="search-box">' +
+    '<input type="search" id="search-input" class="search-input" placeholder="' + esc(t('searchPlaceholder')) + '" ' +
+    'aria-label="' + esc(t('searchPlaceholder')) + '" oninput="onSearchInput(this.value)">' +
+    '<div id="search-results" class="search-results" role="region" aria-live="polite"></div>' +
+    '</div>';
+}
+
+let searchDebounceTimer = null;
+function onSearchInput(value) {
+  clearTimeout(searchDebounceTimer);
+  searchDebounceTimer = setTimeout(() => renderSearchResults(value), 150);
+}
+
+function renderSearchResults(query) {
+  const container = document.getElementById('search-results');
+  if (!container) return;
+  const q = query || '';
+  if (!q.trim()) {
+    container.innerHTML = '';
+    return;
+  }
+  const results = searchBhajans(q);
+  if (results.length === 0) {
+    container.innerHTML = '<div class="search-empty">' + esc(t('noResults')) + '</div>';
+    return;
+  }
+  let html = '<div class="search-count">' + esc(t('searchResults', { count: results.length })) + '</div>';
+  results.forEach(r => {
+    const b = r.b;
+    const enc = encodeURIComponent(b.title);
+    html += '<a class="search-result-item" href="#bhajan:' + enc + '" onclick="navigate(\'bhajan:' + enc + '\'); return false;">';
+    html += '<div class="b-title">' + esc(b.title) + '</div>';
+    html += '<div class="b-meta">' + esc(b.author) + ' &middot; <span class="search-match-field">' + esc(searchFieldLabel(r.field)) + '</span></div>';
+    html += '</a>';
+  });
+  container.innerHTML = html;
+}
+
 // State
 let currentLang = localStorage.getItem('currentLang') || 'original';
+
+// H5: per-route scroll positions, kept in memory only (not persisted).
+const scrollPositions = {};
+let currentRoute = null;
+// Set right before a hash assignment that should NOT reset scroll / focus
+// (currently: leaving the language-choice screen back to where it was opened).
+let pendingPreserveScroll = false;
+
+function saveScrollForCurrentRoute() {
+  if (currentRoute !== null) {
+    scrollPositions[currentRoute] = window.pageYOffset;
+  }
+}
+
+// List-style routes restore their saved scroll position on return; bhajan
+// pages and the language chooser always start at the top.
+function isListRoute(route) {
+  if (!route || route === 'home' || route === 'titles' || route === 'firstline' ||
+      route === 'categories' || route === 'authors') return true;
+  if (route.startsWith('category:') || route.startsWith('author:')) return true;
+  return false;
+}
+
+// ---- Font size control (M6) ----
+const FONT_SCALE_STEPS = [0.9, 1.0, 1.15, 1.3];
+function getFontScaleIndex() {
+  const stored = parseInt(localStorage.getItem('verseFontScaleIndex'), 10);
+  if (!isNaN(stored) && stored >= 0 && stored < FONT_SCALE_STEPS.length) return stored;
+  return 1; // default: 1.0x
+}
+function applyFontScale() {
+  const idx = getFontScaleIndex();
+  document.body.style.setProperty('--verse-scale', FONT_SCALE_STEPS[idx]);
+}
+function setFontScaleIndex(idx) {
+  idx = Math.max(0, Math.min(FONT_SCALE_STEPS.length - 1, idx));
+  localStorage.setItem('verseFontScaleIndex', String(idx));
+  applyFontScale();
+}
+function fontSmaller() { setFontScaleIndex(getFontScaleIndex() - 1); }
+function fontLarger() { setFontScaleIndex(getFontScaleIndex() + 1); }
+
+function renderFontSizeControl() {
+  return '<div class="font-size-control">' +
+    '<button class="fs-btn" aria-label="' + esc(t('fontSmaller')) + '" onclick="fontSmaller()">A−</button>' +
+    '<button class="fs-btn" aria-label="' + esc(t('fontLarger')) + '" onclick="fontLarger()">A+</button>' +
+    '</div>';
+}
+
+// ---- M6: reflect currentLang (verse display mode) in shared bhajan URLs ----
+function isValidLangMode(mode) {
+  if (mode === 'original' || mode === 'english') return true;
+  const fields = Object.values(LANG_FIELD);
+  if (fields.indexOf(mode) !== -1) return true;
+  if (mode.indexOf('orig+') === 0 && fields.indexOf(mode.substring(5)) !== -1) return true;
+  return false;
+}
+
+// Updates the hash to '#bhajan:<enc>:<currentLang>' without firing hashchange
+// (so it never triggers a redundant re-render or a scroll jump).
+function updateBhajanHash(encodedTitle) {
+  const newHash = '#bhajan:' + encodedTitle + ':' + encodeURIComponent(currentLang);
+  if (window.location.hash !== newHash) {
+    history.replaceState(null, '', newHash);
+  }
+}
 
 // Breadcrumb
 function setBreadcrumb(parts) {
@@ -1517,19 +1687,28 @@ function renderLanguageChoice(isFirstLaunch) {
   return html;
 }
 
-function chooseLang(code) {
-  setWorkingLang(code);
+// Language switch re-renders the same route in place: preserve scroll and skip
+// the re-announce/re-focus that a real navigation would trigger (H3/H5).
+function goBackFromLangChoice(code) {
+  if (code !== null) setWorkingLang(code);
   const back = langChoiceReturnRoute || 'home';
   langChoiceReturnRoute = null;
-  window.location.hash = back;
-  render(back);
+  pendingPreserveScroll = true;
+  if (window.location.hash.substring(1) === back) {
+    // Hash never changed while the chooser was open — hashchange won't fire,
+    // so render directly.
+    render(back, true);
+  } else {
+    window.location.hash = back;
+  }
+}
+
+function chooseLang(code) {
+  goBackFromLangChoice(code);
 }
 
 function cancelLangChoice() {
-  const back = langChoiceReturnRoute || 'home';
-  langChoiceReturnRoute = null;
-  window.location.hash = back;
-  render(back);
+  goBackFromLangChoice(null);
 }
 
 // Alpha nav
@@ -1551,7 +1730,17 @@ function setAlphaNav(letters, scrollPrefix) {
     }
   });
   nav.innerHTML = html;
+  updateAlphaNavOffset();
 }
+
+// L6: keep the sticky alpha-nav pinned directly under the breadcrumb even if
+// the breadcrumb's real height differs from the CSS default (wrapping, etc).
+function updateAlphaNavOffset() {
+  const bc = document.getElementById('breadcrumb');
+  const nav = document.getElementById('alpha-nav');
+  if (bc && nav) nav.style.top = bc.offsetHeight + 'px';
+}
+window.addEventListener('resize', updateAlphaNavOffset);
 
 function scrollToLetter(letter, prefix) {
   const el = document.getElementById(prefix + '-' + letter);
@@ -1624,7 +1813,7 @@ function renderHome() {
   const authCount = getAuthorCounts().length;
   return `
     <div class="home-header">
-      <h1>\u015ar\u012b Gau\u1e0d\u012bya G\u012bti-guccha</h1>
+      <h1 id="main-heading" tabindex="-1">\u015ar\u012b Gau\u1e0d\u012bya G\u012bti-guccha</h1>
       <div class="subtitle">An Anthology of Gau\u1e0d\u012bya Vai\u1e63\u1e47ava Songs</div>
       <div class="lang-note">In Bengali, Sanskrit, Hindi and Oriya</div>
     </div>
@@ -1635,6 +1824,7 @@ function renderHome() {
       <div class="stat"><div class="stat-number">${catCount}</div><div class="stat-label">Categories</div></div>
       <div class="stat"><div class="stat-number">${authCount}</div><div class="stat-label">Authors</div></div>
     </div>
+    ${renderSearchBox()}
     <div class="nav-grid">
       <a class="nav-btn" href="#titles" onclick="navigate('titles'); return false;">
         <span class="label">${esc(t('songIndex'))}</span>
@@ -1660,13 +1850,14 @@ function renderTitles() {
   setAlphaNav(letters, 'title');
 
   let html = compactHeader();
+  html += renderSearchBox();
   html += '<div class="list-section">';
-  html += '<h2 class="page-title">' + esc(t('songIndex')) + '</h2>';
+  html += '<h2 class="page-title" id="main-heading" tabindex="-1">' + esc(t('songIndex')) + '</h2>';
   for (const letter of letters) {
     html += '<div class="letter-heading" id="title-' + letter + '">' + letter + '</div>';
     groups[letter].forEach(b => {
-      const safeTitle = esc(b.title).replace(/'/g, '&#39;');
-      html += '<a class="bhajan-item" href="#bhajan:' + encodeURIComponent(b.title) + '" onclick="navigate(\'bhajan:\' + decodeURIComponent(\'' + encodeURIComponent(b.title) + '\')); return false;">';
+      const enc = encodeURIComponent(b.title);
+      html += '<a class="bhajan-item" href="#bhajan:' + enc + '" onclick="navigate(\'bhajan:' + enc + '\'); return false;">';
       html += '<div class="b-title">' + esc(b.title) + (YOUTUBE_IDS[b.title] ? ' <span class="video-badge">&#9654; Video</span>' : '') + (AUDIO_IDS[b.title] ? ' <span class="audio-badge">&#9836; Audio</span>' : '') + '</div>';
       html += '<div class="b-meta">' + esc(b.author) + ' &middot; ' + esc(b.category) + ' &middot; ' + b.verses.length + ' ' + esc(t('verses')) + '</div>';
       html += '</a>';
@@ -1690,12 +1881,13 @@ function renderFirstLine() {
 
   let html = compactHeader();
   html += '<div class="list-section">';
-  html += '<h2 class="page-title">' + esc(t('byFirstLine')) + '</h2>';
+  html += '<h2 class="page-title" id="main-heading" tabindex="-1">' + esc(t('byFirstLine')) + '</h2>';
   for (const letter of letters) {
     html += '<div class="letter-heading" id="fl-' + letter + '">' + letter + '</div>';
     groups[letter].forEach(b => {
       const firstLine = (b.verses.length > 0 && b.verses[0].original) ? b.verses[0].original.split('\n')[0] : b.title;
-      html += '<a class="bhajan-item" href="#bhajan:' + encodeURIComponent(b.title) + '" onclick="navigate(\'bhajan:\' + decodeURIComponent(\'' + encodeURIComponent(b.title) + '\')); return false;">';
+      const enc = encodeURIComponent(b.title);
+      html += '<a class="bhajan-item" href="#bhajan:' + enc + '" onclick="navigate(\'bhajan:' + enc + '\'); return false;">';
       html += '<div class="b-title">' + esc(firstLine) + (YOUTUBE_IDS[b.title] ? ' <span class="video-badge">&#9654; Video</span>' : '') + (AUDIO_IDS[b.title] ? ' <span class="audio-badge">&#9836; Audio</span>' : '') + '</div>';
       html += '<div class="b-meta">' + esc(b.title) + ' &middot; ' + esc(b.author) + '</div>';
       html += '</a>';
@@ -1711,9 +1903,10 @@ function renderCategories() {
   const cats = getCategoryCounts();
 
   let html = compactHeader();
-  html += '<h2 class="page-title">' + esc(t('categories')) + '</h2>';
+  html += '<h2 class="page-title" id="main-heading" tabindex="-1">' + esc(t('categories')) + '</h2>';
   cats.forEach(([name, count]) => {
-    html += '<a class="cat-item" href="#category:' + encodeURIComponent(name) + '" onclick="navigate(\'category:\' + decodeURIComponent(\'' + encodeURIComponent(name) + '\')); return false;">';
+    const enc = encodeURIComponent(name);
+    html += '<a class="cat-item" href="#category:' + enc + '" onclick="navigate(\'category:' + enc + '\'); return false;">';
     html += '<span class="cat-name">' + esc(name) + '</span>';
     html += '<span class="cat-count">' + count + '</span>';
     html += '</a>';
@@ -1727,9 +1920,10 @@ function renderAuthors() {
   const auths = getAuthorCounts();
 
   let html = compactHeader();
-  html += '<h2 class="page-title">' + esc(t('authors')) + '</h2>';
+  html += '<h2 class="page-title" id="main-heading" tabindex="-1">' + esc(t('authors')) + '</h2>';
   auths.forEach(([name, count]) => {
-    html += '<a class="cat-item" href="#author:' + encodeURIComponent(name) + '" onclick="navigate(\'author:\' + decodeURIComponent(\'' + encodeURIComponent(name) + '\')); return false;">';
+    const enc = encodeURIComponent(name);
+    html += '<a class="cat-item" href="#author:' + enc + '" onclick="navigate(\'author:' + enc + '\'); return false;">';
     html += '<span class="cat-name">' + esc(name) + '</span>';
     html += '<span class="cat-count">' + count + '</span>';
     html += '</a>';
@@ -1746,10 +1940,11 @@ function renderCategoryView(catName) {
   const items = BHAJANS.filter(b => b.category === catName).sort((a,b) => a.title.localeCompare(b.title));
 
   let html = compactHeader();
-  html += '<h2 class="page-title">' + esc(catName) + '</h2>';
+  html += '<h2 class="page-title" id="main-heading" tabindex="-1">' + esc(catName) + '</h2>';
   html += '<p style="color:var(--text-secondary);margin-bottom:16px;">' + items.length + ' ' + esc(t('bhajans')) + '</p>';
   items.forEach(b => {
-    html += '<a class="bhajan-item" href="#bhajan:' + encodeURIComponent(b.title) + '" onclick="navigate(\'bhajan:\' + decodeURIComponent(\'' + encodeURIComponent(b.title) + '\')); return false;">';
+    const enc = encodeURIComponent(b.title);
+    html += '<a class="bhajan-item" href="#bhajan:' + enc + '" onclick="navigate(\'bhajan:' + enc + '\'); return false;">';
     html += '<div class="b-title">' + esc(b.title) + (YOUTUBE_IDS[b.title] ? ' <span class="video-badge">&#9654; Video</span>' : '') + (AUDIO_IDS[b.title] ? ' <span class="audio-badge">&#9836; Audio</span>' : '') + '</div>';
     html += '<div class="b-meta">' + esc(b.author) + ' &middot; ' + b.verses.length + ' ' + esc(t('verses')) + '</div>';
     html += '</a>';
@@ -1766,10 +1961,11 @@ function renderAuthorView(authName) {
   const items = BHAJANS.filter(b => b.author === authName).sort((a,b) => a.title.localeCompare(b.title));
 
   let html = compactHeader();
-  html += '<h2 class="page-title">' + esc(authName) + '</h2>';
+  html += '<h2 class="page-title" id="main-heading" tabindex="-1">' + esc(authName) + '</h2>';
   html += '<p style="color:var(--text-secondary);margin-bottom:16px;">' + items.length + ' ' + esc(t('bhajans')) + '</p>';
   items.forEach(b => {
-    html += '<a class="bhajan-item" href="#bhajan:' + encodeURIComponent(b.title) + '" onclick="navigate(\'bhajan:\' + decodeURIComponent(\'' + encodeURIComponent(b.title) + '\')); return false;">';
+    const enc = encodeURIComponent(b.title);
+    html += '<a class="bhajan-item" href="#bhajan:' + enc + '" onclick="navigate(\'bhajan:' + enc + '\'); return false;">';
     html += '<div class="b-title">' + esc(b.title) + (YOUTUBE_IDS[b.title] ? ' <span class="video-badge">&#9654; Video</span>' : '') + (AUDIO_IDS[b.title] ? ' <span class="audio-badge">&#9836; Audio</span>' : '') + '</div>';
     html += '<div class="b-meta">' + esc(b.category) + ' &middot; ' + b.verses.length + ' ' + esc(t('verses')) + '</div>';
     html += '</a>';
@@ -1835,7 +2031,12 @@ function renderVersesContainer(b) {
 
 function renderBhajan(title) {
   const b = findBhajan(title);
-  if (!b) return '<p>' + esc(t('bhajanNotFound')) + '</p>';
+  if (!b) {
+    // L4: not-found path still needs a consistent chrome (breadcrumb/alpha-nav)
+    setBreadcrumb([{label: t('bhajanNotFound'), hash: null}]);
+    setAlphaNav(null);
+    return '<p id="main-heading" tabindex="-1">' + esc(t('bhajanNotFound')) + '</p>';
+  }
 
   setBreadcrumb([
     {label: b.category, hash: 'category:' + encodeURIComponent(b.category)},
@@ -1845,7 +2046,7 @@ function renderBhajan(title) {
 
   let html = compactHeader();
   html += '<div class="bhajan-view">';
-  html += '<h2>' + esc(b.title) + '</h2>';
+  html += '<h2 id="main-heading" tabindex="-1">' + esc(b.title) + '</h2>';
   html += '<div class="bv-meta">';
   html += 'by <a href="#author:' + encodeURIComponent(b.author) + '" onclick="navigate(\'author:' + encodeURIComponent(b.author) + '\'); return false;">' + esc(b.author) + '</a>';
   html += ' &middot; <a href="#category:' + encodeURIComponent(b.category) + '" onclick="navigate(\'category:' + encodeURIComponent(b.category) + '\'); return false;">' + esc(b.category) + '</a>';
@@ -1885,17 +2086,25 @@ function renderBhajan(title) {
   const enc = encodeURIComponent(title);
   html += renderLangButtons(enc);
 
+  // Font size control (M6) — sits next to the language selector
+  html += renderFontSizeControl();
+
   // Verses — isolated in their own container so switchLang can re-render
   // just this part without disturbing the audio player (M1 fix)
   html += renderVersesContainer(b);
   html += '</div>';
+
+  // M6: reflect the current verse-display mode in the hash for shareable links
+  updateBhajanHash(enc);
+
   return html;
 }
 
 function switchLang(lang, encodedTitle) {
   currentLang = lang;
   localStorage.setItem('currentLang', currentLang);
-  const title = decodeURIComponent(encodedTitle);
+  const title = safeDecodeURIComponent(encodedTitle, null);
+  if (title === null) return;
   const b = findBhajan(title);
   if (!b) return;
   // Re-render ONLY the verses container and the language button row —
@@ -1904,6 +2113,7 @@ function switchLang(lang, encodedTitle) {
   if (versesEl) {
     versesEl.outerHTML = renderVersesContainer(b);
   }
+  updateBhajanHash(encodedTitle);
   const selectorEl = document.querySelector('.bhajan-view .lang-selector');
   if (selectorEl) {
     selectorEl.outerHTML = renderLangButtons(encodedTitle);
@@ -1915,7 +2125,25 @@ function navigate(route) {
   window.location.hash = route;
 }
 
+// H3: announce the new route to screen-reader users via the aria-live region.
+function announceRoute(route) {
+  const el = document.getElementById('route-announcer');
+  if (!el) return;
+  let label = t('home');
+  if (!route || route === 'home') label = t('home');
+  else if (route === 'titles') label = t('songIndex');
+  else if (route === 'firstline') label = t('byFirstLine');
+  else if (route === 'categories') label = t('categories');
+  else if (route === 'authors') label = t('authors');
+  else if (route === 'langchoice') label = t('langChoiceTitle');
+  else if (route.indexOf('category:') === 0) label = safeDecodeURIComponent(route.substring(9), route);
+  else if (route.indexOf('author:') === 0) label = safeDecodeURIComponent(route.substring(7), route);
+  else if (route.indexOf('bhajan:') === 0) label = safeDecodeURIComponent(route.substring(7).split(':')[0], route);
+  el.textContent = t('navigatedTo', { page: label });
+}
+
 function render(route, preserveScroll) {
+  saveScrollForCurrentRoute();
   const app = document.getElementById('app');
   const scrollPos = preserveScroll ? window.pageYOffset : 0;
 
@@ -1924,6 +2152,7 @@ function render(route, preserveScroll) {
     if (route && route !== 'home' && langChoiceReturnRoute === null) {
       langChoiceReturnRoute = route; // preserve deep link through first-launch chooser
     }
+    currentRoute = 'langchoice';
     document.getElementById('breadcrumb').style.display = 'none';
     document.getElementById('alpha-nav').style.display = 'none';
     app.innerHTML = renderLanguageChoice(true);
@@ -1933,39 +2162,75 @@ function render(route, preserveScroll) {
   document.getElementById('breadcrumb').style.display = '';
 
   if (route === 'langchoice') {
+    currentRoute = 'langchoice';
     document.getElementById('alpha-nav').style.display = 'none';
     app.innerHTML = renderLanguageChoice(!getWorkingLang());
     window.scrollTo(0, 0);
     return;
   } else if (!route || route === 'home') {
+    currentRoute = route || 'home';
     app.innerHTML = renderHome();
   } else if (route === 'titles') {
+    currentRoute = route;
     app.innerHTML = renderTitles();
   } else if (route === 'firstline') {
+    currentRoute = route;
     app.innerHTML = renderFirstLine();
   } else if (route === 'categories') {
+    currentRoute = route;
     app.innerHTML = renderCategories();
   } else if (route === 'authors') {
+    currentRoute = route;
     app.innerHTML = renderAuthors();
-  } else if (route.startsWith('category:')) {
-    const name = decodeURIComponent(route.substring(9));
-    app.innerHTML = renderCategoryView(name);
-  } else if (route.startsWith('author:')) {
-    const name = decodeURIComponent(route.substring(7));
-    app.innerHTML = renderAuthorView(name);
-  } else if (route.startsWith('bhajan:')) {
-    const title = decodeURIComponent(route.substring(7));
-    app.innerHTML = renderBhajan(title);
+  } else if (route.indexOf('category:') === 0) {
+    currentRoute = route;
+    const name = safeDecodeURIComponent(route.substring(9), null);
+    app.innerHTML = (name === null) ? renderHome() : renderCategoryView(name);
+    if (name === null) currentRoute = 'home';
+  } else if (route.indexOf('author:') === 0) {
+    currentRoute = route;
+    const name = safeDecodeURIComponent(route.substring(7), null);
+    app.innerHTML = (name === null) ? renderHome() : renderAuthorView(name);
+    if (name === null) currentRoute = 'home';
+  } else if (route.indexOf('bhajan:') === 0) {
+    currentRoute = route;
+    // Backwards-compatible route: 'bhajan:<encTitle>' or 'bhajan:<encTitle>:<encLangMode>' (M6)
+    const rest = route.substring(7);
+    const segs = rest.split(':');
+    const title = safeDecodeURIComponent(segs[0], null);
+    if (title === null) {
+      app.innerHTML = renderHome();
+      currentRoute = 'home';
+    } else {
+      if (segs[1]) {
+        const urlLangMode = safeDecodeURIComponent(segs[1], null);
+        if (urlLangMode !== null && isValidLangMode(urlLangMode)) {
+          currentLang = urlLangMode; // view-only override — not persisted to localStorage
+        }
+      }
+      app.innerHTML = renderBhajan(title);
+    }
   } else {
+    currentRoute = 'home';
     app.innerHTML = renderHome();
   }
 
   if (preserveScroll) {
     window.scrollTo(0, scrollPos);
+  } else if (isListRoute(currentRoute) && scrollPositions[currentRoute] !== undefined) {
+    window.scrollTo(0, scrollPositions[currentRoute]);
   } else {
     window.scrollTo(0, 0);
   }
   initAudioPlayers();
+  applyFontScale();
+  updateAlphaNavOffset();
+
+  if (!preserveScroll) {
+    announceRoute(currentRoute);
+    const heading = document.getElementById('main-heading');
+    if (heading) heading.focus({ preventScroll: true });
+  }
 }
 
 // Custom audio player
@@ -1976,12 +2241,11 @@ function apFmt(s) {
 }
 function apToggle(id) {
   const a = document.getElementById(id);
-  const btn = document.getElementById('btn_' + id);
   if (!a) return;
   if (a.paused) {
     // pause all others
     document.querySelectorAll('audio').forEach(x => { if (x !== a) x.pause(); });
-    a.play();
+    a.play().catch(() => {});
   } else {
     a.pause();
   }
@@ -2022,8 +2286,17 @@ function initAudioPlayers() {
 // Hash listener
 window.addEventListener('hashchange', () => {
   const route = window.location.hash.substring(1);
-  render(route);
+  const preserve = pendingPreserveScroll;
+  pendingPreserveScroll = false;
+  render(route, preserve);
 });
+
+// Skip-link label is localized once workingLang is known; the static markup
+// carries an English fallback for the instant before this script runs.
+const skipLinkEl = document.getElementById('skip-link');
+if (skipLinkEl) skipLinkEl.textContent = t('skipToContent');
+
+applyFontScale();
 
 // Initial render
 const initRoute = window.location.hash.substring(1) || 'home';
