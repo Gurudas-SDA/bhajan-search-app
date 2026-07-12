@@ -2295,6 +2295,10 @@ function render(route, preserveScroll) {
   } else if (!route || route === 'home') {
     currentRoute = route || 'home';
     app.innerHTML = renderHome();
+  } else if (route === 'diag') {
+    currentRoute = route;
+    app.innerHTML = '<div style="padding:20px;font-family:monospace;font-size:13px;white-space:pre-wrap;word-break:break-all" id="diag-out">Running diagnostics…</div>';
+    runDiagnostics();
   } else if (route === 'titles') {
     currentRoute = route;
     app.innerHTML = renderTitles();
@@ -2408,6 +2412,76 @@ function apSetup(id) {
 // Initialize all audio players after render
 function initAudioPlayers() {
   document.querySelectorAll('audio[id^="ap_"]').forEach(a => apSetup(a.id));
+}
+
+// Offline diagnostics — reachable at #diag. Runs on-device tests and prints
+// the results so we can pinpoint why offline audio may fail on a given phone.
+async function runDiagnostics() {
+  const out = document.getElementById('diag-out');
+  const L = [];
+  const log = (s) => { L.push(s); if (out) out.textContent = L.join('\n'); };
+  try {
+    log('online: ' + navigator.onLine);
+    // SW status
+    const reg = await navigator.serviceWorker.getRegistration();
+    log('SW registered: ' + !!reg);
+    log('SW controller: ' + !!navigator.serviceWorker.controller);
+    if (navigator.serviceWorker.controller) log('SW script: ' + navigator.serviceWorker.controller.scriptURL);
+    const active = reg && reg.active;
+    log('SW active state: ' + (active ? active.state : 'none'));
+    // Which shell version cache exists
+    const cacheNames = await caches.keys();
+    log('caches: ' + cacheNames.join(', '));
+    // Media cache
+    const media = await caches.open('media-v1');
+    const mkeys = await media.keys();
+    log('media-v1 entries: ' + mkeys.length);
+    // Storage persisted + estimate
+    if (navigator.storage) {
+      if (navigator.storage.persisted) log('storage persisted: ' + await navigator.storage.persisted());
+      if (navigator.storage.estimate) { const e = await navigator.storage.estimate(); log('storage usage: ' + Math.round((e.usage||0)/1048576) + ' MB / quota ' + Math.round((e.quota||0)/1048576) + ' MB'); }
+    }
+    // Pick first cached audio and test the SW range path + actual playback
+    const first = mkeys[0];
+    if (!first) { log('NO cached audio — download did not populate media-v1'); return; }
+    const url = new URL(first.url).pathname + new URL(first.url).search;
+    log('test file: ' + url.split('/').pop());
+    // 1) range fetch through SW
+    try {
+      const r = await fetch(url, { headers: { Range: 'bytes=0-1000' } });
+      log('range fetch status: ' + r.status + ' (206 = good)');
+      log('  content-type: ' + r.headers.get('content-type'));
+      log('  content-range: ' + r.headers.get('content-range'));
+      const b = await r.blob();
+      log('  bytes returned: ' + b.size);
+    } catch (e) { log('range fetch FAILED: ' + e.message); }
+    // 2) plain fetch
+    try {
+      const r2 = await fetch(url);
+      log('plain fetch status: ' + r2.status + ' type ' + (await r2.blob()).type);
+    } catch (e) { log('plain fetch FAILED: ' + e.message); }
+    // 3) actual <audio> playback attempt
+    log('--- trying playback ---');
+    const a = new Audio();
+    a.preload = 'auto';
+    a.src = url;
+    const evLog = [];
+    ['loadstart','loadedmetadata','loadeddata','canplay','playing','waiting','stalled','suspend','error'].forEach(ev =>
+      a.addEventListener(ev, () => { evLog.push(ev + (ev==='error' && a.error ? '('+a.error.code+')' : '')); log('audio events: ' + evLog.join(' ')); }, { once: true }));
+    try {
+      await a.play();
+      log('play() resolved');
+      await new Promise(r => setTimeout(r, 2000));
+      log('after 2s: paused=' + a.paused + ' currentTime=' + a.currentTime.toFixed(2) + ' readyState=' + a.readyState + ' err=' + (a.error ? a.error.code : 'none'));
+      a.pause();
+      log(a.currentTime > 0.1 ? 'RESULT: PLAYBACK WORKS' : 'RESULT: play() ok but no progress');
+    } catch (e) {
+      log('play() REJECTED: ' + e.name + ' - ' + e.message);
+      log('audio err code: ' + (a.error ? a.error.code : 'none'));
+    }
+  } catch (e) {
+    log('DIAG ERROR: ' + e.message);
+  }
 }
 
 // ---- PWA (Phase 5): offline video hiding ----
