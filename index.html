@@ -1257,6 +1257,7 @@ const UI_STRINGS = {
     langHeaderAriaLabel: 'Change language',
     bhajanNotFound: 'Bhajan not found.',
     footer: 'Devotional Songbook',
+    statBhajans: 'Bhajans', statVerses: 'Verses', statCategories: 'Categories', statAuthors: 'Authors',
     updateAvailable: 'Update available (~{size})',
     updateNow: 'Update now',
     updateLater: 'Later',
@@ -1296,6 +1297,7 @@ const UI_STRINGS = {
     langHeaderAriaLabel: 'Mainīt valodu',
     bhajanNotFound: 'Bhadžans nav atrasts.',
     footer: 'Dievu slavinoša dziesmu grāmata',
+    statBhajans: 'Bhadžani', statVerses: 'Panti', statCategories: 'Kategorijas', statAuthors: 'Autori',
     updateAvailable: 'Pieejams atjauninājums (~{size})',
     updateNow: 'Atjaunināt tagad',
     updateLater: 'Vēlāk',
@@ -1335,6 +1337,7 @@ const UI_STRINGS = {
     langHeaderAriaLabel: 'Сменить язык',
     bhajanNotFound: 'Бхаджан не найден.',
     footer: 'Сборник духовных песен',
+    statBhajans: 'Бхаджаны', statVerses: 'Стихи', statCategories: 'Категории', statAuthors: 'Авторы',
     updateAvailable: 'Доступно обновление (~{size})',
     updateNow: 'Обновить сейчас',
     updateLater: 'Позже',
@@ -1374,6 +1377,7 @@ const UI_STRINGS = {
     langHeaderAriaLabel: 'Cambiar idioma',
     bhajanNotFound: 'Bhajan no encontrado.',
     footer: 'Cancionero devocional',
+    statBhajans: 'Bhajans', statVerses: 'Versos', statCategories: 'Categorías', statAuthors: 'Autores',
     updateAvailable: 'Actualización disponible (~{size})',
     updateNow: 'Actualizar ahora',
     updateLater: 'Más tarde',
@@ -1413,6 +1417,7 @@ const UI_STRINGS = {
     langHeaderAriaLabel: 'Cambia lingua',
     bhajanNotFound: 'Bhajan non trovato.',
     footer: 'Innario devozionale',
+    statBhajans: 'Bhajan', statVerses: 'Versi', statCategories: 'Categorie', statAuthors: 'Autori',
     updateAvailable: 'Aggiornamento disponibile (~{size})',
     updateNow: 'Aggiorna ora',
     updateLater: 'Più tardi',
@@ -1452,6 +1457,7 @@ const UI_STRINGS = {
     langHeaderAriaLabel: 'Changer de langue',
     bhajanNotFound: 'Bhajan introuvable.',
     footer: 'Recueil de chants dévotionnels',
+    statBhajans: 'Bhajans', statVerses: 'Versets', statCategories: 'Catégories', statAuthors: 'Auteurs',
     updateAvailable: 'Mise à jour disponible (~{size})',
     updateNow: 'Mettre à jour',
     updateLater: 'Plus tard',
@@ -1903,10 +1909,10 @@ function renderHome() {
     </div>
     <div class="divider">\u2022 \u2022 \u2022</div>
     <div class="stats">
-      <div class="stat"><div class="stat-number">${BHAJANS.length}</div><div class="stat-label">Bhajans</div></div>
-      <div class="stat"><div class="stat-number">${BHAJANS.reduce((s,b)=>s+b.verses.length,0)}</div><div class="stat-label">Verses</div></div>
-      <div class="stat"><div class="stat-number">${catCount}</div><div class="stat-label">Categories</div></div>
-      <div class="stat"><div class="stat-number">${authCount}</div><div class="stat-label">Authors</div></div>
+      <div class="stat"><div class="stat-number">${BHAJANS.length}</div><div class="stat-label">${t('statBhajans')}</div></div>
+      <div class="stat"><div class="stat-number">${BHAJANS.reduce((s,b)=>s+b.verses.length,0)}</div><div class="stat-label">${t('statVerses')}</div></div>
+      <div class="stat"><div class="stat-number">${catCount}</div><div class="stat-label">${t('statCategories')}</div></div>
+      <div class="stat"><div class="stat-number">${authCount}</div><div class="stat-label">${t('statAuthors')}</div></div>
     </div>
     ${renderSearchBox()}
     <div class="nav-grid">
