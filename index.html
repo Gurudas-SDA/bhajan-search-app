@@ -623,11 +623,13 @@ body {
 /* Nav buttons — single row */
 .nav-grid {
   display: flex;
+  flex-wrap: wrap;
   gap: 12px;
   margin: 10px 0;
 }
 .nav-btn {
-  flex: 1;
+  flex: 1 1 30%;
+  min-width: 130px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1189,6 +1191,295 @@ body.offline .video-badge {
   font-weight: 600;
 }
 
+/* Bhajan Sets (user playlists, M-Sets) */
+.set-detail-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 4px 0 20px;
+}
+.set-action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 40px;
+  padding: 8px 16px;
+  border: 1px solid var(--border-tan);
+  border-radius: 20px;
+  background: white;
+  color: var(--dark-brown);
+  font-family: var(--font-ui);
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.set-action-btn:hover {
+  border-color: var(--orange);
+  background: var(--soft-orange);
+}
+.empty-msg {
+  color: var(--text-secondary);
+  font-style: italic;
+  padding: 12px 0;
+}
+.set-inline-form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  padding: 12px 16px;
+  background: white;
+  border: 1px solid var(--border-tan);
+  border-radius: 10px;
+  margin: 6px 0;
+}
+.set-name-input {
+  flex: 1;
+  min-width: 160px;
+  min-height: 40px;
+  padding: 8px 12px;
+  border: 1px solid var(--border-tan);
+  border-radius: 8px;
+  background: var(--warm-white);
+  color: var(--dark-brown);
+  font-family: var(--font-ui);
+  font-size: 0.95rem;
+}
+.set-name-input:focus {
+  outline: none;
+  border-color: var(--orange);
+  box-shadow: 0 0 0 3px rgba(200,107,31,0.15);
+}
+
+/* Sets list rows */
+.set-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 6px 6px 6px 16px;
+  margin: 6px 0;
+  background: white;
+  border: 1px solid var(--border-tan);
+  border-radius: 10px;
+  transition: all 0.2s;
+}
+.set-row:hover {
+  border-color: var(--orange);
+}
+.set-row-main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  padding: 8px 0;
+  text-decoration: none;
+  color: var(--dark-brown);
+  cursor: pointer;
+}
+.set-row-name {
+  font-family: 'Crimson Text', serif;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+.set-row-count {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  margin-top: 2px;
+}
+.set-row-actions {
+  display: flex;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+/* Icon buttons (↑ ↓ 🗑 ✏) — 40px min tap target */
+.icon-btn {
+  min-width: 40px;
+  min-height: 40px;
+  border: 1px solid var(--border-tan);
+  border-radius: 8px;
+  background: white;
+  color: var(--medium-brown);
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.icon-btn:hover:not(:disabled) {
+  border-color: var(--orange);
+  background: var(--soft-orange);
+}
+.icon-btn:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+
+/* Set detail — bhajan rows with reorder controls */
+.set-bhajan-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 10px 6px 10px 16px;
+  margin: 6px 0;
+  background: white;
+  border: 1px solid var(--border-tan);
+  border-radius: 10px;
+}
+.set-bhajan-main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 8px;
+  text-decoration: none;
+  color: var(--dark-brown);
+  cursor: pointer;
+}
+.set-bhajan-index {
+  color: var(--text-secondary);
+  font-weight: 600;
+}
+.set-bhajan-actions {
+  display: flex;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+/* Add-bhajans picker */
+.set-add-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 14px;
+  margin: 4px 0;
+  background: white;
+  border: 1px solid var(--border-tan);
+  border-radius: 8px;
+}
+.set-add-info {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.set-add-status {
+  flex-shrink: 0;
+  color: var(--gold);
+  font-size: 0.85rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* Namahatta sticky nav bar — sequential set playback (setplay: route) */
+.set-nav-bar {
+  position: sticky;
+  top: 40px; /* JS could refine this like alpha-nav, but bhajan pages have no alpha-nav */
+  z-index: 98;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 16px;
+  background: linear-gradient(135deg, var(--saffron-dark) 0%, var(--saffron) 100%);
+  color: #fff;
+  padding: 10px 16px;
+  border-radius: 10px;
+  margin: 0 0 20px;
+  box-shadow: 0 2px 8px rgba(168,84,26,0.25);
+}
+.set-nav-bar-info {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  font-size: 0.85rem;
+}
+.set-nav-bar-name {
+  font-weight: 600;
+}
+.set-nav-bar-pos {
+  opacity: 0.85;
+}
+.set-nav-bar-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.set-nav-btn {
+  display: inline-flex;
+  align-items: center;
+  min-height: 36px;
+  padding: 6px 14px;
+  border: 1px solid rgba(255,255,255,0.4);
+  border-radius: 18px;
+  background: rgba(255,255,255,0.18);
+  color: #fff;
+  text-decoration: none;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.set-nav-btn:hover {
+  background: rgba(255,255,255,0.32);
+}
+.set-nav-back {
+  background: rgba(0,0,0,0.15);
+}
+
+/* Add-to-set control on a bhajan page */
+.add-to-set-control {
+  position: relative;
+  display: inline-block;
+  margin: 4px 0 20px;
+}
+.add-to-set-menu {
+  position: absolute;
+  z-index: 50;
+  top: calc(100% + 6px);
+  left: 0;
+  min-width: 220px;
+  background: white;
+  border: 1px solid var(--border-tan);
+  border-radius: 10px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+  padding: 8px;
+}
+.add-to-set-menu-title {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--text-secondary);
+  padding: 4px 8px 8px;
+}
+.add-to-set-menu-item {
+  display: block;
+  width: 100%;
+  text-align: left;
+  min-height: 40px;
+  padding: 8px 10px;
+  border: none;
+  border-radius: 6px;
+  background: none;
+  color: var(--dark-brown);
+  font-family: var(--font-ui);
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+.add-to-set-menu-item:hover {
+  background: var(--soft-orange);
+}
+.add-to-set-menu-new {
+  border-top: 1px solid var(--border-tan);
+  margin-top: 4px;
+  padding-top: 12px;
+  color: var(--orange);
+  font-weight: 600;
+}
+
 /* Responsive */
 @media (max-width: 600px) {
   .home-header h1 { font-size: 1.8rem; }
@@ -1300,6 +1591,29 @@ const UI_STRINGS = {
     fontLarger: 'Increase verse text size',
     navigatedTo: 'Navigated to {page}',
     skipToContent: 'Skip to content',
+    mySets: 'My Sets',
+    newSet: 'New set',
+    setName: 'Set name',
+    createSet: 'Create set',
+    renameSet: 'Rename set',
+    deleteSet: 'Delete set',
+    deleteSetConfirm: 'Delete "{name}"? This cannot be undone.',
+    addToSet: 'Add to set',
+    removeFromSet: 'Remove from set',
+    emptySet: 'This set has no bhajans yet.',
+    noSets: 'You have no sets yet. Create one to get started.',
+    setCount: '{n} bhajans',
+    moveUp: 'Move up',
+    moveDown: 'Move down',
+    addBhajans: 'Add bhajans',
+    doneAdding: 'Done',
+    inSet: 'In set',
+    prevInSet: 'Previous',
+    nextInSet: 'Next',
+    setPosition: '{i} of {n}',
+    backToSet: 'Back to set',
+    alreadyInSet: 'Already added',
+    chooseSet: 'Choose a set',
   },
   lv: {
     songIndex: 'Dziesmu saraksts',
@@ -1342,6 +1656,29 @@ const UI_STRINGS = {
     fontLarger: 'Palielināt panta teksta izmēru',
     navigatedTo: 'Pāriets uz {page}',
     skipToContent: 'Pāriet uz saturu',
+    mySets: 'Mani seti',
+    newSet: 'Jauns sets',
+    setName: 'Seta nosaukums',
+    createSet: 'Izveidot setu',
+    renameSet: 'Pārdēvēt setu',
+    deleteSet: 'Dzēst setu',
+    deleteSetConfirm: 'Dzēst "{name}"? To nevar atsaukt.',
+    addToSet: 'Pievienot setam',
+    removeFromSet: 'Izņemt no seta',
+    emptySet: 'Šajā setā vēl nav bhadžanu.',
+    noSets: 'Tev vēl nav setu. Izveido pirmo, lai sāktu.',
+    setCount: '{n} bhadžani',
+    moveUp: 'Pārvietot augšup',
+    moveDown: 'Pārvietot lejup',
+    addBhajans: 'Pievienot bhadžanus',
+    doneAdding: 'Gatavs',
+    inSet: 'Setā',
+    prevInSet: 'Iepriekšējais',
+    nextInSet: 'Nākamais',
+    setPosition: '{i} no {n}',
+    backToSet: 'Atpakaļ uz setu',
+    alreadyInSet: 'Jau pievienots',
+    chooseSet: 'Izvēlies setu',
   },
   ru: {
     songIndex: 'Указатель песен',
@@ -1384,6 +1721,29 @@ const UI_STRINGS = {
     fontLarger: 'Увеличить размер текста стиха',
     navigatedTo: 'Переход на {page}',
     skipToContent: 'Перейти к содержанию',
+    mySets: 'Мои подборки',
+    newSet: 'Новая подборка',
+    setName: 'Название подборки',
+    createSet: 'Создать подборку',
+    renameSet: 'Переименовать подборку',
+    deleteSet: 'Удалить подборку',
+    deleteSetConfirm: 'Удалить «{name}»? Это нельзя отменить.',
+    addToSet: 'Добавить в подборку',
+    removeFromSet: 'Удалить из подборки',
+    emptySet: 'В этой подборке пока нет бхаджанов.',
+    noSets: 'У вас пока нет подборок. Создайте первую, чтобы начать.',
+    setCount: '{n} бхаджанов',
+    moveUp: 'Переместить вверх',
+    moveDown: 'Переместить вниз',
+    addBhajans: 'Добавить бхаджаны',
+    doneAdding: 'Готово',
+    inSet: 'В подборке',
+    prevInSet: 'Предыдущий',
+    nextInSet: 'Следующий',
+    setPosition: '{i} из {n}',
+    backToSet: 'Назад к подборке',
+    alreadyInSet: 'Уже добавлен',
+    chooseSet: 'Выберите подборку',
   },
   es: {
     songIndex: 'Índice de canciones',
@@ -1426,6 +1786,29 @@ const UI_STRINGS = {
     fontLarger: 'Aumentar el tamaño del texto del verso',
     navigatedTo: 'Navegado a {page}',
     skipToContent: 'Saltar al contenido',
+    mySets: 'Mis listas',
+    newSet: 'Nueva lista',
+    setName: 'Nombre de la lista',
+    createSet: 'Crear lista',
+    renameSet: 'Renombrar lista',
+    deleteSet: 'Eliminar lista',
+    deleteSetConfirm: '¿Eliminar "{name}"? Esto no se puede deshacer.',
+    addToSet: 'Añadir a la lista',
+    removeFromSet: 'Quitar de la lista',
+    emptySet: 'Esta lista aún no tiene bhajans.',
+    noSets: 'Aún no tienes listas. Crea una para empezar.',
+    setCount: '{n} bhajans',
+    moveUp: 'Subir',
+    moveDown: 'Bajar',
+    addBhajans: 'Añadir bhajans',
+    doneAdding: 'Listo',
+    inSet: 'En la lista',
+    prevInSet: 'Anterior',
+    nextInSet: 'Siguiente',
+    setPosition: '{i} de {n}',
+    backToSet: 'Volver a la lista',
+    alreadyInSet: 'Ya añadido',
+    chooseSet: 'Elige una lista',
   },
   it: {
     songIndex: 'Indice dei canti',
@@ -1468,6 +1851,29 @@ const UI_STRINGS = {
     fontLarger: 'Aumenta la dimensione del testo del verso',
     navigatedTo: 'Passato a {page}',
     skipToContent: 'Vai al contenuto',
+    mySets: 'I miei set',
+    newSet: 'Nuovo set',
+    setName: 'Nome del set',
+    createSet: 'Crea set',
+    renameSet: 'Rinomina set',
+    deleteSet: 'Elimina set',
+    deleteSetConfirm: 'Eliminare "{name}"? Non può essere annullato.',
+    addToSet: 'Aggiungi al set',
+    removeFromSet: 'Rimuovi dal set',
+    emptySet: 'Questo set non ha ancora bhajan.',
+    noSets: 'Non hai ancora set. Creane uno per iniziare.',
+    setCount: '{n} bhajan',
+    moveUp: 'Sposta su',
+    moveDown: 'Sposta giù',
+    addBhajans: 'Aggiungi bhajan',
+    doneAdding: 'Fatto',
+    inSet: 'Nel set',
+    prevInSet: 'Precedente',
+    nextInSet: 'Successivo',
+    setPosition: '{i} di {n}',
+    backToSet: 'Torna al set',
+    alreadyInSet: 'Già aggiunto',
+    chooseSet: 'Scegli un set',
   },
   fr: {
     songIndex: 'Index des chants',
@@ -1510,6 +1916,29 @@ const UI_STRINGS = {
     fontLarger: 'Augmenter la taille du texte du verset',
     navigatedTo: 'Navigué vers {page}',
     skipToContent: 'Aller au contenu',
+    mySets: 'Mes listes',
+    newSet: 'Nouvelle liste',
+    setName: 'Nom de la liste',
+    createSet: 'Créer la liste',
+    renameSet: 'Renommer la liste',
+    deleteSet: 'Supprimer la liste',
+    deleteSetConfirm: 'Supprimer « {name} » ? Cette action est irréversible.',
+    addToSet: 'Ajouter à la liste',
+    removeFromSet: 'Retirer de la liste',
+    emptySet: 'Cette liste ne contient pas encore de bhajans.',
+    noSets: 'Vous n’avez pas encore de liste. Créez-en une pour commencer.',
+    setCount: '{n} bhajans',
+    moveUp: 'Monter',
+    moveDown: 'Descendre',
+    addBhajans: 'Ajouter des bhajans',
+    doneAdding: 'Terminé',
+    inSet: 'Dans la liste',
+    prevInSet: 'Précédent',
+    nextInSet: 'Suivant',
+    setPosition: '{i} sur {n}',
+    backToSet: 'Retour à la liste',
+    alreadyInSet: 'Déjà ajouté',
+    chooseSet: 'Choisissez une liste',
   },
 };
 
@@ -1716,8 +2145,9 @@ function saveScrollForCurrentRoute() {
 // pages and the language chooser always start at the top.
 function isListRoute(route) {
   if (!route || route === 'home' || route === 'titles' || route === 'firstline' ||
-      route === 'categories' || route === 'authors') return true;
-  if (route.startsWith('category:') || route.startsWith('author:')) return true;
+      route === 'categories' || route === 'authors' || route === 'sets') return true;
+  if (route.startsWith('category:') || route.startsWith('author:') ||
+      route.startsWith('set:') || route.startsWith('setadd:')) return true;
   return false;
 }
 
@@ -1758,7 +2188,11 @@ function isValidLangMode(mode) {
 
 // Updates the hash to '#bhajan:<enc>:<currentLang>' without firing hashchange
 // (so it never triggers a redundant re-render or a scroll jump).
+// Skipped while inside a Bhajan Set "namahatta" playback route (#setplay:...)
+// so switching language mid-set doesn't clobber the set-playback hash (M-Sets).
 function updateBhajanHash(encodedTitle) {
+  const currentHash = window.location.hash.substring(1);
+  if (currentHash.indexOf('setplay:') === 0) return;
   const newHash = '#bhajan:' + encodedTitle + ':' + encodeURIComponent(currentLang);
   if (window.location.hash !== newHash) {
     history.replaceState(null, '', newHash);
@@ -1928,6 +2362,91 @@ function compactHeader() {
   return '<div class="compact-header"><h1>\u015ar\u012b Gau\u1e0d\u012bya G\u012bti-guccha <span>' + t('subtitle') + '</span></h1></div>';
 }
 
+// ---- Bhajan Sets (user playlists, local-only, M-Sets) ----
+
+const SETS_KEY = 'bhajanSets';
+
+function getSets() {
+  try {
+    const raw = localStorage.getItem(SETS_KEY);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch (e) {
+    return [];
+  }
+}
+
+function saveSets(arr) {
+  localStorage.setItem(SETS_KEY, JSON.stringify(arr));
+}
+
+function getSet(id) {
+  return getSets().find(s => s.id === id) || null;
+}
+
+function genSetId() {
+  return 'set_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 8);
+}
+
+function createSet(name) {
+  const sets = getSets();
+  const id = genSetId();
+  sets.push({ id, name: name || t('newSet'), titles: [], updated: Date.now() });
+  saveSets(sets);
+  return id;
+}
+
+function renameSet(id, name) {
+  const sets = getSets();
+  const s = sets.find(x => x.id === id);
+  if (!s) return;
+  s.name = name;
+  s.updated = Date.now();
+  saveSets(sets);
+}
+
+function deleteSet(id) {
+  const sets = getSets().filter(x => x.id !== id);
+  saveSets(sets);
+}
+
+function addToSet(id, title) {
+  const sets = getSets();
+  const s = sets.find(x => x.id === id);
+  if (!s) return;
+  if (s.titles.indexOf(title) === -1) {
+    s.titles.push(title);
+    s.updated = Date.now();
+    saveSets(sets);
+  }
+}
+
+function removeFromSet(id, title) {
+  const sets = getSets();
+  const s = sets.find(x => x.id === id);
+  if (!s) return;
+  const idx = s.titles.indexOf(title);
+  if (idx !== -1) {
+    s.titles.splice(idx, 1);
+    s.updated = Date.now();
+    saveSets(sets);
+  }
+}
+
+function moveInSet(id, index, dir) {
+  const sets = getSets();
+  const s = sets.find(x => x.id === id);
+  if (!s) return;
+  const newIndex = index + dir;
+  if (newIndex < 0 || newIndex >= s.titles.length) return;
+  const tmp = s.titles[index];
+  s.titles[index] = s.titles[newIndex];
+  s.titles[newIndex] = tmp;
+  s.updated = Date.now();
+  saveSets(sets);
+}
+
 // PAGES
 
 function renderHome() {
@@ -1962,6 +2481,9 @@ function renderHome() {
       </a>
       <a class="nav-btn" href="#authors" onclick="navigate('authors'); return false;">
         <span class="label">${esc(t('byAuthor'))}</span>
+      </a>
+      <a class="nav-btn" href="#sets" onclick="navigate('sets'); return false;">
+        <span class="label">${esc(t('mySets'))}</span>
       </a>
     </div>
     <div class="footer">\u015ar\u012b Gau\u1e0d\u012bya G\u012bti-guccha &middot; ${esc(t('footer'))}</div>
@@ -2154,7 +2676,17 @@ function renderVersesContainer(b) {
   return html;
 }
 
-function renderBhajan(title) {
+// Renders a single bhajan. `opts` (optional) supports the Bhajan Sets
+// "namahatta" sequential-playback mode (setplay: route, M-Sets):
+//   opts.setContext = { id, name, idx } -> swaps the breadcrumb for
+//     Home > mySets > setName > bhajan title instead of the usual
+//     Home > category > bhajan title.
+//   opts.navBarHtml = pre-rendered sticky prev/next set nav bar, inserted
+//     right after the compact header, above the bhajan content.
+// All audio/lang/verse rendering logic below is shared, unmodified, between
+// the plain #bhajan: route and the #setplay: route — see renderSetPlay().
+function renderBhajan(title, opts) {
+  opts = opts || {};
   const b = findBhajan(title);
   if (!b) {
     // L4: not-found path still needs a consistent chrome (breadcrumb/alpha-nav)
@@ -2163,13 +2695,22 @@ function renderBhajan(title) {
     return '<p id="main-heading" tabindex="-1">' + esc(t('bhajanNotFound')) + '</p>';
   }
 
-  setBreadcrumb([
-    {label: b.category, hash: 'category:' + encodeURIComponent(b.category)},
-    {label: b.title, hash: null}
-  ]);
+  if (opts.setContext) {
+    setBreadcrumb([
+      {label: t('mySets'), hash: 'sets'},
+      {label: opts.setContext.name, hash: 'set:' + encodeURIComponent(opts.setContext.id)},
+      {label: b.title, hash: null}
+    ]);
+  } else {
+    setBreadcrumb([
+      {label: b.category, hash: 'category:' + encodeURIComponent(b.category)},
+      {label: b.title, hash: null}
+    ]);
+  }
   setAlphaNav(null);
 
   let html = compactHeader();
+  if (opts.navBarHtml) html += opts.navBarHtml;
   html += '<div class="bhajan-view">';
   html += '<h2 id="main-heading" tabindex="-1">' + esc(b.title) + '</h2>';
   html += '<div class="bv-meta">';
@@ -2214,6 +2755,9 @@ function renderBhajan(title) {
   // Font size control (M6) — sits next to the language selector
   html += renderFontSizeControl();
 
+  // Add-to-set control (M-Sets) — lightweight dropdown, sits next to font control
+  html += renderAddToSetControl(enc);
+
   // Verses — isolated in their own container so switchLang can re-render
   // just this part without disturbing the audio player (M1 fix)
   html += renderVersesContainer(b);
@@ -2245,6 +2789,387 @@ function switchLang(lang, encodedTitle) {
   }
 }
 
+// ==================== Bhajan Sets (user playlists) — UI ====================
+// Routes: 'sets', 'set:<id>', 'setadd:<id>', 'setplay:<id>:<idx>'.
+// Data helpers (getSets/saveSets/getSet/createSet/renameSet/deleteSet/
+// addToSet/removeFromSet/moveInSet) live above, right before "// PAGES".
+
+// ---- #sets — list of all sets ----
+
+function newSetButtonHtml() {
+  return '<button class="set-action-btn" onclick="showNewSetForm()">＋ ' + esc(t('newSet')) + '</button>';
+}
+
+function showNewSetForm() {
+  const row = document.getElementById('new-set-row');
+  if (!row) return;
+  row.innerHTML = '<div class="set-inline-form">' +
+    '<input type="text" id="new-set-name-input" class="set-name-input" placeholder="' + esc(t('setName')) + '" aria-label="' + esc(t('setName')) + '">' +
+    '<button class="set-action-btn" onclick="submitNewSet()">' + esc(t('createSet')) + '</button>' +
+    '</div>';
+  const inp = document.getElementById('new-set-name-input');
+  if (inp) {
+    inp.focus();
+    inp.addEventListener('keydown', (e) => { if (e.key === 'Enter') submitNewSet(); });
+  }
+}
+
+function submitNewSet() {
+  const inp = document.getElementById('new-set-name-input');
+  const name = (inp && inp.value.trim()) || t('newSet');
+  const id = createSet(name);
+  navigate('set:' + encodeURIComponent(id));
+}
+
+function renderSetsListRows(sets) {
+  if (!sets.length) return '<p class="empty-msg">' + esc(t('noSets')) + '</p>';
+  let html = '';
+  sets.forEach(s => {
+    const enc = encodeURIComponent(s.id);
+    html += '<div class="set-row" id="set-row-' + esc(s.id) + '">';
+    html += '<a class="set-row-main" href="#set:' + enc + '" onclick="navigate(\'set:' + enc + '\'); return false;">';
+    html += '<span class="set-row-name">' + esc(s.name) + '</span>';
+    html += '<span class="set-row-count">' + esc(t('setCount', { n: s.titles.length })) + '</span>';
+    html += '</a>';
+    html += '<div class="set-row-actions">';
+    html += '<button class="icon-btn" aria-label="' + esc(t('renameSet')) + '" onclick="startRenameSet(\'' + s.id + '\')">✏️</button>';
+    html += '<button class="icon-btn" aria-label="' + esc(t('deleteSet')) + '" onclick="confirmDeleteSet(\'' + s.id + '\')">🗑️</button>';
+    html += '</div></div>';
+  });
+  return html;
+}
+
+function startRenameSet(id) {
+  const row = document.getElementById('set-row-' + id);
+  const s = getSet(id);
+  if (!row || !s) return;
+  row.innerHTML = '<div class="set-inline-form">' +
+    '<input type="text" class="set-name-input" id="rename-input-' + id + '" value="' + esc(s.name) + '" aria-label="' + esc(t('setName')) + '">' +
+    '<button class="set-action-btn" onclick="submitRenameSet(\'' + id + '\')">' + esc(t('renameSet')) + '</button>' +
+    '</div>';
+  const inp = document.getElementById('rename-input-' + id);
+  if (inp) {
+    inp.focus();
+    inp.select();
+    inp.addEventListener('keydown', (e) => { if (e.key === 'Enter') submitRenameSet(id); });
+  }
+}
+
+function submitRenameSet(id) {
+  const inp = document.getElementById('rename-input-' + id);
+  const name = (inp && inp.value.trim()) || t('newSet');
+  renameSet(id, name);
+  render('sets', true);
+}
+
+function confirmDeleteSet(id) {
+  const s = getSet(id);
+  if (!s) return;
+  if (window.confirm(t('deleteSetConfirm', { name: s.name }))) {
+    deleteSet(id);
+    render('sets');
+  }
+}
+
+function renderSetsList() {
+  setBreadcrumb([{ label: t('mySets'), hash: null }]);
+  setAlphaNav(null);
+  const sets = getSets().slice().sort((a, b) => (b.updated || 0) - (a.updated || 0));
+  let html = compactHeader();
+  html += '<h2 class="page-title" id="main-heading" tabindex="-1">' + esc(t('mySets')) + '</h2>';
+  html += '<div id="new-set-row" class="set-detail-actions">' + newSetButtonHtml() + '</div>';
+  html += '<div id="sets-list-container" class="list-section">' + renderSetsListRows(sets) + '</div>';
+  return html;
+}
+
+// ---- #set:<id> — a single set's bhajans, reorderable ----
+
+function renderSetBhajanRows(s) {
+  if (!s.titles.length) return '<p class="empty-msg">' + esc(t('emptySet')) + '</p>';
+  let html = '';
+  s.titles.forEach((title, i) => {
+    const b = findBhajan(title);
+    if (!b) return; // edge case: bhajan no longer exists — skip gracefully
+    const enc = encodeURIComponent(title);
+    const isFirst = i === 0;
+    const isLast = i === s.titles.length - 1;
+    html += '<div class="set-bhajan-row">';
+    html += '<a class="set-bhajan-main" href="#setplay:' + encodeURIComponent(s.id) + ':' + i + '" onclick="navigate(\'setplay:' + encodeURIComponent(s.id) + ':' + i + '\'); return false;">';
+    html += '<span class="set-bhajan-index">' + (i + 1) + '.</span> ';
+    html += '<span class="b-title">' + esc(b.title) + '</span>';
+    html += '<span class="b-meta">' + esc(b.author) + '</span>';
+    html += '</a>';
+    html += '<div class="set-bhajan-actions">';
+    html += '<button class="icon-btn" aria-label="' + esc(t('moveUp')) + '"' + (isFirst ? ' disabled' : '') + ' onclick="doMoveInSet(\'' + s.id + '\',' + i + ',-1)">↑</button>';
+    html += '<button class="icon-btn" aria-label="' + esc(t('moveDown')) + '"' + (isLast ? ' disabled' : '') + ' onclick="doMoveInSet(\'' + s.id + '\',' + i + ',1)">↓</button>';
+    html += '<button class="icon-btn" aria-label="' + esc(t('removeFromSet')) + '" onclick="doRemoveFromSet(\'' + s.id + '\',\'' + enc + '\')">🗑️</button>';
+    html += '</div></div>';
+  });
+  return html || '<p class="empty-msg">' + esc(t('emptySet')) + '</p>';
+}
+
+function refreshSetDetail(id) {
+  const listEl = document.getElementById('set-bhajan-list');
+  const s = getSet(id);
+  if (listEl && s) listEl.innerHTML = renderSetBhajanRows(s);
+}
+
+function doMoveInSet(id, index, dir) {
+  moveInSet(id, index, dir);
+  refreshSetDetail(id);
+}
+
+function doRemoveFromSet(id, encTitle) {
+  const title = safeDecodeURIComponent(encTitle, null);
+  if (title === null) return;
+  removeFromSet(id, title);
+  refreshSetDetail(id);
+}
+
+function startRenameSetDetail(id) {
+  const heading = document.getElementById('main-heading');
+  const s = getSet(id);
+  if (!heading || !s) return;
+  heading.outerHTML = '<div class="set-inline-form" id="main-heading" tabindex="-1">' +
+    '<input type="text" class="set-name-input" id="rename-detail-input" value="' + esc(s.name) + '" aria-label="' + esc(t('setName')) + '">' +
+    '<button class="set-action-btn" onclick="submitRenameSetDetail(\'' + id + '\')">' + esc(t('renameSet')) + '</button>' +
+    '</div>';
+  const inp = document.getElementById('rename-detail-input');
+  if (inp) {
+    inp.focus();
+    inp.select();
+    inp.addEventListener('keydown', (e) => { if (e.key === 'Enter') submitRenameSetDetail(id); });
+  }
+}
+
+function submitRenameSetDetail(id) {
+  const inp = document.getElementById('rename-detail-input');
+  const name = (inp && inp.value.trim()) || t('newSet');
+  renameSet(id, name);
+  render('set:' + encodeURIComponent(id), true);
+}
+
+function renderSetDetail(id) {
+  const s = getSet(id);
+  if (!s) {
+    setBreadcrumb([{ label: t('mySets'), hash: 'sets' }, { label: t('noSets'), hash: null }]);
+    setAlphaNav(null);
+    return compactHeader() + '<p id="main-heading" tabindex="-1">' + esc(t('noSets')) + '</p>';
+  }
+  setBreadcrumb([
+    { label: t('mySets'), hash: 'sets' },
+    { label: s.name, hash: null }
+  ]);
+  setAlphaNav(null);
+
+  let html = compactHeader();
+  html += '<h2 class="page-title" id="main-heading" tabindex="-1">' + esc(s.name) + '</h2>';
+  html += '<div class="set-detail-actions">';
+  html += '<button class="set-action-btn" onclick="startRenameSetDetail(\'' + id + '\')">' + esc(t('renameSet')) + '</button>';
+  html += '<a class="set-action-btn" href="#setadd:' + encodeURIComponent(id) + '" onclick="navigate(\'setadd:' + encodeURIComponent(id) + '\'); return false;">＋ ' + esc(t('addBhajans')) + '</a>';
+  html += '</div>';
+  html += '<div id="set-bhajan-list" class="list-section">' + renderSetBhajanRows(s) + '</div>';
+  return html;
+}
+
+// ---- #setadd:<id> — search/browse picker to add bhajans to a set ----
+
+let setAddCurrentQuery = '';
+let setAddDebounceTimer = null;
+
+function onSetAddSearchInput(id, value) {
+  setAddCurrentQuery = value;
+  clearTimeout(setAddDebounceTimer);
+  setAddDebounceTimer = setTimeout(() => refreshSetAddResults(id), 150);
+}
+
+function refreshSetAddResults(id) {
+  const el = document.getElementById('set-add-results');
+  if (el) el.innerHTML = renderSetAddResultRows(id, setAddCurrentQuery);
+}
+
+function doAddToSet(id, encTitle) {
+  const title = safeDecodeURIComponent(encTitle, null);
+  if (title === null) return;
+  addToSet(id, title);
+  refreshSetAddResults(id);
+}
+
+function renderSetAddResultRows(id, query) {
+  const s = getSet(id);
+  if (!s) return '';
+  const q = (query || '').trim();
+  const list = q ? searchBhajans(q).map(r => r.b) : BHAJANS.slice().sort((a, b) => a.title.localeCompare(b.title));
+  if (!list.length) return '<div class="search-empty">' + esc(t('noResults')) + '</div>';
+  let html = '';
+  list.forEach(b => {
+    const enc = encodeURIComponent(b.title);
+    const already = s.titles.indexOf(b.title) !== -1;
+    html += '<div class="set-add-row">';
+    html += '<div class="set-add-info"><span class="b-title">' + esc(b.title) + '</span><span class="b-meta">' + esc(b.author) + '</span></div>';
+    if (already) {
+      html += '<span class="set-add-status">✓ ' + esc(t('alreadyInSet')) + '</span>';
+    } else {
+      html += '<button class="set-action-btn" onclick="doAddToSet(\'' + id + '\',\'' + enc + '\')">＋ ' + esc(t('addToSet')) + '</button>';
+    }
+    html += '</div>';
+  });
+  return html;
+}
+
+function renderSetAddBhajans(id) {
+  const s = getSet(id);
+  if (!s) {
+    setBreadcrumb([{ label: t('mySets'), hash: 'sets' }, { label: t('noSets'), hash: null }]);
+    setAlphaNav(null);
+    return compactHeader() + '<p id="main-heading" tabindex="-1">' + esc(t('noSets')) + '</p>';
+  }
+  setBreadcrumb([
+    { label: t('mySets'), hash: 'sets' },
+    { label: s.name, hash: 'set:' + encodeURIComponent(id) },
+    { label: t('addBhajans'), hash: null }
+  ]);
+  setAlphaNav(null);
+  setAddCurrentQuery = '';
+
+  let html = compactHeader();
+  html += '<h2 class="page-title" id="main-heading" tabindex="-1">' + esc(t('addBhajans')) + ' — ' + esc(s.name) + '</h2>';
+  html += '<div class="search-box">' +
+    '<input type="search" id="set-add-search-input" class="search-input" placeholder="' + esc(t('searchPlaceholder')) + '" ' +
+    'aria-label="' + esc(t('searchPlaceholder')) + '" oninput="onSetAddSearchInput(\'' + id + '\', this.value)">' +
+    '</div>';
+  html += '<div id="set-add-results" class="list-section">' + renderSetAddResultRows(id, '') + '</div>';
+  html += '<div class="set-detail-actions"><a class="set-action-btn" href="#set:' + encodeURIComponent(id) + '" onclick="navigate(\'set:' + encodeURIComponent(id) + '\'); return false;">' + esc(t('doneAdding')) + '</a></div>';
+  return html;
+}
+
+// ---- #setplay:<id>:<idx> — sequential "namahatta" playback within a set ----
+// Reuses renderBhajan() in full (audio player, lang selector, verses, font
+// size) via its `opts` parameter — see renderBhajan() above. This is the key
+// integration point: nothing about audio/lang rendering is duplicated here.
+
+function renderSetNavBar(setId, idx) {
+  const s = getSet(setId);
+  if (!s) return '';
+  const total = s.titles.length;
+  const prevIdx = idx - 1;
+  const nextIdx = idx + 1;
+  let html = '<div class="set-nav-bar" role="navigation" aria-label="' + esc(t('inSet')) + '">';
+  html += '<div class="set-nav-bar-info">';
+  html += '<span class="set-nav-bar-name">' + esc(t('inSet')) + ': ' + esc(s.name) + '</span>';
+  html += '<span class="set-nav-bar-pos">' + esc(t('setPosition', { i: idx + 1, n: total })) + '</span>';
+  html += '</div>';
+  html += '<div class="set-nav-bar-controls">';
+  if (prevIdx >= 0) {
+    html += '<a class="set-nav-btn" href="#setplay:' + encodeURIComponent(setId) + ':' + prevIdx + '" onclick="navigate(\'setplay:' + encodeURIComponent(setId) + ':' + prevIdx + '\'); return false;">◂ ' + esc(t('prevInSet')) + '</a>';
+  }
+  if (nextIdx < total) {
+    html += '<a class="set-nav-btn" href="#setplay:' + encodeURIComponent(setId) + ':' + nextIdx + '" onclick="navigate(\'setplay:' + encodeURIComponent(setId) + ':' + nextIdx + '\'); return false;">' + esc(t('nextInSet')) + ' ▸</a>';
+  }
+  html += '<a class="set-nav-btn set-nav-back" href="#set:' + encodeURIComponent(setId) + '" onclick="navigate(\'set:' + encodeURIComponent(setId) + '\'); return false;">' + esc(t('backToSet')) + '</a>';
+  html += '</div></div>';
+  return html;
+}
+
+function renderSetPlay(id, idx) {
+  const s = getSet(id);
+  if (!s) {
+    setBreadcrumb([{ label: t('mySets'), hash: 'sets' }, { label: t('noSets'), hash: null }]);
+    setAlphaNav(null);
+    return compactHeader() + '<p id="main-heading" tabindex="-1">' + esc(t('noSets')) + '</p>';
+  }
+  let i = idx;
+  if (!(i >= 0 && i < s.titles.length && findBhajan(s.titles[i]))) {
+    // Edge case: index out of range or that bhajan no longer exists — skip
+    // gracefully to the nearest valid entry in the set.
+    let found = -1;
+    for (let k = 0; k < s.titles.length; k++) {
+      if (findBhajan(s.titles[k])) { found = k; break; }
+    }
+    if (found === -1) {
+      setBreadcrumb([
+        { label: t('mySets'), hash: 'sets' },
+        { label: s.name, hash: null }
+      ]);
+      setAlphaNav(null);
+      return compactHeader() + '<p id="main-heading" tabindex="-1">' + esc(t('emptySet')) + '</p>';
+    }
+    i = found;
+  }
+  const title = s.titles[i];
+  return renderBhajan(title, {
+    setContext: { id: s.id, name: s.name, idx: i },
+    navBarHtml: renderSetNavBar(id, i)
+  });
+}
+
+// ---- Add-to-set control on a bhajan page ----
+
+function renderAddToSetControl(encTitle) {
+  return '<div class="add-to-set-control">' +
+    '<button class="set-action-btn" id="add-to-set-btn" aria-haspopup="true" aria-expanded="false" onclick="toggleAddToSetMenu(\'' + encTitle + '\')">＋ ' + esc(t('addToSet')) + '</button>' +
+    '<div class="add-to-set-menu" id="add-to-set-menu" style="display:none"></div>' +
+    '</div>';
+}
+
+function renderAddToSetMenuItems(encTitle) {
+  const sets = getSets();
+  let html = '<div class="add-to-set-menu-inner">';
+  html += '<div class="add-to-set-menu-title">' + esc(t('chooseSet')) + '</div>';
+  sets.forEach(s => {
+    html += '<button class="add-to-set-menu-item" onclick="doAddCurrentToSet(\'' + s.id + '\',\'' + encTitle + '\')">' + esc(s.name) + '</button>';
+  });
+  html += '<button class="add-to-set-menu-item add-to-set-menu-new" onclick="doAddCurrentToNewSet(\'' + encTitle + '\')">＋ ' + esc(t('newSet')) + '</button>';
+  html += '</div>';
+  return html;
+}
+
+function toggleAddToSetMenu(encTitle) {
+  const menu = document.getElementById('add-to-set-menu');
+  const btn = document.getElementById('add-to-set-btn');
+  if (!menu) return;
+  const isOpen = menu.style.display !== 'none' && menu.innerHTML !== '';
+  if (isOpen) {
+    menu.style.display = 'none';
+    menu.innerHTML = '';
+    if (btn) btn.setAttribute('aria-expanded', 'false');
+  } else {
+    menu.innerHTML = renderAddToSetMenuItems(encTitle);
+    menu.style.display = 'block';
+    if (btn) btn.setAttribute('aria-expanded', 'true');
+  }
+}
+
+function doAddCurrentToSet(setId, encTitle) {
+  const title = safeDecodeURIComponent(encTitle, null);
+  if (title === null) return;
+  addToSet(setId, title);
+  showAddToSetConfirmation();
+}
+
+function doAddCurrentToNewSet(encTitle) {
+  const title = safeDecodeURIComponent(encTitle, null);
+  if (title === null) return;
+  const name = window.prompt(t('setName'), '');
+  if (name === null) return; // cancelled
+  const id = createSet(name || t('newSet'));
+  addToSet(id, title);
+  showAddToSetConfirmation();
+}
+
+function showAddToSetConfirmation() {
+  const menu = document.getElementById('add-to-set-menu');
+  const btn = document.getElementById('add-to-set-btn');
+  if (menu) { menu.style.display = 'none'; menu.innerHTML = ''; }
+  if (btn) {
+    btn.setAttribute('aria-expanded', 'false');
+    btn.innerHTML = '✓ ' + esc(t('addToSet'));
+    setTimeout(() => { btn.innerHTML = '＋ ' + esc(t('addToSet')); }, 1500);
+  }
+}
+
+// ==================== end Bhajan Sets UI ====================
+
 // Router
 function navigate(route) {
   window.location.hash = route;
@@ -2261,9 +3186,13 @@ function announceRoute(route) {
   else if (route === 'categories') label = t('categories');
   else if (route === 'authors') label = t('authors');
   else if (route === 'langchoice') label = t('langChoiceTitle');
+  else if (route === 'sets') label = t('mySets');
   else if (route.indexOf('category:') === 0) label = safeDecodeURIComponent(route.substring(9), route);
   else if (route.indexOf('author:') === 0) label = safeDecodeURIComponent(route.substring(7), route);
   else if (route.indexOf('bhajan:') === 0) label = safeDecodeURIComponent(route.substring(7).split(':')[0], route);
+  else if (route.indexOf('setadd:') === 0) label = t('addBhajans');
+  else if (route.indexOf('setplay:') === 0) label = t('inSet');
+  else if (route.indexOf('set:') === 0) { const s = getSet(safeDecodeURIComponent(route.substring(4), '')); label = s ? s.name : t('mySets'); }
   el.textContent = t('navigatedTo', { page: label });
 }
 
@@ -2311,6 +3240,31 @@ function render(route, preserveScroll) {
   } else if (route === 'authors') {
     currentRoute = route;
     app.innerHTML = renderAuthors();
+  } else if (route === 'sets') {
+    currentRoute = route;
+    app.innerHTML = renderSetsList();
+  } else if (route.indexOf('setadd:') === 0) {
+    currentRoute = route;
+    const id = safeDecodeURIComponent(route.substring(7), null);
+    app.innerHTML = (id === null) ? renderHome() : renderSetAddBhajans(id);
+    if (id === null) currentRoute = 'home';
+  } else if (route.indexOf('setplay:') === 0) {
+    currentRoute = route;
+    const rest = route.substring(8);
+    const segs = rest.split(':');
+    const setId = safeDecodeURIComponent(segs[0], null);
+    const idx = parseInt(segs[1], 10);
+    if (setId === null || isNaN(idx)) {
+      app.innerHTML = renderHome();
+      currentRoute = 'home';
+    } else {
+      app.innerHTML = renderSetPlay(setId, idx);
+    }
+  } else if (route.indexOf('set:') === 0) {
+    currentRoute = route;
+    const id = safeDecodeURIComponent(route.substring(4), null);
+    app.innerHTML = (id === null) ? renderHome() : renderSetDetail(id);
+    if (id === null) currentRoute = 'home';
   } else if (route.indexOf('category:') === 0) {
     currentRoute = route;
     const name = safeDecodeURIComponent(route.substring(9), null);
