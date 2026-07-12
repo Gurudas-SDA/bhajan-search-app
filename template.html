@@ -702,6 +702,79 @@ body {
   white-space: nowrap;
 }
 
+/* Offline mode (Phase 5): video is not reachable offline, hide the embed and
+   its "Video" badge; audio remains available via the media-v1 cache. */
+body.offline .yt-embed,
+body.offline .video-badge {
+  display: none;
+}
+
+/* PWA update / first-install offline-media banner */
+.pwa-banner {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 500;
+  background: var(--saffron);
+  color: #fff;
+  padding: 10px 16px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--font-ui);
+  font-size: 0.85rem;
+  box-shadow: 0 -2px 10px rgba(0,0,0,0.15);
+}
+.pwa-banner[hidden] {
+  display: none;
+}
+.pwa-banner-text {
+  flex: 1 1 auto;
+  min-width: 180px;
+}
+.pwa-banner-progress {
+  flex: 1 1 100%;
+  height: 6px;
+  background: rgba(255,255,255,0.35);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.pwa-banner-progress[hidden] {
+  display: none;
+}
+.pwa-banner-progress-bar {
+  height: 100%;
+  width: 0%;
+  background: #fff;
+  transition: width 0.2s ease;
+}
+.pwa-banner-actions {
+  display: flex;
+  gap: 8px;
+  flex: 0 0 auto;
+}
+.pwa-banner-btn {
+  border: 1px solid rgba(255,255,255,0.7);
+  background: transparent;
+  color: #fff;
+  padding: 5px 12px;
+  border-radius: 4px;
+  font-family: var(--font-ui);
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+.pwa-banner-btn[hidden] {
+  display: none;
+}
+.pwa-banner-btn-primary {
+  background: #fff;
+  color: var(--saffron);
+  border-color: #fff;
+  font-weight: 600;
+}
+
 /* Audio player — custom */
 .audio-player {
   background: linear-gradient(135deg, #fdf8f2, #f8ead8);
@@ -1119,6 +1192,17 @@ body {
 <div id="alpha-nav"></div>
 <div id="app"></div>
 <div id="route-announcer" class="visually-hidden" aria-live="polite" aria-atomic="true"></div>
+
+<div id="pwa-banner" class="pwa-banner" hidden role="status">
+  <div id="pwa-banner-text" class="pwa-banner-text"></div>
+  <div id="pwa-banner-progress" class="pwa-banner-progress" hidden>
+    <div id="pwa-banner-progress-bar" class="pwa-banner-progress-bar"></div>
+  </div>
+  <div class="pwa-banner-actions">
+    <button id="pwa-banner-now" type="button" class="pwa-banner-btn pwa-banner-btn-primary"></button>
+    <button id="pwa-banner-later" type="button" class="pwa-banner-btn"></button>
+  </div>
+</div>
 
 <script>
 const BHAJANS = {{BHAJANS_JSON}};
@@ -2225,6 +2309,7 @@ function render(route, preserveScroll) {
   initAudioPlayers();
   applyFontScale();
   updateAlphaNavOffset();
+  updateOnlineUI();
 
   if (!preserveScroll) {
     announceRoute(currentRoute);
@@ -2282,6 +2367,206 @@ function apSetup(id) {
 function initAudioPlayers() {
   document.querySelectorAll('audio[id^="ap_"]').forEach(a => apSetup(a.id));
 }
+
+// ---- PWA (Phase 5): offline video hiding ----
+
+function updateOnlineUI() {
+  document.body.classList.toggle('offline', !navigator.onLine);
+}
+window.addEventListener('online', updateOnlineUI);
+window.addEventListener('offline', updateOnlineUI);
+updateOnlineUI();
+
+// ---- PWA (Phase 5): service worker registration + offline media install/update flow ----
+(function initPWA() {
+  if (!('serviceWorker' in navigator)) return;
+
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js').catch((err) => {
+      console.error('[pwa] service worker registration failed', err);
+    });
+  });
+
+  const banner = document.getElementById('pwa-banner');
+  if (!banner) return;
+  const textEl = document.getElementById('pwa-banner-text');
+  const progressWrap = document.getElementById('pwa-banner-progress');
+  const progressBar = document.getElementById('pwa-banner-progress-bar');
+  const nowBtn = document.getElementById('pwa-banner-now');
+  const laterBtn = document.getElementById('pwa-banner-later');
+
+  const LATER_KEY = 'pwaUpdateDismissedThisSession';
+  let currentAssets = null; // {assets, allAssets, version, mode} pending download
+
+  function fmtSize(bytes) {
+    const mb = bytes / (1024 * 1024);
+    if (mb >= 1) return mb.toFixed(1) + ' MB';
+    return Math.max(1, Math.round(bytes / 1024)) + ' KB';
+  }
+
+  function toPathKey(url) {
+    try {
+      const u = new URL(url, window.location.href);
+      return u.pathname + u.search;
+    } catch (e) {
+      return url;
+    }
+  }
+
+  function showBanner(mode, sizeBytes) {
+    textEl.textContent = t(mode === 'first' ? 'downloadOffline' : 'updateAvailable', { size: fmtSize(sizeBytes) });
+    nowBtn.textContent = t('updateNow');
+    laterBtn.textContent = t('updateLater');
+    nowBtn.hidden = false;
+    laterBtn.hidden = false;
+    progressWrap.hidden = true;
+    banner.hidden = false;
+  }
+
+  function showTransientMessage(text, autoHideMs) {
+    textEl.textContent = text;
+    nowBtn.hidden = true;
+    laterBtn.hidden = true;
+    progressWrap.hidden = true;
+    banner.hidden = false;
+    if (autoHideMs) {
+      setTimeout(() => { banner.hidden = true; }, autoHideMs);
+    }
+  }
+
+  async function getCachedMediaUrls() {
+    if (!('caches' in window)) return new Set();
+    try {
+      const cache = await caches.open('media-v1');
+      const keys = await cache.keys();
+      return new Set(keys.map((req) => toPathKey(req.url)));
+    } catch (e) {
+      return new Set();
+    }
+  }
+
+  async function checkForMediaUpdate() {
+    let versionInfo;
+    try {
+      const res = await fetch('version.json', { cache: 'no-store' });
+      if (!res.ok) return;
+      versionInfo = await res.json();
+    } catch (e) {
+      return; // offline or unreachable - nothing to offer
+    }
+
+    const installedVersion = localStorage.getItem('installedMediaVersion');
+    const cachedUrls = await getCachedMediaUrls();
+    if (installedVersion === String(versionInfo.version) && cachedUrls.size > 0) {
+      return; // fast path: already fully installed at this version
+    }
+
+    let manifest;
+    try {
+      const res2 = await fetch('asset-list.json', { cache: 'no-store' });
+      if (!res2.ok) return;
+      manifest = await res2.json();
+    } catch (e) {
+      return;
+    }
+
+    const missing = manifest.assets.filter((a) => !cachedUrls.has(toPathKey(a.url)));
+    if (missing.length === 0) {
+      try { localStorage.setItem('installedMediaVersion', String(versionInfo.version)); } catch (e) {}
+      currentAssets = null;
+      return;
+    }
+
+    const isFirstInstall = cachedUrls.size === 0;
+    if (!isFirstInstall && sessionStorage.getItem(LATER_KEY)) return;
+
+    currentAssets = {
+      assets: missing,
+      allAssets: manifest.assets,
+      version: versionInfo.version,
+      mode: isFirstInstall ? 'first' : 'update',
+    };
+    const totalSize = missing.reduce((sum, a) => sum + (a.size || 0), 0);
+    showBanner(currentAssets.mode, totalSize);
+  }
+
+  async function checkStorageQuota(neededBytes) {
+    if (!('storage' in navigator) || !navigator.storage.estimate) return true;
+    try {
+      if (navigator.storage.persist) {
+        await navigator.storage.persist();
+      }
+      const estimate = await navigator.storage.estimate();
+      const available = (estimate.quota || 0) - (estimate.usage || 0);
+      return available > neededBytes * 1.1; // small safety margin
+    } catch (e) {
+      return true; // can't check - proceed optimistically, SW reports quota errors per-asset
+    }
+  }
+
+  function sendToSW(msg) {
+    if (navigator.serviceWorker.controller) {
+      navigator.serviceWorker.controller.postMessage(msg);
+      return true;
+    }
+    return false;
+  }
+
+  async function startDownload() {
+    if (!currentAssets) return;
+    const totalBytes = currentAssets.assets.reduce((sum, a) => sum + (a.size || 0), 0);
+    const enoughSpace = await checkStorageQuota(totalBytes);
+    if (!enoughSpace) {
+      showTransientMessage(t('storageError'), 4000);
+      return;
+    }
+
+    nowBtn.hidden = true;
+    laterBtn.hidden = true;
+    progressWrap.hidden = false;
+    progressBar.style.width = '0%';
+    textEl.textContent = t('downloading', { done: 0, total: currentAssets.assets.length });
+
+    await navigator.serviceWorker.ready;
+    if (!navigator.serviceWorker.controller) {
+      // First install: this load wasn't controlled by the SW yet. Reload once
+      // so the now-active SW controls the page and can receive the message.
+      window.location.reload();
+      return;
+    }
+    if (!sendToSW({ type: 'DOWNLOAD_ASSETS', assets: currentAssets.assets })) {
+      showTransientMessage(t('storageError'), 4000);
+    }
+  }
+
+  navigator.serviceWorker.addEventListener('message', (event) => {
+    const data = event.data;
+    if (!data || !data.type) return;
+    if (data.type === 'PROGRESS') {
+      textEl.textContent = t('downloading', { done: data.done, total: data.total });
+      const pct = data.total ? Math.round((data.done / data.total) * 100) : 0;
+      progressBar.style.width = pct + '%';
+    } else if (data.type === 'DOWNLOAD_COMPLETE') {
+      showTransientMessage(t('downloadComplete'), 2500);
+      if (currentAssets) {
+        try { localStorage.setItem('installedMediaVersion', String(currentAssets.version)); } catch (e) {}
+        sendToSW({ type: 'PRUNE', keepUrls: currentAssets.allAssets.map((a) => a.url) });
+      }
+      currentAssets = null;
+    }
+    // DOWNLOAD_ERROR: the SW already continues with the remaining assets;
+    // the final DOWNLOAD_COMPLETE message reflects the actually-cached count.
+  });
+
+  nowBtn.addEventListener('click', startDownload);
+  laterBtn.addEventListener('click', () => {
+    try { sessionStorage.setItem(LATER_KEY, '1'); } catch (e) {}
+    banner.hidden = true;
+  });
+
+  window.addEventListener('load', checkForMediaUpdate);
+  window.addEventListener('online', checkForMediaUpdate);
+})();
 
 // Hash listener
 window.addEventListener('hashchange', () => {
