@@ -2479,6 +2479,27 @@ async function runDiagnostics() {
       log('play() REJECTED: ' + e.name + ' - ' + e.message);
       log('audio err code: ' + (a.error ? a.error.code : 'none'));
     }
+    // 4) Blob-URL playback (bypasses SW entirely - the candidate fix)
+    log('--- trying blob-URL playback ---');
+    try {
+      const cache = await caches.open('media-v1');
+      const cachedResp = await cache.match(url);
+      const blob = await cachedResp.blob();
+      log('blob size: ' + blob.size + ' type: ' + blob.type);
+      const blobUrl = URL.createObjectURL(blob);
+      const b = new Audio();
+      b.src = blobUrl;
+      try {
+        await b.play();
+        await new Promise(r => setTimeout(r, 1500));
+        log('blob play: paused=' + b.paused + ' currentTime=' + b.currentTime.toFixed(2) + ' err=' + (b.error ? b.error.code : 'none'));
+        b.pause();
+        log(b.currentTime > 0.1 ? 'BLOB RESULT: WORKS (this is the fix)' : 'BLOB RESULT: no progress');
+      } catch (e2) {
+        log('blob play REJECTED: ' + e2.name + ' err=' + (b.error ? b.error.code : 'none'));
+      }
+      URL.revokeObjectURL(blobUrl);
+    } catch (e) { log('blob test error: ' + e.message); }
   } catch (e) {
     log('DIAG ERROR: ' + e.message);
   }
