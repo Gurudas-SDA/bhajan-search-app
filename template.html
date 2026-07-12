@@ -1114,9 +1114,11 @@ body {
 </head>
 <body>
 
+<a href="#app" class="skip-link" id="skip-link">Skip to content</a>
 <div id="breadcrumb"></div>
 <div id="alpha-nav"></div>
 <div id="app"></div>
+<div id="route-announcer" class="visually-hidden" aria-live="polite" aria-atomic="true"></div>
 
 <script>
 const BHAJANS = {{BHAJANS_JSON}};
@@ -1179,6 +1181,16 @@ const UI_STRINGS = {
     downloadComplete: 'Download complete',
     storageError: 'Not enough storage space on this device',
     offlineReady: 'Ready for offline use',
+    searchPlaceholder: 'Search bhajans, authors, verses…',
+    searchResults: '{count} results',
+    noResults: 'No bhajans found',
+    matchTitle: 'title',
+    matchFirstLine: 'first line',
+    matchVerseText: 'verse text',
+    fontSmaller: 'Decrease verse text size',
+    fontLarger: 'Increase verse text size',
+    navigatedTo: 'Navigated to {page}',
+    skipToContent: 'Skip to content',
   },
   lv: {
     songIndex: 'Dziesmu saraksts',
@@ -1208,6 +1220,16 @@ const UI_STRINGS = {
     downloadComplete: 'Lejupielāde pabeigta',
     storageError: 'Ierīcē nepietiek brīvas vietas',
     offlineReady: 'Gatavs bezsaistes lietošanai',
+    searchPlaceholder: 'Meklēt bhadžanus, autorus, pantus…',
+    searchResults: '{count} rezultāti',
+    noResults: 'Bhadžani nav atrasti',
+    matchTitle: 'nosaukums',
+    matchFirstLine: 'pirmā rinda',
+    matchVerseText: 'panta teksts',
+    fontSmaller: 'Samazināt panta teksta izmēru',
+    fontLarger: 'Palielināt panta teksta izmēru',
+    navigatedTo: 'Pāriets uz {page}',
+    skipToContent: 'Pāriet uz saturu',
   },
   ru: {
     songIndex: 'Указатель песен',
@@ -1237,6 +1259,16 @@ const UI_STRINGS = {
     downloadComplete: 'Загрузка завершена',
     storageError: 'На устройстве недостаточно места',
     offlineReady: 'Готово для автономного использования',
+    searchPlaceholder: 'Поиск бхаджанов, авторов, стихов…',
+    searchResults: '{count} результатов',
+    noResults: 'Бхаджаны не найдены',
+    matchTitle: 'название',
+    matchFirstLine: 'первая строка',
+    matchVerseText: 'текст стиха',
+    fontSmaller: 'Уменьшить размер текста стиха',
+    fontLarger: 'Увеличить размер текста стиха',
+    navigatedTo: 'Переход на {page}',
+    skipToContent: 'Перейти к содержанию',
   },
   es: {
     songIndex: 'Índice de canciones',
@@ -1266,6 +1298,16 @@ const UI_STRINGS = {
     downloadComplete: 'Descarga completa',
     storageError: 'No hay suficiente espacio de almacenamiento en este dispositivo',
     offlineReady: 'Listo para uso sin conexión',
+    searchPlaceholder: 'Buscar bhajans, autores, versos…',
+    searchResults: '{count} resultados',
+    noResults: 'No se encontraron bhajans',
+    matchTitle: 'título',
+    matchFirstLine: 'primera línea',
+    matchVerseText: 'texto del verso',
+    fontSmaller: 'Reducir el tamaño del texto del verso',
+    fontLarger: 'Aumentar el tamaño del texto del verso',
+    navigatedTo: 'Navegado a {page}',
+    skipToContent: 'Saltar al contenido',
   },
   it: {
     songIndex: 'Indice dei canti',
@@ -1295,6 +1337,16 @@ const UI_STRINGS = {
     downloadComplete: 'Download completato',
     storageError: 'Spazio di archiviazione insufficiente su questo dispositivo',
     offlineReady: 'Pronto per l’uso offline',
+    searchPlaceholder: 'Cerca bhajan, autori, versi…',
+    searchResults: '{count} risultati',
+    noResults: 'Nessun bhajan trovato',
+    matchTitle: 'titolo',
+    matchFirstLine: 'prima riga',
+    matchVerseText: 'testo del verso',
+    fontSmaller: 'Riduci la dimensione del testo del verso',
+    fontLarger: 'Aumenta la dimensione del testo del verso',
+    navigatedTo: 'Passato a {page}',
+    skipToContent: 'Vai al contenuto',
   },
   fr: {
     songIndex: 'Index des chants',
@@ -1324,6 +1376,16 @@ const UI_STRINGS = {
     downloadComplete: 'Téléchargement terminé',
     storageError: 'Espace de stockage insuffisant sur cet appareil',
     offlineReady: 'Prêt pour une utilisation hors ligne',
+    searchPlaceholder: 'Rechercher bhajans, auteurs, versets…',
+    searchResults: '{count} résultats',
+    noResults: 'Aucun bhajan trouvé',
+    matchTitle: 'titre',
+    matchFirstLine: 'premier vers',
+    matchVerseText: 'texte du verset',
+    fontSmaller: 'Réduire la taille du texte du verset',
+    fontLarger: 'Augmenter la taille du texte du verset',
+    navigatedTo: 'Navigué vers {page}',
+    skipToContent: 'Aller au contenu',
   },
 };
 
