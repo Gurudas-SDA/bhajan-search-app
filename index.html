@@ -1009,6 +1009,45 @@ body.offline .video-badge {
   color: var(--dark-brown);
   margin-bottom: 6px;
 }
+.bv-title-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+.bv-title-row h2 {
+  flex: 1;
+  min-width: 0;
+}
+.fav-star-btn {
+  flex-shrink: 0;
+  min-width: 40px;
+  min-height: 40px;
+  border: 1px solid var(--border-tan);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--medium-brown);
+  font-size: 1.3rem;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.fav-star-btn:hover {
+  border-color: var(--orange);
+  background: var(--soft-orange);
+}
+.fav-star-btn.active {
+  color: var(--saffron-dark);
+  border-color: var(--saffron);
+  background: var(--soft-orange);
+}
+.fav-badge {
+  color: var(--saffron-dark);
+  font-size: 0.95em;
+  vertical-align: middle;
+}
 .bhajan-view .bv-meta {
   font-size: 0.9rem;
   color: var(--text-secondary);
@@ -1715,6 +1754,11 @@ const UI_STRINGS = {
     backToSet: 'Back to set',
     alreadyInSet: 'Already added',
     chooseSet: 'Choose a set',
+    favorites: 'Favorites',
+    addFavorite: 'Add to favorites',
+    removeFavorite: 'Remove from favorites',
+    noFavorites: 'You have no favorites yet. Tap the star on a bhajan to add it.',
+    favoritesCount: '{n} favorites',
   },
   lv: {
     songIndex: 'Dziesmu saraksts',
@@ -1781,6 +1825,11 @@ const UI_STRINGS = {
     backToSet: 'Atpakaļ uz setu',
     alreadyInSet: 'Jau pievienots',
     chooseSet: 'Izvēlies setu',
+    favorites: 'Iecienītie',
+    addFavorite: 'Pievienot iecienītajiem',
+    removeFavorite: 'Izņemt no iecienītajiem',
+    noFavorites: 'Tev vēl nav iecienītu bhadžanu. Pieskaries zvaigznītei pie bhadžana, lai to pievienotu.',
+    favoritesCount: '{n} iecienīti',
   },
   ru: {
     songIndex: 'Указатель песен',
@@ -1847,6 +1896,11 @@ const UI_STRINGS = {
     backToSet: 'Назад к подборке',
     alreadyInSet: 'Уже добавлен',
     chooseSet: 'Выберите подборку',
+    favorites: 'Избранное',
+    addFavorite: 'Добавить в избранное',
+    removeFavorite: 'Удалить из избранного',
+    noFavorites: 'У вас пока нет избранного. Нажмите на звёздочку у бхаджана, чтобы добавить его.',
+    favoritesCount: '{n} в избранном',
   },
   es: {
     songIndex: 'Índice de canciones',
@@ -1913,6 +1967,11 @@ const UI_STRINGS = {
     backToSet: 'Volver a la lista',
     alreadyInSet: 'Ya añadido',
     chooseSet: 'Elige una lista',
+    favorites: 'Favoritos',
+    addFavorite: 'Añadir a favoritos',
+    removeFavorite: 'Quitar de favoritos',
+    noFavorites: 'Aún no tienes favoritos. Toca la estrella de un bhajan para añadirlo.',
+    favoritesCount: '{n} favoritos',
   },
   it: {
     songIndex: 'Indice dei canti',
@@ -1979,6 +2038,11 @@ const UI_STRINGS = {
     backToSet: 'Torna al set',
     alreadyInSet: 'Già aggiunto',
     chooseSet: 'Scegli un set',
+    favorites: 'Preferiti',
+    addFavorite: 'Aggiungi ai preferiti',
+    removeFavorite: 'Rimuovi dai preferiti',
+    noFavorites: 'Non hai ancora preferiti. Tocca la stella su un bhajan per aggiungerlo.',
+    favoritesCount: '{n} preferiti',
   },
   fr: {
     songIndex: 'Index des chants',
@@ -2045,6 +2109,11 @@ const UI_STRINGS = {
     backToSet: 'Retour à la liste',
     alreadyInSet: 'Déjà ajouté',
     chooseSet: 'Choisissez une liste',
+    favorites: 'Favoris',
+    addFavorite: 'Ajouter aux favoris',
+    removeFavorite: 'Retirer des favoris',
+    noFavorites: 'Vous n’avez pas encore de favoris. Touchez l’étoile d’un bhajan pour l’ajouter.',
+    favoritesCount: '{n} favoris',
   },
 };
 
@@ -2251,7 +2320,7 @@ function saveScrollForCurrentRoute() {
 // pages and the language chooser always start at the top.
 function isListRoute(route) {
   if (!route || route === 'home' || route === 'titles' || route === 'firstline' ||
-      route === 'categories' || route === 'authors' || route === 'sets') return true;
+      route === 'categories' || route === 'authors' || route === 'sets' || route === 'favorites') return true;
   if (route.startsWith('category:') || route.startsWith('author:') ||
       route.startsWith('set:') || route.startsWith('setadd:')) return true;
   return false;
@@ -2577,6 +2646,42 @@ function moveInSet(id, index, dir) {
   saveSets(sets);
 }
 
+// ==================== Favorites (bookmarked bhajans) — local-only ====================
+const FAVORITES_KEY = 'favorites';
+
+function getFavorites() {
+  try {
+    const raw = localStorage.getItem(FAVORITES_KEY);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch (e) {
+    return [];
+  }
+}
+
+function saveFavorites(arr) {
+  localStorage.setItem(FAVORITES_KEY, JSON.stringify(arr));
+}
+
+function isFavorite(title) {
+  return getFavorites().indexOf(title) !== -1;
+}
+
+function toggleFavorite(title) {
+  const favs = getFavorites();
+  const idx = favs.indexOf(title);
+  if (idx === -1) {
+    favs.push(title);
+  } else {
+    favs.splice(idx, 1);
+  }
+  saveFavorites(favs);
+  return idx === -1; // true if now favorited
+}
+
+// ==================== end Favorites ====================
+
 // PAGES
 
 function renderHome() {
@@ -2615,6 +2720,9 @@ function renderHome() {
       <a class="nav-btn" href="#sets" onclick="navigate('sets'); return false;">
         <span class="label">${esc(t('mySets'))}</span>
       </a>
+      <a class="nav-btn" href="#favorites" onclick="navigate('favorites'); return false;">
+        <span class="label">${esc(t('favorites'))}</span>
+      </a>
     </div>
     <div class="footer">\u015ar\u012b Gau\u1e0d\u012bya G\u012bti-guccha &middot; ${esc(t('footer'))}</div>
   `;
@@ -2635,7 +2743,7 @@ function renderTitles() {
     groups[letter].forEach(b => {
       const enc = encodeURIComponent(b.title);
       html += '<a class="bhajan-item" href="#bhajan:' + enc + '" onclick="navigate(\'bhajan:' + enc + '\'); return false;">';
-      html += '<div class="b-title">' + esc(b.title) + (YOUTUBE_IDS[b.title] ? ' <span class="video-badge">&#9654; Video</span>' : '') + (AUDIO_IDS[b.title] ? ' <span class="audio-badge">&#9836; Audio</span>' : '') + '</div>';
+      html += '<div class="b-title">' + (isFavorite(b.title) ? '<span class="fav-badge" title="' + esc(t('favorites')) + '">&#9733;</span> ' : '') + esc(b.title) + (YOUTUBE_IDS[b.title] ? ' <span class="video-badge">&#9654; Video</span>' : '') + (AUDIO_IDS[b.title] ? ' <span class="audio-badge">&#9836; Audio</span>' : '') + '</div>';
       html += '<div class="b-meta">' + esc(b.author) + ' &middot; ' + esc(b.category) + ' &middot; ' + b.verses.length + ' ' + esc(t('verses')) + '</div>';
       html += '</a>';
     });
@@ -2839,10 +2947,12 @@ function renderBhajan(title, opts) {
   }
   setAlphaNav(null);
 
+  const enc = encodeURIComponent(title);
+
   let html = compactHeader();
   if (opts.navBarHtml) html += opts.navBarHtml;
   html += '<div class="bhajan-view">';
-  html += '<h2 id="main-heading" tabindex="-1">' + esc(b.title) + '</h2>';
+  html += '<div class="bv-title-row"><h2 id="main-heading" tabindex="-1">' + esc(b.title) + '</h2>' + renderFavoriteToggle(enc) + '</div>';
   html += '<div class="bv-meta">';
   html += 'by <a href="#author:' + encodeURIComponent(b.author) + '" onclick="navigate(\'author:' + encodeURIComponent(b.author) + '\'); return false;">' + esc(b.author) + '</a>';
   html += ' &middot; <a href="#category:' + encodeURIComponent(b.category) + '" onclick="navigate(\'category:' + encodeURIComponent(b.category) + '\'); return false;">' + esc(b.category) + '</a>';
@@ -2879,7 +2989,6 @@ function renderBhajan(title, opts) {
   html += '</div>'; // #audio-player-wrapper
 
   // Language selector — single row (4 buttons, or 3 for English working language)
-  const enc = encodeURIComponent(title);
   html += renderLangButtons(enc);
 
   // Font size control (M6) — sits next to the language selector
@@ -2918,6 +3027,76 @@ function switchLang(lang, encodedTitle) {
     selectorEl.outerHTML = renderLangButtons(encodedTitle);
   }
 }
+
+// ---- Favorite star toggle (bhajan page) ----
+
+function renderFavoriteToggle(encTitle) {
+  const title = safeDecodeURIComponent(encTitle, '');
+  const fav = isFavorite(title);
+  return '<button class="fav-star-btn' + (fav ? ' active' : '') + '" id="fav-star-btn" ' +
+    'aria-pressed="' + (fav ? 'true' : 'false') + '" ' +
+    'aria-label="' + esc(fav ? t('removeFavorite') : t('addFavorite')) + '" ' +
+    'onclick="toggleFavoriteUI(\'' + encTitle + '\')">' + (fav ? '★' : '☆') + '</button>';
+}
+
+function toggleFavoriteUI(encTitle) {
+  const title = safeDecodeURIComponent(encTitle, null);
+  if (title === null) return;
+  toggleFavorite(title);
+  const btn = document.getElementById('fav-star-btn');
+  if (!btn) return;
+  const fav = isFavorite(title);
+  btn.className = 'fav-star-btn' + (fav ? ' active' : '');
+  btn.setAttribute('aria-pressed', fav ? 'true' : 'false');
+  btn.setAttribute('aria-label', fav ? t('removeFavorite') : t('addFavorite'));
+  btn.textContent = fav ? '★' : '☆';
+}
+
+// ==================== end Favorite star toggle ====================
+
+// ==================== Favorites view (#favorites) — bookmarked bhajans list ====================
+
+function renderFavoritesRows(favs) {
+  let html = '';
+  favs.forEach(b => {
+    const enc = encodeURIComponent(b.title);
+    html += '<div class="set-row" id="fav-row-' + esc(enc) + '">';
+    html += '<a class="set-row-main" href="#bhajan:' + enc + '" onclick="navigate(\'bhajan:' + enc + '\'); return false;">';
+    html += '<span class="set-row-name">' + esc(b.title) + '</span>';
+    html += '<span class="set-row-count">' + esc(b.author) + '</span>';
+    html += '</a>';
+    html += '<div class="set-row-actions">';
+    html += '<button class="icon-btn" aria-label="' + esc(t('removeFavorite')) + '" onclick="removeFavoriteFromList(\'' + enc + '\')">☆</button>';
+    html += '</div></div>';
+  });
+  return html;
+}
+
+function removeFavoriteFromList(encTitle) {
+  const title = safeDecodeURIComponent(encTitle, null);
+  if (title === null) return;
+  toggleFavorite(title); // row only shown while favorited, so this removes it
+  render('favorites', true);
+}
+
+function renderFavorites() {
+  setBreadcrumb([{ label: t('favorites'), hash: null }]);
+  setAlphaNav(null);
+  const favs = getFavorites()
+    .map(title => findBhajan(title))
+    .filter(Boolean)
+    .sort((a, b) => a.title.localeCompare(b.title));
+  let html = compactHeader();
+  html += '<h2 class="page-title" id="main-heading" tabindex="-1">' + esc(t('favorites')) + '</h2>';
+  if (!favs.length) {
+    html += '<p class="empty-msg">' + esc(t('noFavorites')) + '</p>';
+  } else {
+    html += '<div id="favorites-list-container" class="list-section">' + renderFavoritesRows(favs) + '</div>';
+  }
+  return html;
+}
+
+// ==================== end Favorites view ====================
 
 // ==================== Bhajan Sets (user playlists) — UI ====================
 // Routes: 'sets', 'set:<id>', 'setadd:<id>', 'setplay:<id>:<idx>'.
@@ -3317,6 +3496,7 @@ function announceRoute(route) {
   else if (route === 'authors') label = t('authors');
   else if (route === 'langchoice') label = t('langChoiceTitle');
   else if (route === 'sets') label = t('mySets');
+  else if (route === 'favorites') label = t('favorites');
   else if (route.indexOf('category:') === 0) label = safeDecodeURIComponent(route.substring(9), route);
   else if (route.indexOf('author:') === 0) label = safeDecodeURIComponent(route.substring(7), route);
   else if (route.indexOf('bhajan:') === 0) label = safeDecodeURIComponent(route.substring(7).split(':')[0], route);
@@ -3373,6 +3553,9 @@ function render(route, preserveScroll) {
   } else if (route === 'sets') {
     currentRoute = route;
     app.innerHTML = renderSetsList();
+  } else if (route === 'favorites') {
+    currentRoute = route;
+    app.innerHTML = renderFavorites();
   } else if (route.indexOf('setadd:') === 0) {
     currentRoute = route;
     const id = safeDecodeURIComponent(route.substring(7), null);
