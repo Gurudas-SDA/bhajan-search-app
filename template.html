@@ -582,6 +582,28 @@ body {
   margin: 8px 0 12px 0;
   flex-wrap: wrap;
 }
+.offline-status {
+  text-align: center;
+  margin: 4px 0 10px 0;
+  min-height: 24px;
+}
+.offline-status .offline-ok {
+  color: var(--medium-brown);
+  font-size: 0.9rem;
+}
+.offline-dl-btn {
+  background: var(--saffron);
+  color: #fff;
+  border: none;
+  border-radius: 22px;
+  padding: 10px 20px;
+  font-family: inherit;
+  font-size: 0.95rem;
+  cursor: pointer;
+  min-height: 44px;
+  box-shadow: 0 2px 6px rgba(168,84,26,0.3);
+}
+.offline-dl-btn:hover { background: var(--saffron-dark); }
 .stat {
   text-align: center;
 }
@@ -1927,6 +1949,7 @@ function renderHome() {
       <div class="stat"><div class="stat-number">${authCount}</div><div class="stat-label">${t('statAuthors')}</div></div>
     </div>
     ${renderSearchBox()}
+    <div id="offline-status" class="offline-status"></div>
     <div class="nav-grid">
       <a class="nav-btn" href="#titles" onclick="navigate('titles'); return false;">
         <span class="label">${esc(t('songIndex'))}</span>
@@ -2325,6 +2348,7 @@ function render(route, preserveScroll) {
     window.scrollTo(0, 0);
   }
   initAudioPlayers();
+  if (window.refreshOfflineStatus) window.refreshOfflineStatus();
   applyFontScale();
   updateAlphaNavOffset();
   updateOnlineUI();
@@ -2571,6 +2595,7 @@ updateOnlineUI();
         sendToSW({ type: 'PRUNE', keepUrls: currentAssets.allAssets.map((a) => a.url) });
       }
       currentAssets = null;
+      refreshOfflineStatus();
     }
     // DOWNLOAD_ERROR: the SW already continues with the remaining assets;
     // the final DOWNLOAD_COMPLETE message reflects the actually-cached count.
@@ -2584,6 +2609,48 @@ updateOnlineUI();
 
   window.addEventListener('load', checkForMediaUpdate);
   window.addEventListener('online', checkForMediaUpdate);
+
+  // Persistent offline-status control on the home page (always discoverable,
+  // unlike the transient banner). Rendered by renderHome via #offline-status.
+  async function refreshOfflineStatus() {
+    const el = document.getElementById('offline-status');
+    if (!el) return;
+    try {
+      const cachedUrls = await getCachedMediaUrls();
+      let manifest = null;
+      try {
+        const res = await fetch('asset-list.json', { cache: 'no-store' });
+        if (res.ok) manifest = await res.json();
+      } catch (e) { /* offline */ }
+      if (!manifest) {
+        el.innerHTML = cachedUrls.size > 0
+          ? '<span class="offline-ok">✓ ' + esc(t('offlineReady')) + '</span>'
+          : '';
+        return;
+      }
+      const missing = manifest.assets.filter((a) => !cachedUrls.has(toPathKey(a.url)));
+      if (missing.length === 0) {
+        el.innerHTML = '<span class="offline-ok">✓ ' + esc(t('offlineReady')) + '</span>';
+      } else {
+        const size = missing.reduce((s, a) => s + (a.size || 0), 0);
+        el.innerHTML = '<button type="button" class="offline-dl-btn" onclick="startOfflineDownload()">⬇ '
+          + esc(t('downloadOffline', { size: fmtSize(size) })) + '</button>';
+      }
+    } catch (e) { /* leave empty */ }
+  }
+
+  window.startOfflineDownload = function () {
+    try { sessionStorage.removeItem(LATER_KEY); } catch (e) {}
+    checkForMediaUpdate().then(() => {
+      // checkForMediaUpdate shows the banner with the confirm button;
+      // trigger the download directly since the user already clicked.
+      if (currentAssets) nowBtn.click();
+    });
+  };
+
+  window.refreshOfflineStatus = refreshOfflineStatus;
+  window.addEventListener('load', refreshOfflineStatus);
+  window.addEventListener('online', refreshOfflineStatus);
 })();
 
 // Hash listener
