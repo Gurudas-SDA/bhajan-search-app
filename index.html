@@ -392,24 +392,54 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-  --dark-brown: #4a2c17;
-  --saffron: #c86b1f;
-  --saffron-dark: #a0541a;
-  --saffron-light: #f8e8d4;
-  --gold: #8f7318;
-  --medium-brown: #6b5340;
-  --warm-white: #fdf8f2;
-  --light-tan: #f5efe5;
-  --border-tan: #e4d5c3;
-  --soft-saffron: #fef5eb;
-  --text-secondary: #6f5a40;
-  --maroon: #7a2e2e;
+  /* Semantic theme layer (light defaults) — dark override below */
+  --bg: #fdf8f2;
+  --surface: #ffffff;
+  --surface-2: #f5efe5;
+  --surface-3: #fef5eb;
+  --text: #4a2c17;
+  --text-muted: #6f5a40;
+  --border: #e4d5c3;
+  --on-accent: #ffffff;
+  --accent: #c86b1f;
+  --accent-dark: #a0541a;
+  --accent-light: #f8e8d4;
+  --gold-accent: #8f7318;
+  --maroon-accent: #7a2e2e;
+  --alpha-link: #cc2200;
+  --badge-audio-fg: #1a6b3a;
+  --badge-audio-bg: #edf7f1;
+  --badge-audio-border: #a8d5b8;
+  --badge-video-fg: #c0392b;
+  --badge-video-bg: #fdf0ef;
+  --badge-video-border: #e8b4b0;
+  --shadow-color: 0,0,0;
+  --shadow-soft: rgba(0,0,0,0.04);
+  --shadow-medium: rgba(0,0,0,0.12);
+
+  /* Legacy names — kept so the rest of the CSS (and any external refs)
+     keep working unchanged; they now resolve through the semantic vars
+     above so :root[data-theme="dark"] only needs to override the
+     semantic layer. */
+  --dark-brown: var(--text);
+  --saffron: var(--accent);
+  --saffron-dark: var(--accent-dark);
+  --saffron-light: var(--accent-light);
+  --gold: var(--gold-accent);
+  --medium-brown: var(--text-muted);
+  --warm-white: var(--bg);
+  --light-tan: var(--surface-2);
+  --border-tan: var(--border);
+  --soft-saffron: var(--surface-3);
+  --text-secondary: var(--text-muted);
+  --maroon: var(--maroon-accent);
   --font-ui: 'Noto Serif', serif;
   --verse-scale: 1;
   /* Legacy aliases */
   --orange: var(--saffron);
   --soft-orange: var(--soft-saffron);
 }
+
 
 html { scroll-behavior: smooth; }
 
@@ -427,14 +457,14 @@ body {
   top: 0;
   z-index: 100;
   background: linear-gradient(135deg, var(--saffron-dark) 0%, var(--saffron) 100%);
-  color: #fff;
+  color: var(--on-accent);
   padding: 10px 20px;
   font-family: 'Noto Serif', serif;
   font-size: 0.9rem;
   box-shadow: 0 2px 8px rgba(168,84,26,0.25);
 }
 #breadcrumb a {
-  color: #fff;
+  color: var(--on-accent);
   text-decoration: none;
   transition: text-decoration 0.2s;
 }
@@ -454,7 +484,7 @@ body {
   flex-shrink: 0;
   background: rgba(255,255,255,0.18);
   border: 1px solid rgba(255,255,255,0.4);
-  color: #fff;
+  color: var(--on-accent);
   border-radius: 8px;
   padding: 6px 12px;
   font-family: 'Noto Serif', serif;
@@ -481,7 +511,7 @@ body {
   display: inline-block;
   padding: 4px 8px;
   margin: 2px;
-  color: #CC2200;
+  color: var(--alpha-link);
   text-decoration: none;
   font-family: 'Noto Serif', serif;
   font-size: 0.85rem;
@@ -501,7 +531,7 @@ body {
 }
 #alpha-nav a:hover, #alpha-nav a.active {
   background: var(--orange);
-  color: white;
+  color: var(--on-accent);
 }
 #alpha-nav a.disabled {
   opacity: 0.3;
@@ -593,7 +623,7 @@ body {
 }
 .offline-dl-btn {
   background: var(--saffron);
-  color: #fff;
+  color: var(--on-accent);
   border: none;
   border-radius: 22px;
   padding: 10px 20px;
@@ -635,7 +665,7 @@ body {
   justify-content: center;
   gap: 8px;
   padding: 14px 12px;
-  background: white;
+  background: var(--surface);
   border: 1px solid var(--border-tan);
   border-radius: 10px;
   text-decoration: none;
@@ -643,7 +673,7 @@ body {
   text-align: center;
   transition: all 0.3s;
   cursor: pointer;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+  box-shadow: 0 1px 3px var(--shadow-soft);
 }
 .nav-btn:hover {
   border-color: var(--orange);
@@ -672,7 +702,7 @@ body {
   display: block;
   padding: 12px 16px;
   margin: 4px 0;
-  background: white;
+  background: var(--surface);
   border: 1px solid transparent;
   border-radius: 8px;
   text-decoration: none;
@@ -699,9 +729,9 @@ body {
   font-size: 0.65rem;
   font-family: var(--font-ui);
   font-weight: 600;
-  color: #c0392b;
-  background: #fdf0ef;
-  border: 1px solid #e8b4b0;
+  color: var(--badge-video-fg);
+  background: var(--badge-video-bg);
+  border: 1px solid var(--badge-video-border);
   border-radius: 3px;
   padding: 1px 5px;
   margin-left: 6px;
@@ -715,9 +745,9 @@ body {
   font-size: 0.65rem;
   font-family: var(--font-ui);
   font-weight: 600;
-  color: #1a6b3a;
-  background: #edf7f1;
-  border: 1px solid #a8d5b8;
+  color: var(--badge-audio-fg);
+  background: var(--badge-audio-bg);
+  border: 1px solid var(--badge-audio-border);
   border-radius: 3px;
   padding: 1px 5px;
   margin-left: 4px;
@@ -741,7 +771,7 @@ body.offline .video-badge {
   bottom: 0;
   z-index: 500;
   background: var(--saffron);
-  color: #fff;
+  color: var(--on-accent);
   padding: 10px 16px;
   display: flex;
   flex-wrap: wrap;
@@ -771,7 +801,7 @@ body.offline .video-badge {
 .pwa-banner-progress-bar {
   height: 100%;
   width: 0%;
-  background: #fff;
+  background: var(--on-accent);
   transition: width 0.2s ease;
 }
 .pwa-banner-actions {
@@ -782,7 +812,7 @@ body.offline .video-badge {
 .pwa-banner-btn {
   border: 1px solid rgba(255,255,255,0.7);
   background: transparent;
-  color: #fff;
+  color: var(--on-accent);
   padding: 5px 12px;
   border-radius: 4px;
   font-family: var(--font-ui);
@@ -793,15 +823,15 @@ body.offline .video-badge {
   display: none;
 }
 .pwa-banner-btn-primary {
-  background: #fff;
+  background: var(--on-accent);
   color: var(--saffron);
-  border-color: #fff;
+  border-color: var(--on-accent);
   font-weight: 600;
 }
 
 /* Audio player — custom */
 .audio-player {
-  background: linear-gradient(135deg, #fdf8f2, #f8ead8);
+  background: linear-gradient(135deg, var(--surface), var(--surface-2));
   border: 1px solid var(--border-tan);
   border-left: 4px solid var(--saffron);
   border-radius: 10px;
@@ -837,7 +867,7 @@ body.offline .video-badge {
   transition: background 0.15s;
 }
 .ap-play-btn:hover { background: var(--saffron-dark); }
-.ap-play-btn svg { fill: white; }
+.ap-play-btn svg { fill: var(--on-accent); }
 .ap-time {
   font-size: 0.88rem;
   color: var(--saffron-dark);
@@ -873,7 +903,7 @@ body.offline .video-badge {
   align-items: center;
   padding: 14px 20px;
   margin: 6px 0;
-  background: white;
+  background: var(--surface);
   border: 1px solid var(--border-tan);
   border-radius: 10px;
   text-decoration: none;
@@ -949,7 +979,7 @@ body.offline .video-badge {
   min-height: 44px;
   border: 1px solid var(--border-tan);
   border-radius: 8px;
-  background: white;
+  background: var(--surface);
   color: var(--medium-brown);
   font-family: 'Noto Serif', serif;
   font-size: 0.85rem;
@@ -961,7 +991,7 @@ body.offline .video-badge {
 }
 .lang-btn.active {
   background: var(--orange);
-  color: white;
+  color: var(--on-accent);
   border-color: var(--orange);
 }
 
@@ -993,7 +1023,7 @@ body.offline .video-badge {
 .lang-choice-btn {
   min-height: 64px;
   padding: 14px 16px;
-  background: white;
+  background: var(--surface);
   border: 1px solid var(--border-tan);
   border-radius: 12px;
   color: var(--dark-brown);
@@ -1002,7 +1032,7 @@ body.offline .video-badge {
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+  box-shadow: 0 1px 3px var(--shadow-soft);
 }
 .lang-choice-btn:hover {
   border-color: var(--orange);
@@ -1042,10 +1072,10 @@ body.offline .video-badge {
 .verse {
   margin: 24px 0;
   padding: 20px 24px;
-  background: white;
+  background: var(--surface);
   border-left: 3px solid var(--orange);
   border-radius: 0 10px 10px 0;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+  box-shadow: 0 1px 4px var(--shadow-soft);
 }
 .verse-number {
   font-family: 'Playfair Display', serif;
@@ -1075,7 +1105,7 @@ body.offline .video-badge {
   min-height: 40px;
   border: 1px solid var(--border-tan);
   border-radius: 8px;
-  background: white;
+  background: var(--surface);
   color: var(--medium-brown);
   font-family: var(--font-ui);
   font-size: 0.95rem;
@@ -1110,7 +1140,7 @@ body.offline .video-badge {
   left: -9999px;
   top: 0;
   background: var(--saffron-dark);
-  color: #fff;
+  color: var(--on-accent);
   padding: 10px 16px;
   z-index: 1000;
   border-radius: 0 0 8px 0;
@@ -1145,11 +1175,11 @@ body.offline .video-badge {
   min-height: 44px;
   border: 1px solid var(--border-tan);
   border-radius: 10px;
-  background: white;
+  background: var(--surface);
   color: var(--dark-brown);
   font-family: var(--font-ui);
   font-size: 1rem;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+  box-shadow: 0 1px 3px var(--shadow-soft);
 }
 .search-input:focus {
   outline: none;
@@ -1174,7 +1204,7 @@ body.offline .video-badge {
   display: block;
   padding: 10px 14px;
   margin: 4px 0;
-  background: white;
+  background: var(--surface);
   border: 1px solid var(--border-tan);
   border-radius: 8px;
   text-decoration: none;
@@ -1206,7 +1236,7 @@ body.offline .video-badge {
   padding: 8px 16px;
   border: 1px solid var(--border-tan);
   border-radius: 20px;
-  background: white;
+  background: var(--surface);
   color: var(--dark-brown);
   font-family: var(--font-ui);
   font-size: 0.9rem;
@@ -1230,7 +1260,7 @@ body.offline .video-badge {
   gap: 8px;
   align-items: center;
   padding: 12px 16px;
-  background: white;
+  background: var(--surface);
   border: 1px solid var(--border-tan);
   border-radius: 10px;
   margin: 6px 0;
@@ -1261,7 +1291,7 @@ body.offline .video-badge {
   gap: 8px;
   padding: 6px 6px 6px 16px;
   margin: 6px 0;
-  background: white;
+  background: var(--surface);
   border: 1px solid var(--border-tan);
   border-radius: 10px;
   transition: all 0.2s;
@@ -1301,7 +1331,7 @@ body.offline .video-badge {
   min-height: 40px;
   border: 1px solid var(--border-tan);
   border-radius: 8px;
-  background: white;
+  background: var(--surface);
   color: var(--medium-brown);
   font-size: 1rem;
   cursor: pointer;
@@ -1324,7 +1354,7 @@ body.offline .video-badge {
   gap: 8px;
   padding: 10px 6px 10px 16px;
   margin: 6px 0;
-  background: white;
+  background: var(--surface);
   border: 1px solid var(--border-tan);
   border-radius: 10px;
 }
@@ -1357,7 +1387,7 @@ body.offline .video-badge {
   gap: 12px;
   padding: 10px 14px;
   margin: 4px 0;
-  background: white;
+  background: var(--surface);
   border: 1px solid var(--border-tan);
   border-radius: 8px;
 }
@@ -1385,7 +1415,7 @@ body.offline .video-badge {
   justify-content: space-between;
   gap: 8px 16px;
   background: linear-gradient(135deg, var(--saffron-dark) 0%, var(--saffron) 100%);
-  color: #fff;
+  color: var(--on-accent);
   padding: 10px 16px;
   border-radius: 10px;
   margin: 0 0 20px;
@@ -1416,7 +1446,7 @@ body.offline .video-badge {
   border: 1px solid rgba(255,255,255,0.4);
   border-radius: 18px;
   background: rgba(255,255,255,0.18);
-  color: #fff;
+  color: var(--on-accent);
   text-decoration: none;
   font-size: 0.85rem;
   font-weight: 600;
@@ -1442,10 +1472,10 @@ body.offline .video-badge {
   top: calc(100% + 6px);
   left: 0;
   min-width: 220px;
-  background: white;
+  background: var(--surface);
   border: 1px solid var(--border-tan);
   border-radius: 10px;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+  box-shadow: 0 4px 16px var(--shadow-medium);
   padding: 8px;
 }
 .add-to-set-menu-title {
