@@ -4049,8 +4049,11 @@ async function runDownloadDiag() {
     }
 
     log('[4] SW controller check…');
-    log('    controller: ' + !!navigator.serviceWorker.controller);
-    if (!navigator.serviceWorker.controller) {
+    const hasSW = 'serviceWorker' in navigator;
+    log('    serviceWorker API: ' + hasSW);
+    const swCtrl = hasSW ? navigator.serviceWorker.controller : null;
+    log('    controller: ' + !!swCtrl);
+    if (!swCtrl) {
       log('    → no controller. Will attempt DIRECT fetch+cache from PAGE (bypassing SW postMessage).');
     }
 
@@ -4079,7 +4082,7 @@ async function runDownloadDiag() {
     log('    match: ' + (hit ? 'FOUND (' + (await hit.blob()).size + ' bytes)' : 'MISS'));
 
     log('[8] Now try via SW postMessage (normal flow)…');
-    if (!navigator.serviceWorker.controller) {
+    if (!swCtrl) {
       log('    SKIP — no controller.');
     } else {
       const second = manifest.assets[1] || manifest.assets[0];
@@ -4114,10 +4117,13 @@ async function runDiagnostics() {
   try {
     log('online: ' + navigator.onLine);
     // SW status
-    const reg = await navigator.serviceWorker.getRegistration();
+    const hasSW = 'serviceWorker' in navigator;
+    log('serviceWorker API: ' + hasSW);
+    const reg = hasSW ? await navigator.serviceWorker.getRegistration() : null;
     log('SW registered: ' + !!reg);
-    log('SW controller: ' + !!navigator.serviceWorker.controller);
-    if (navigator.serviceWorker.controller) log('SW script: ' + navigator.serviceWorker.controller.scriptURL);
+    const swCtrl = hasSW ? navigator.serviceWorker.controller : null;
+    log('SW controller: ' + !!swCtrl);
+    if (swCtrl) log('SW script: ' + swCtrl.scriptURL);
     const active = reg && reg.active;
     log('SW active state: ' + (active ? active.state : 'none'));
     // Which shell version cache exists
