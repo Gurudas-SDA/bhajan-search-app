@@ -3799,6 +3799,11 @@ function render(route, preserveScroll) {
     currentRoute = route;
     app.innerHTML = '<div style="padding:20px;font-family:monospace;font-size:13px;white-space:pre-wrap;word-break:break-all" id="diag-out">Running diagnostics…</div>';
     runDiagnostics();
+  } else if (route === 'diagdl') {
+    currentRoute = route;
+    app.innerHTML = '<div style="padding:20px;font-family:monospace;font-size:13px;white-space:pre-wrap;word-break:break-all" id="diagdl-out">Ready. Tap START to attempt an offline media download with a live step-by-step log.</div>' +
+      '<div style="padding:0 20px 20px"><button id="diagdl-start" style="padding:12px 20px;font-size:1rem;background:var(--accent);color:var(--on-accent);border:none;border-radius:8px;min-height:44px">START download test</button></div>';
+    setTimeout(() => { const b = document.getElementById('diagdl-start'); if (b) b.onclick = runDownloadDiag; }, 50);
   } else if (route === 'titles') {
     currentRoute = route;
     app.innerHTML = renderTitles();
@@ -4013,6 +4018,95 @@ function initAudioPlayers() {
 
 // Offline diagnostics — reachable at #diag. Runs on-device tests and prints
 // the results so we can pinpoint why offline audio may fail on a given phone.
+// Step-by-step download diagnostic — reachable at #diagdl. Attempts the same
+// offline download flow the "Download for offline use" button triggers, but
+// with a live log printed on the page. Designed to be readable on iPad Safari
+// where the normal UI silently fails.
+async function runDownloadDiag() {
+  const out = document.getElementById('diagdl-out');
+  const btn = document.getElementById('diagdl-start');
+  if (btn) btn.disabled = true;
+  const L = [];
+  const log = (s) => { L.push(s); if (out) out.textContent = L.join('\n'); };
+  try {
+    log('[1] fetching asset-list.json…');
+    const res = await fetch('asset-list.json', { cache: 'no-store' });
+    log('    HTTP ' + res.status);
+    if (!res.ok) { log('FAIL: asset-list not ok'); return; }
+    const manifest = await res.json();
+    log('    assets: ' + manifest.assets.length + ' (version ' + manifest.version + ')');
+
+    log('[2] navigator.storage.persist() try…');
+    if (navigator.storage && navigator.storage.persist) {
+      try { const ok = await navigator.storage.persist(); log('    persist() → ' + ok); }
+      catch (e) { log('    persist() threw: ' + e.message); }
+    } else log('    (storage.persist not available)');
+
+    log('[3] storage.estimate…');
+    if (navigator.storage && navigator.storage.estimate) {
+      const est = await navigator.storage.estimate();
+      log('    usage: ' + Math.round((est.usage||0)/1048576) + ' MB / quota ' + Math.round((est.quota||0)/1048576) + ' MB');
+    }
+
+    log('[4] SW controller check…');
+    log('    controller: ' + !!navigator.serviceWorker.controller);
+    if (!navigator.serviceWorker.controller) {
+      log('    → no controller. Will attempt DIRECT fetch+cache from PAGE (bypassing SW postMessage).');
+    }
+
+    log('[5] direct fetch test: FIRST asset (small, sequential)…');
+    const first = manifest.assets[0];
+    log('    url: ' + first.url + '  size: ' + Math.round(first.size/1024) + ' KB');
+    let resp;
+    try {
+      const t0 = Date.now();
+      resp = await fetch(first.url);
+      log('    fetch → HTTP ' + resp.status + ' in ' + (Date.now()-t0) + ' ms');
+    } catch (e) { log('    fetch THREW: ' + e.name + ' - ' + e.message); return; }
+    if (!resp.ok) { log('FAIL: fetch not ok'); return; }
+
+    log('[6] cache.put test on media-v1…');
+    let cache;
+    try { cache = await caches.open('media-v1'); log('    caches.open OK'); }
+    catch (e) { log('    caches.open THREW: ' + e.message); return; }
+    try {
+      await cache.put(first.url, resp.clone());
+      log('    cache.put OK');
+    } catch (e) { log('    cache.put THREW: ' + e.name + ' - ' + e.message); return; }
+
+    log('[7] verify: cache.match…');
+    const hit = await cache.match(first.url);
+    log('    match: ' + (hit ? 'FOUND (' + (await hit.blob()).size + ' bytes)' : 'MISS'));
+
+    log('[8] Now try via SW postMessage (normal flow)…');
+    if (!navigator.serviceWorker.controller) {
+      log('    SKIP — no controller.');
+    } else {
+      const second = manifest.assets[1] || manifest.assets[0];
+      log('    posting DOWNLOAD_ASSETS for 1 asset via SW…');
+      const done = new Promise((resolve) => {
+        const t = setTimeout(() => resolve('TIMEOUT after 30s'), 30000);
+        function h(ev) {
+          if (!ev.data || !ev.data.type) return;
+          log('    SW → ' + ev.data.type + ' ' + JSON.stringify({done:ev.data.done, total:ev.data.total, url:ev.data.url, reason:ev.data.reason}));
+          if (ev.data.type === 'DOWNLOAD_COMPLETE' || ev.data.type === 'DOWNLOAD_ERROR') {
+            clearTimeout(t); navigator.serviceWorker.removeEventListener('message', h); resolve(ev.data.type);
+          }
+        }
+        navigator.serviceWorker.addEventListener('message', h);
+      });
+      navigator.serviceWorker.controller.postMessage({ type:'DOWNLOAD_ASSETS', assets:[second], keepUrls: manifest.assets.map(a=>a.url) });
+      const r = await done;
+      log('    result: ' + r);
+    }
+
+    log('[9] final media-v1 count: ' + (await (await caches.open('media-v1')).keys()).length);
+    log('DONE. If asset [5]+[6] succeeded but [8] timed out → SW postMessage is not reaching the SW on iPad. If [5]/[6] failed → tell me exactly which threw.');
+  } catch (e) {
+    log('UNCAUGHT: ' + e.name + ' - ' + e.message);
+  } finally { if (btn) btn.disabled = false; }
+}
+
 async function runDiagnostics() {
   const out = document.getElementById('diag-out');
   const L = [];
