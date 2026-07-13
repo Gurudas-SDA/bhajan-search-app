@@ -704,6 +704,79 @@ body {
   box-shadow: 0 2px 6px rgba(168,84,26,0.3);
 }
 .offline-dl-btn:hover { background: var(--saffron-dark); }
+
+/* Background audio download panel (home page, #offline-status) — replaces
+   the old "download now / wait" gate with an always-visible, non-blocking
+   inline card. Three states: start / busy / ready. Semantic vars only so
+   it stays readable in dark mode. */
+.offline-panel {
+  text-align: left;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 14px 16px;
+  margin: 4px 0 10px 0;
+}
+.offline-panel-title {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  margin: 0 0 6px 0;
+}
+.offline-panel--busy .offline-panel-title {
+  color: var(--accent-text);
+}
+.offline-panel-body {
+  font-size: 0.9rem;
+  color: var(--text);
+  line-height: 1.5;
+  margin: 0 0 10px 0;
+}
+.offline-panel-hint {
+  display: block;
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  margin-top: 2px;
+}
+.offline-panel-footnote {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin: 8px 0 0 0;
+}
+.offline-start-btn {
+  display: block;
+  width: 100%;
+  background: var(--accent);
+  color: var(--on-accent);
+  border: none;
+  border-radius: 22px;
+  padding: 12px 18px;
+  font-family: inherit;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  min-height: 44px;
+}
+.offline-start-btn:hover { filter: brightness(1.08); }
+.offline-progress-bar {
+  height: 6px;
+  background: var(--border);
+  border-radius: 3px;
+  overflow: hidden;
+  margin: 2px 0 10px 0;
+}
+.offline-progress-fill {
+  height: 100%;
+  width: 0%;
+  background: var(--accent);
+  transition: width 0.25s ease;
+}
+.offline-ready-row {
+  text-align: center;
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  margin: 4px 0 10px 0;
+}
 .stat {
   text-align: center;
 }
@@ -1796,6 +1869,15 @@ const UI_STRINGS = {
     downloadComplete: 'Download complete',
     storageError: 'Not enough storage space on this device',
     offlineReady: 'Ready for offline use',
+    audioOfflineTitle: 'Offline audio (~{size})',
+    audioBgHint1: 'You can use the app right away — audio will download in the background.',
+    audioBgHint2: 'Closing the tab pauses it; it resumes next time.',
+    audioStartBtn: '🎵 Start audio download (~{size})',
+    wifiHint: 'Recommended: Wi-Fi.',
+    audioBgDownloading: 'Downloading audio in background…',
+    audioBgProgress: '{done} of {total} files ({size} downloaded)',
+    audioBgFine: 'The app is fully usable while this runs.',
+    audioReady: '✓ Offline audio ready ({count} files)',
     searchPlaceholder: 'Type what you\'re looking for…',
     searchResults: '{count} results',
     noResults: 'No bhajans found',
@@ -1875,6 +1957,15 @@ const UI_STRINGS = {
     downloadComplete: 'Lejupielāde pabeigta',
     storageError: 'Ierīcē nepietiek brīvas vietas',
     offlineReady: 'Gatavs bezsaistes lietošanai',
+    audioOfflineTitle: 'Bezsaistes audio (~{size})',
+    audioBgHint1: 'App var lietot uzreiz — audio ielādēsies fonā.',
+    audioBgHint2: 'Aizverot cilni, ielāde pauzē un atsākas nākamreiz.',
+    audioStartBtn: '🎵 Sākt audio lejupielādi (~{size})',
+    wifiHint: 'Ieteicams: Wi-Fi.',
+    audioBgDownloading: 'Ielādē audio fonā…',
+    audioBgProgress: '{done} no {total} failiem ({size} lejupielādēts)',
+    audioBgFine: 'App var lietot normāli, kamēr tas notiek.',
+    audioReady: '✓ Bezsaistes audio gatavs ({count} faili)',
     searchPlaceholder: 'Ieraksti ko meklē…',
     searchResults: '{count} rezultāti',
     noResults: 'Bhadžani nav atrasti',
@@ -1954,6 +2045,15 @@ const UI_STRINGS = {
     downloadComplete: 'Загрузка завершена',
     storageError: 'На устройстве недостаточно места',
     offlineReady: 'Готово для автономного использования',
+    audioOfflineTitle: 'Автономное аудио (~{size})',
+    audioBgHint1: 'Приложением можно пользоваться сразу — аудио загрузится в фоне.',
+    audioBgHint2: 'При закрытии вкладки загрузка приостанавливается и возобновится в следующий раз.',
+    audioStartBtn: '🎵 Начать загрузку аудио (~{size})',
+    wifiHint: 'Рекомендуется Wi-Fi.',
+    audioBgDownloading: 'Загрузка аудио в фоне…',
+    audioBgProgress: '{done} из {total} файлов (загружено {size})',
+    audioBgFine: 'Приложением можно полноценно пользоваться, пока это происходит.',
+    audioReady: '✓ Автономное аудио готово ({count} файлов)',
     searchPlaceholder: 'Введите, что ищете…',
     searchResults: '{count} результатов',
     noResults: 'Бхаджаны не найдены',
@@ -2033,6 +2133,15 @@ const UI_STRINGS = {
     downloadComplete: 'Descarga completa',
     storageError: 'No hay suficiente espacio de almacenamiento en este dispositivo',
     offlineReady: 'Listo para uso sin conexión',
+    audioOfflineTitle: 'Audio sin conexión (~{size})',
+    audioBgHint1: 'Puedes usar la app de inmediato — el audio se descargará en segundo plano.',
+    audioBgHint2: 'Si cierras la pestaña se pausa; se reanuda la próxima vez.',
+    audioStartBtn: '🎵 Iniciar descarga de audio (~{size})',
+    wifiHint: 'Recomendado: Wi-Fi.',
+    audioBgDownloading: 'Descargando audio en segundo plano…',
+    audioBgProgress: '{done} de {total} archivos ({size} descargados)',
+    audioBgFine: 'La app se puede usar con normalidad mientras esto ocurre.',
+    audioReady: '✓ Audio sin conexión listo ({count} archivos)',
     searchPlaceholder: 'Escribe lo que buscas…',
     searchResults: '{count} resultados',
     noResults: 'No se encontraron bhajans',
@@ -2112,6 +2221,15 @@ const UI_STRINGS = {
     downloadComplete: 'Download completato',
     storageError: 'Spazio di archiviazione insufficiente su questo dispositivo',
     offlineReady: 'Pronto per l’uso offline',
+    audioOfflineTitle: 'Audio offline (~{size})',
+    audioBgHint1: 'Puoi usare subito l’app — l’audio si scaricherà in background.',
+    audioBgHint2: 'Chiudendo la scheda il download si mette in pausa e riprende la prossima volta.',
+    audioStartBtn: '🎵 Avvia download audio (~{size})',
+    wifiHint: 'Consigliato: Wi-Fi.',
+    audioBgDownloading: 'Download audio in background…',
+    audioBgProgress: '{done} di {total} file ({size} scaricati)',
+    audioBgFine: 'L’app è pienamente utilizzabile mentre questo avviene.',
+    audioReady: '✓ Audio offline pronto ({count} file)',
     searchPlaceholder: 'Scrivi cosa cerchi…',
     searchResults: '{count} risultati',
     noResults: 'Nessun bhajan trovato',
@@ -2191,6 +2309,15 @@ const UI_STRINGS = {
     downloadComplete: 'Téléchargement terminé',
     storageError: 'Espace de stockage insuffisant sur cet appareil',
     offlineReady: 'Prêt pour une utilisation hors ligne',
+    audioOfflineTitle: 'Audio hors ligne (~{size})',
+    audioBgHint1: 'Vous pouvez utiliser l’app tout de suite — l’audio se téléchargera en arrière-plan.',
+    audioBgHint2: 'Fermer l’onglet met le téléchargement en pause ; il reprendra la prochaine fois.',
+    audioStartBtn: '🎵 Démarrer le téléchargement audio (~{size})',
+    wifiHint: 'Recommandé : Wi-Fi.',
+    audioBgDownloading: 'Téléchargement audio en arrière-plan…',
+    audioBgProgress: '{done} sur {total} fichiers ({size} téléchargés)',
+    audioBgFine: 'L’app reste pleinement utilisable pendant ce temps.',
+    audioReady: '✓ Audio hors ligne prêt ({count} fichiers)',
     searchPlaceholder: 'Tapez ce que vous cherchez…',
     searchResults: '{count} résultats',
     noResults: 'Aucun bhajan trouvé',
@@ -4306,6 +4433,13 @@ updateOnlineUI();
   const LATER_KEY = 'pwaUpdateDismissedThisSession';
   let currentAssets = null; // {assets, allAssets, version, mode} pending download
 
+  // Background-download UX state for the home-page panel (#offline-status).
+  // audioDownloading flips on the moment a download starts (SW or direct
+  // path) and off on completion; lastProgress holds the most recent numbers
+  // so refreshOfflineStatus() can render the busy state mid-download.
+  let audioDownloading = false;
+  let lastProgress = { done: 0, total: 0, bytesDone: 0 };
+
   function fmtSize(bytes) {
     const mb = bytes / (1024 * 1024);
     if (mb >= 1) return mb.toFixed(1) + ' MB';
@@ -4402,7 +4536,15 @@ updateOnlineUI();
       mode: isFirstInstall ? 'first' : 'update',
     };
     const totalSize = missing.reduce((sum, a) => sum + (a.size || 0), 0);
-    showBanner(currentAssets.mode, totalSize);
+    // First-install audio is offered quietly via the home-page panel
+    // (#offline-status, see refreshOfflineStatus below) — no bottom-banner
+    // gate on load. The banner is still used for the "update" case (media
+    // already installed, a newer version exists) since that's a distinct,
+    // less frequent prompt users expect to see.
+    if (currentAssets.mode === 'update') {
+      showBanner(currentAssets.mode, totalSize);
+    }
+    refreshOfflineStatus();
   }
 
   async function checkStorageQuota(neededBytes) {
@@ -4506,6 +4648,7 @@ updateOnlineUI();
           done++; bytesDone += (asset.size || 0);
           textEl.textContent = t('downloading', { done, total });
           progressBar.style.width = Math.round((done/total)*100) + '%';
+          updateHomeOfflineProgress(done, total, bytesDone);
         } catch (e) { /* continue with rest */ }
       }
     }
@@ -4518,6 +4661,7 @@ updateOnlineUI();
       try { localStorage.setItem('installedMediaVersion', String(currentAssets.version)); } catch (e) {}
     }
     currentAssets = null;
+    audioDownloading = false;
     refreshOfflineStatus();
   }
 
@@ -4529,6 +4673,7 @@ updateOnlineUI();
       textEl.textContent = t('downloading', { done: data.done, total: data.total });
       const pct = data.total ? Math.round((data.done / data.total) * 100) : 0;
       progressBar.style.width = pct + '%';
+      updateHomeOfflineProgress(data.done, data.total, data.bytesDone || 0);
     } else if (data.type === 'DOWNLOAD_COMPLETE') {
       showTransientMessage(t('downloadComplete'), 2500);
       if (currentAssets) {
@@ -4536,13 +4681,28 @@ updateOnlineUI();
         sendToSW({ type: 'PRUNE', keepUrls: currentAssets.allAssets.map((a) => a.url) });
       }
       currentAssets = null;
+      audioDownloading = false;
       refreshOfflineStatus();
     }
     // DOWNLOAD_ERROR: the SW already continues with the remaining assets;
     // the final DOWNLOAD_COMPLETE message reflects the actually-cached count.
   });
 
-  nowBtn.addEventListener('click', startDownload);
+  // beginAudioDownload() is the single entry point for actually starting the
+  // audio download: it's the bottom-banner "now" button handler AND — via
+  // window.startOfflineDownload() -> nowBtn.click() below — what the home
+  // page's State A button ends up triggering. In the new background-download
+  // UX the bottom banner must not compete with the home page's inline panel,
+  // so it's hidden immediately; all live progress goes to #offline-status.
+  function beginAudioDownload() {
+    audioDownloading = true;
+    lastProgress = { done: 0, total: (currentAssets ? currentAssets.assets.length : 0), bytesDone: 0 };
+    banner.hidden = true;
+    refreshOfflineStatus();
+    startDownload();
+  }
+
+  nowBtn.addEventListener('click', beginAudioDownload);
   laterBtn.addEventListener('click', () => {
     try { sessionStorage.setItem(LATER_KEY, '1'); } catch (e) {}
     banner.hidden = true;
@@ -4551,12 +4711,47 @@ updateOnlineUI();
   window.addEventListener('load', checkForMediaUpdate);
   window.addEventListener('online', checkForMediaUpdate);
 
+  function renderOfflineStartHtml(sizeBytes) {
+    const size = fmtSize(sizeBytes);
+    return '<div class="offline-panel">'
+      + '<div class="offline-panel-title">🎵 ' + esc(t('audioOfflineTitle', { size })) + '</div>'
+      + '<p class="offline-panel-body">' + esc(t('audioBgHint1'))
+      + '<span class="offline-panel-hint">' + esc(t('audioBgHint2')) + '</span></p>'
+      + '<button type="button" class="offline-start-btn" onclick="window.startOfflineDownload()">'
+      + esc(t('audioStartBtn', { size })) + '</button>'
+      + '<div class="offline-panel-footnote">' + esc(t('wifiHint')) + '</div>'
+      + '</div>';
+  }
+
+  function renderOfflineBusyHtml(done, total, bytesDone) {
+    const pct = total ? Math.round((done / total) * 100) : 0;
+    return '<div class="offline-panel offline-panel--busy" data-offline-state="busy">'
+      + '<div class="offline-panel-title">🎵 ' + esc(t('audioBgDownloading')) + '</div>'
+      + '<div class="offline-panel-body" id="offline-progress-text">'
+      + esc(t('audioBgProgress', { done, total, size: fmtSize(bytesDone) })) + '</div>'
+      + '<div class="offline-progress-bar"><div class="offline-progress-fill" id="offline-progress-fill" style="width:' + pct + '%"></div></div>'
+      + '<div class="offline-panel-footnote">' + esc(t('audioBgFine')) + '</div>'
+      + '</div>';
+  }
+
+  function renderOfflineReadyHtml(count) {
+    return '<div class="offline-ready-row">' + esc(t('audioReady', { count })) + '</div>';
+  }
+
   // Persistent offline-status control on the home page (always discoverable,
   // unlike the transient banner). Rendered by renderHome via #offline-status.
+  // Three states: not started (button + calm copy), busy (live progress),
+  // ready (subtle confirmation). Never re-renders mid-download except to
+  // transition INTO the busy state — see updateHomeOfflineProgress, which
+  // patches numbers in place once the busy panel exists.
   async function refreshOfflineStatus() {
     const el = document.getElementById('offline-status');
     if (!el) return;
     try {
+      if (audioDownloading) {
+        el.innerHTML = renderOfflineBusyHtml(lastProgress.done, lastProgress.total, lastProgress.bytesDone);
+        return;
+      }
       const cachedUrls = await getCachedMediaUrls();
       let manifest = null;
       try {
@@ -4564,32 +4759,50 @@ updateOnlineUI();
         if (res.ok) manifest = await res.json();
       } catch (e) { /* offline */ }
       if (!manifest) {
-        el.innerHTML = cachedUrls.size > 0
-          ? '<span class="offline-ok">✓ ' + esc(t('offlineReady')) + '</span>'
-          : '';
+        el.innerHTML = cachedUrls.size > 0 ? renderOfflineReadyHtml(cachedUrls.size) : '';
         return;
       }
       const missing = manifest.assets.filter((a) => !cachedUrls.has(toPathKey(a.url)));
       if (missing.length === 0) {
-        el.innerHTML = '<span class="offline-ok">✓ ' + esc(t('offlineReady')) + '</span>';
+        el.innerHTML = renderOfflineReadyHtml(manifest.assets.length);
       } else {
         const size = missing.reduce((s, a) => s + (a.size || 0), 0);
-        el.innerHTML = '<button type="button" class="offline-dl-btn" onclick="startOfflineDownload()">⬇ '
-          + esc(t('downloadOffline', { size: fmtSize(size) })) + '</button>';
+        el.innerHTML = renderOfflineStartHtml(size);
       }
     } catch (e) { /* leave empty */ }
+  }
+
+  // Called from both progress-delivery paths (SW 'PROGRESS' postMessage and
+  // directDownload's own loop). If the busy panel is already showing, patch
+  // its numbers/width in place — cheap, no re-render of the home page. If
+  // the panel isn't up yet (download just started, or user navigated home
+  // mid-download), do one refreshOfflineStatus() to bring it up; further
+  // calls then take the cheap patch path.
+  function updateHomeOfflineProgress(done, total, bytesDone) {
+    lastProgress = { done, total, bytesDone };
+    const textNode = document.getElementById('offline-progress-text');
+    const fillNode = document.getElementById('offline-progress-fill');
+    if (textNode && fillNode) {
+      textNode.textContent = t('audioBgProgress', { done, total, size: fmtSize(bytesDone) });
+      const pct = total ? Math.round((done / total) * 100) : 0;
+      fillNode.style.width = pct + '%';
+    } else if (audioDownloading) {
+      refreshOfflineStatus();
+    }
   }
 
   window.startOfflineDownload = function () {
     try { sessionStorage.removeItem(LATER_KEY); } catch (e) {}
     checkForMediaUpdate().then(() => {
-      // checkForMediaUpdate shows the banner with the confirm button;
-      // trigger the download directly since the user already clicked.
+      // checkForMediaUpdate no longer shows the banner for a first-install;
+      // trigger the download directly since the user already clicked the
+      // home-page button. nowBtn.click() runs beginAudioDownload().
       if (currentAssets) nowBtn.click();
     });
   };
 
   window.refreshOfflineStatus = refreshOfflineStatus;
+  window.updateHomeOfflineProgress = updateHomeOfflineProgress;
   window.addEventListener('load', refreshOfflineStatus);
   window.addEventListener('online', refreshOfflineStatus);
 })();
