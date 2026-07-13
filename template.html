@@ -3804,6 +3804,11 @@ function render(route, preserveScroll) {
     app.innerHTML = '<div style="padding:20px;font-family:monospace;font-size:13px;white-space:pre-wrap;word-break:break-all" id="diagdl-out">Ready. Tap START to attempt an offline media download with a live step-by-step log.</div>' +
       '<div style="padding:0 20px 20px"><button id="diagdl-start" style="padding:12px 20px;font-size:1rem;background:var(--accent);color:var(--on-accent);border:none;border-radius:8px;min-height:44px">START download test</button></div>';
     setTimeout(() => { const b = document.getElementById('diagdl-start'); if (b) b.onclick = runDownloadDiag; }, 50);
+  } else if (route === 'diagplay') {
+    currentRoute = route;
+    app.innerHTML = '<div style="padding:20px;font-family:monospace;font-size:13px;white-space:pre-wrap;word-break:break-all" id="diagplay-out">Ready. Tap START to test playback of a cached audio file in 3 ways.</div>' +
+      '<div style="padding:0 20px 20px"><button id="diagplay-start" style="padding:12px 20px;font-size:1rem;background:var(--accent);color:var(--on-accent);border:none;border-radius:8px;min-height:44px">START playback test</button></div>';
+    setTimeout(() => { const b = document.getElementById('diagplay-start'); if (b) b.onclick = runPlaybackDiag; }, 50);
   } else if (route === 'titles') {
     currentRoute = route;
     app.innerHTML = renderTitles();
@@ -4108,6 +4113,75 @@ async function runDownloadDiag() {
   } catch (e) {
     log('UNCAUGHT: ' + e.name + ' - ' + e.message);
   } finally { if (btn) btn.disabled = false; }
+}
+
+// Playback diagnostic — reachable at #diagplay. Assumes some audio is already
+// cached (via the offline download flow). Tries THREE playback paths and logs
+// which one works on this device. Designed to isolate the iOS Safari
+// blob-URL / SW / cache mismatch that stops offline playback.
+async function runPlaybackDiag() {
+  const out = document.getElementById('diagplay-out');
+  const btn = document.getElementById('diagplay-start');
+  if (btn) btn.disabled = true;
+  const L = [];
+  const log = (s) => { L.push(s); if (out) out.textContent = L.join('\n'); };
+  try {
+    log('[1] Reading media-v1 cache…');
+    const cache = await caches.open('media-v1');
+    const keys = await cache.keys();
+    log('    cached entries: ' + keys.length);
+    if (keys.length === 0) { log('NOTHING CACHED — do #diagdl or download first.'); return; }
+    const testUrl = new URL(keys[0].url).pathname + new URL(keys[0].url).search;
+    log('    test file: ' + testUrl);
+
+    // Path A: direct src=<url> — relies on the SW to serve from cache
+    log('[A] <audio src="' + testUrl + '"> (via SW fetch)…');
+    await tryPlay(log, 'A', () => { const a = new Audio(); a.src = testUrl; return a; });
+
+    // Path B: blob-URL from cache.match — bypasses SW entirely
+    log('[B] <audio src=blob:…> from cache.match().blob()…');
+    const resp = await cache.match(testUrl);
+    if (!resp) { log('    cache.match returned NOTHING for ' + testUrl); }
+    else {
+      const b = await resp.blob();
+      log('    blob size: ' + b.size + ' type: ' + (b.type || '(empty!)'));
+      const blobUrl = URL.createObjectURL(b);
+      await tryPlay(log, 'B', () => { const a = new Audio(); a.src = blobUrl; return a; });
+      URL.revokeObjectURL(blobUrl);
+
+      // Path C: same blob but explicitly TYPED as audio/ogg — some iOS builds
+      // reject blobs with empty type
+      if (b.type !== 'audio/ogg') {
+        const typed = new Blob([await b.arrayBuffer()], { type: 'audio/ogg' });
+        const typedUrl = URL.createObjectURL(typed);
+        log('[C] <audio src=blob:…> with forced type audio/ogg…');
+        await tryPlay(log, 'C', () => { const a = new Audio(); a.src = typedUrl; return a; });
+        URL.revokeObjectURL(typedUrl);
+      } else {
+        log('[C] SKIP — blob type is already audio/ogg');
+      }
+    }
+
+    log('DONE. If A/B fail but C works → iOS needs blobs explicitly typed. If B/C fail with error(4) → iOS cannot decode the .ogg. If A works → your player just needs the SW path.');
+  } catch (e) { log('UNCAUGHT: ' + e.name + ' - ' + e.message); }
+  finally { if (btn) btn.disabled = false; }
+}
+async function tryPlay(log, tag, mkAudio) {
+  const a = mkAudio();
+  a.preload = 'auto';
+  const events = [];
+  ['loadedmetadata','loadeddata','canplay','playing','error','stalled'].forEach(ev =>
+    a.addEventListener(ev, () => events.push(ev + (ev==='error' && a.error ? '('+a.error.code+')' : '')), { once: true }));
+  try {
+    await a.play();
+    await new Promise(r => setTimeout(r, 1500));
+    a.pause();
+    log('    [' + tag + '] events: ' + events.join(' '));
+    log('    [' + tag + '] currentTime=' + a.currentTime.toFixed(2) + ' readyState=' + a.readyState + ' err=' + (a.error ? a.error.code : 'none'));
+    log('    [' + tag + '] RESULT: ' + (a.currentTime > 0.1 ? 'PLAYED' : 'no progress'));
+  } catch (e) {
+    log('    [' + tag + '] play() REJECTED: ' + e.name + ' - ' + e.message + ' err=' + (a.error ? a.error.code : 'none'));
+  }
 }
 
 async function runDiagnostics() {
