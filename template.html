@@ -4346,15 +4346,21 @@ updateOnlineUI();
   }
 
   function sendToSW(msg) {
-    if (navigator.serviceWorker.controller) {
+    if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
       navigator.serviceWorker.controller.postMessage(msg);
       return true;
     }
     return false;
   }
 
+  // Set to a callback in startDownload; the SW 'message' handler calls it so
+  // startDownload knows the SW is alive and the iOS fallback is not needed.
+  let swProgressSeen = () => {};
+
   async function startDownload() {
     if (!currentAssets) return;
+    // swProgressSeen is (re)assigned inside startDownload; ensure it exists
+    // before the SW 'message' handler runs (which calls it) — see startDownload.
     const totalBytes = currentAssets.assets.reduce((sum, a) => sum + (a.size || 0), 0);
     const enoughSpace = await checkStorageQuota(totalBytes);
     if (!enoughSpace) {
@@ -4368,21 +4374,83 @@ updateOnlineUI();
     progressBar.style.width = '0%';
     textEl.textContent = t('downloading', { done: 0, total: currentAssets.assets.length });
 
-    await navigator.serviceWorker.ready;
-    if (!navigator.serviceWorker.controller) {
-      // First install: this load wasn't controlled by the SW yet. Reload once
-      // so the now-active SW controls the page and can receive the message.
-      window.location.reload();
-      return;
-    }
-    if (!sendToSW({ type: 'DOWNLOAD_ASSETS', assets: currentAssets.assets, keepUrls: currentAssets.allAssets.map((a) => a.url) })) {
-      showTransientMessage(t('storageError'), 4000);
+    // Track when the SW responds so we can fall back to a page-side download
+    // path if it doesn't (iOS Safari: SW is registered and controlling, but
+    // postMessage from the page never elicits a reply — verified via #diagdl).
+    let swResponded = false;
+    swProgressSeen = () => { swResponded = true; };
+
+    const hasSWCtrl = ('serviceWorker' in navigator) && navigator.serviceWorker.controller;
+    if (hasSWCtrl) {
+      try { await navigator.serviceWorker.ready; } catch (e) {}
+      sendToSW({ type: 'DOWNLOAD_ASSETS', assets: currentAssets.assets, keepUrls: currentAssets.allAssets.map((a) => a.url) });
+      // Give the SW ~5s to prove it's alive. If nothing comes back, take over
+      // from the page (works on iOS where SW postMessage is a dead channel).
+      setTimeout(() => {
+        if (!swResponded && currentAssets) {
+          textEl.textContent = 'Direct download…';
+          directDownload(currentAssets.assets, currentAssets.allAssets);
+        }
+      }, 5000);
+    } else {
+      // No SW controller at all (iOS private mode, first install, etc.) — go
+      // straight to the page-side path.
+      directDownload(currentAssets.assets, currentAssets.allAssets);
     }
   }
 
-  navigator.serviceWorker.addEventListener('message', (event) => {
+  // Page-side parallel downloader — mirrors the SW's DOWNLOAD_ASSETS logic
+  // (6-way concurrency, PROGRESS updates, PRUNE at the end) but doesn't
+  // depend on the service-worker message channel, which is broken on iOS.
+  async function directDownload(assets, allAssets) {
+    let cache;
+    try { cache = await caches.open('media-v1'); }
+    catch (e) { showTransientMessage(t('storageError'), 4000); return; }
+
+    // Prune stale entries first (same as SW does).
+    try {
+      const keep = new Set(allAssets.map(a => toPathKey(a.url)));
+      const existing = await cache.keys();
+      for (const req of existing) {
+        if (!keep.has(toPathKey(req.url))) { try { await cache.delete(req); } catch (e) {} }
+      }
+    } catch (e) {}
+
+    const total = assets.length;
+    let done = 0, bytesDone = 0, index = 0;
+    const CONCURRENCY = 6;
+
+    async function worker() {
+      while (index < assets.length) {
+        const asset = assets[index++];
+        try {
+          const existing = await cache.match(asset.url);
+          if (!existing) {
+            const r = await fetch(asset.url);
+            if (r && r.ok) { try { await cache.put(asset.url, r.clone()); } catch (e) {} }
+          }
+          done++; bytesDone += (asset.size || 0);
+          textEl.textContent = t('downloading', { done, total });
+          progressBar.style.width = Math.round((done/total)*100) + '%';
+        } catch (e) { /* continue with rest */ }
+      }
+    }
+    const workers = [];
+    for (let i = 0; i < Math.min(CONCURRENCY, assets.length); i++) workers.push(worker());
+    await Promise.all(workers);
+
+    showTransientMessage(t('downloadComplete'), 2500);
+    if (currentAssets) {
+      try { localStorage.setItem('installedMediaVersion', String(currentAssets.version)); } catch (e) {}
+    }
+    currentAssets = null;
+    refreshOfflineStatus();
+  }
+
+  if ('serviceWorker' in navigator) navigator.serviceWorker.addEventListener('message', (event) => {
     const data = event.data;
     if (!data || !data.type) return;
+    swProgressSeen();
     if (data.type === 'PROGRESS') {
       textEl.textContent = t('downloading', { done: data.done, total: data.total });
       const pct = data.total ? Math.round((data.done / data.total) * 100) : 0;
