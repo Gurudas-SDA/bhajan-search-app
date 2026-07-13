@@ -777,6 +777,86 @@ body {
   color: var(--text-muted);
   margin: 4px 0 10px 0;
 }
+
+/* Two-choice offline chooser (State A) — replaces the old single "start
+   audio download" panel. Two explicit, independent paths: text-only vs
+   text+audio. Stacked on mobile, side-by-side once there's room. */
+.offline-choice-panel {
+  text-align: left;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 14px 16px;
+  margin: 4px 0 10px 0;
+}
+.offline-choice-title {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  margin: 0 0 10px 0;
+}
+.offline-choice-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+@media (min-width: 480px) {
+  .offline-choice-buttons {
+    flex-direction: row;
+  }
+}
+.offline-choose-btn {
+  flex: 1 1 0;
+  display: block;
+  width: 100%;
+  background: var(--accent);
+  color: var(--on-accent);
+  border: none;
+  border-radius: 10px;
+  padding: 12px 14px;
+  font-family: inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
+  line-height: 1.35;
+  cursor: pointer;
+  min-height: 44px;
+  text-align: center;
+}
+.offline-choose-btn:hover { background: var(--accent-dark); }
+
+/* Generic state wrapper reused by the "text only ready", "downloading
+   audio" and "everything ready" panels — same shell as .offline-panel,
+   kept as a distinct class so JS can target it without depending on the
+   legacy single-flow panel that used to live here. */
+.offline-flow-state {
+  text-align: left;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 14px 16px;
+  margin: 4px 0 10px 0;
+}
+.offline-flow-state--busy .offline-panel-title {
+  color: var(--accent-text);
+}
+.offline-flow-secondary-btn {
+  display: inline-block;
+  background: none;
+  border: none;
+  color: var(--accent-text);
+  font-family: inherit;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 6px 0 0 0;
+  min-height: 32px;
+}
+.offline-flow-secondary-btn:hover { text-decoration: underline; }
+.offline-flow-ready-line {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  margin: 0;
+}
 .stat {
   text-align: center;
 }
@@ -1878,6 +1958,14 @@ const UI_STRINGS = {
     audioBgProgress: '{done} of {total} files ({size} downloaded)',
     audioBgFine: 'The app is fully usable while this runs.',
     audioReady: '✓ Offline audio ready ({count} files)',
+    offlineChooseTitle: 'Use offline:',
+    offlineTextOnlyBtn: '📖 Text only (ready in seconds)',
+    offlineWithAudioBtn: '🎵 Text + audio (~{size}, ~5 min)',
+    offlinePreparingTexts: 'Preparing offline (text only)…',
+    offlineTextReady: '✓ App usable offline (without audio). Audio bhajans playable only online.',
+    offlineAddAudioLater: 'Add audio too (~{size}) →',
+    offlineDownloadingAudio: 'Downloading audio for offline use…',
+    offlineAllReady: '✓ Everything ready for offline use ({count} audio files)',
     searchPlaceholder: 'Type what you\'re looking for…',
     searchResults: '{count} results',
     noResults: 'No bhajans found',
@@ -1966,6 +2054,14 @@ const UI_STRINGS = {
     audioBgProgress: '{done} no {total} failiem ({size} lejupielādēts)',
     audioBgFine: 'App var lietot normāli, kamēr tas notiek.',
     audioReady: '✓ Bezsaistes audio gatavs ({count} faili)',
+    offlineChooseTitle: 'Lietot bezsaistē:',
+    offlineTextOnlyBtn: '📖 Tikai teksti (gatavs pēc dažām sekundēm)',
+    offlineWithAudioBtn: '🎵 Teksti + audio (~{size}, ~5 min)',
+    offlinePreparingTexts: 'Sagatavojam bezsaistes lietošanai (bez audio)…',
+    offlineTextReady: '✓ App lietojama bezsaistē (bez audio). Audio bhajanus var klausīties tikai ar internetu.',
+    offlineAddAudioLater: 'Pievienot arī audio (~{size}) →',
+    offlineDownloadingAudio: 'Ielādē audio bezsaistes lietošanai…',
+    offlineAllReady: '✓ Viss gatavs bezsaistes lietošanai ({count} audio faili)',
     searchPlaceholder: 'Ieraksti ko meklē…',
     searchResults: '{count} rezultāti',
     noResults: 'Bhadžani nav atrasti',
@@ -2054,6 +2150,14 @@ const UI_STRINGS = {
     audioBgProgress: '{done} из {total} файлов (загружено {size})',
     audioBgFine: 'Приложением можно полноценно пользоваться, пока это происходит.',
     audioReady: '✓ Автономное аудио готово ({count} файлов)',
+    offlineChooseTitle: 'Использовать офлайн:',
+    offlineTextOnlyBtn: '📖 Только тексты (готово за секунды)',
+    offlineWithAudioBtn: '🎵 Тексты + аудио (~{size}, ~5 мин)',
+    offlinePreparingTexts: 'Подготовка офлайн-режима (только тексты)…',
+    offlineTextReady: '✓ Приложение доступно офлайн (без аудио). Аудио-бхаджаны можно слушать только онлайн.',
+    offlineAddAudioLater: 'Добавить и аудио (~{size}) →',
+    offlineDownloadingAudio: 'Загрузка аудио для офлайн-использования…',
+    offlineAllReady: '✓ Всё готово для офлайн-использования ({count} аудиофайлов)',
     searchPlaceholder: 'Введите, что ищете…',
     searchResults: '{count} результатов',
     noResults: 'Бхаджаны не найдены',
@@ -2142,6 +2246,14 @@ const UI_STRINGS = {
     audioBgProgress: '{done} de {total} archivos ({size} descargados)',
     audioBgFine: 'La app se puede usar con normalidad mientras esto ocurre.',
     audioReady: '✓ Audio sin conexión listo ({count} archivos)',
+    offlineChooseTitle: 'Usar sin conexión:',
+    offlineTextOnlyBtn: '📖 Solo texto (listo en segundos)',
+    offlineWithAudioBtn: '🎵 Texto + audio (~{size}, ~5 min)',
+    offlinePreparingTexts: 'Preparando modo sin conexión (solo texto)…',
+    offlineTextReady: '✓ La app funciona sin conexión (sin audio). Los bhajans de audio solo se pueden reproducir en línea.',
+    offlineAddAudioLater: 'Añadir también audio (~{size}) →',
+    offlineDownloadingAudio: 'Descargando audio para uso sin conexión…',
+    offlineAllReady: '✓ Todo listo para usar sin conexión ({count} archivos de audio)',
     searchPlaceholder: 'Escribe lo que buscas…',
     searchResults: '{count} resultados',
     noResults: 'No se encontraron bhajans',
@@ -2230,6 +2342,14 @@ const UI_STRINGS = {
     audioBgProgress: '{done} di {total} file ({size} scaricati)',
     audioBgFine: 'L’app è pienamente utilizzabile mentre questo avviene.',
     audioReady: '✓ Audio offline pronto ({count} file)',
+    offlineChooseTitle: 'Usa offline:',
+    offlineTextOnlyBtn: '📖 Solo testo (pronto in pochi secondi)',
+    offlineWithAudioBtn: '🎵 Testo + audio (~{size}, ~5 min)',
+    offlinePreparingTexts: 'Preparazione modalità offline (solo testo)…',
+    offlineTextReady: '✓ App utilizzabile offline (senza audio). I bhajan audio si possono ascoltare solo online.',
+    offlineAddAudioLater: 'Aggiungi anche l’audio (~{size}) →',
+    offlineDownloadingAudio: 'Download audio per l’uso offline…',
+    offlineAllReady: '✓ Tutto pronto per l’uso offline ({count} file audio)',
     searchPlaceholder: 'Scrivi cosa cerchi…',
     searchResults: '{count} risultati',
     noResults: 'Nessun bhajan trovato',
@@ -2318,6 +2438,14 @@ const UI_STRINGS = {
     audioBgProgress: '{done} sur {total} fichiers ({size} téléchargés)',
     audioBgFine: 'L’app reste pleinement utilisable pendant ce temps.',
     audioReady: '✓ Audio hors ligne prêt ({count} fichiers)',
+    offlineChooseTitle: 'Utiliser hors ligne :',
+    offlineTextOnlyBtn: '📖 Texte seul (prêt en quelques secondes)',
+    offlineWithAudioBtn: '🎵 Texte + audio (~{size}, ~5 min)',
+    offlinePreparingTexts: 'Préparation du mode hors ligne (texte seul)…',
+    offlineTextReady: '✓ L’app est utilisable hors ligne (sans audio). Les bhajans audio ne sont lisibles qu’en ligne.',
+    offlineAddAudioLater: 'Ajouter aussi l’audio (~{size}) →',
+    offlineDownloadingAudio: 'Téléchargement de l’audio pour une utilisation hors ligne…',
+    offlineAllReady: '✓ Tout est prêt pour une utilisation hors ligne ({count} fichiers audio)',
     searchPlaceholder: 'Tapez ce que vous cherchez…',
     searchResults: '{count} résultats',
     noResults: 'Aucun bhajan trouvé',
@@ -4711,45 +4839,98 @@ updateOnlineUI();
   window.addEventListener('load', checkForMediaUpdate);
   window.addEventListener('online', checkForMediaUpdate);
 
-  function renderOfflineStartHtml(sizeBytes) {
+  // ---- Two-choice offline UX (State A: chooser) ----
+  //
+  // Rework of the single-flow "background download" panel: the home page
+  // now presents two explicit, independent choices — "text only" (an
+  // instant acknowledgement, since the app shell is already precached by
+  // the SW on first visit) and "text + audio" (the pre-existing v32
+  // background-download flow, unchanged). TEXT_ONLY_KEY remembers the
+  // user's choice so we don't ask again once they've picked text-only;
+  // picking "add audio" later clears the need to ask by moving straight
+  // into the ready/all-ready states.
+  const TEXT_ONLY_KEY = 'textOnlyAccepted';
+  function isTextOnlyAccepted() {
+    try { return localStorage.getItem(TEXT_ONLY_KEY) === '1'; } catch (e) { return false; }
+  }
+
+  function renderOfflineChooserHtml(sizeBytes) {
     const size = fmtSize(sizeBytes);
-    return '<div class="offline-panel">'
-      + '<div class="offline-panel-title">🎵 ' + esc(t('audioOfflineTitle', { size })) + '</div>'
+    return '<div class="offline-choice-panel">'
+      + '<div class="offline-choice-title">' + esc(t('offlineChooseTitle')) + '</div>'
+      + '<div class="offline-choice-buttons">'
+      + '<button type="button" class="offline-choose-btn" onclick="window.chooseTextOnlyOffline()">'
+      + esc(t('offlineTextOnlyBtn')) + '</button>'
+      + '<button type="button" class="offline-choose-btn" onclick="window.startOfflineDownload()">'
+      + esc(t('offlineWithAudioBtn', { size })) + '</button>'
+      + '</div></div>';
+  }
+
+  // Flow A: text-only acknowledged. Small secondary button lets the user
+  // switch into Flow B (window.startOfflineDownload) at any time.
+  function renderOfflineTextReadyHtml(remainingBytes) {
+    const size = fmtSize(remainingBytes);
+    return '<div class="offline-flow-state" data-offline-state="text-ready">'
+      + '<p class="offline-flow-ready-line">' + esc(t('offlineTextReady')) + '</p>'
+      + '<button type="button" class="offline-flow-secondary-btn" onclick="window.startOfflineDownload()">'
+      + esc(t('offlineAddAudioLater', { size })) + '</button>'
+      + '</div>';
+  }
+
+  // Flow A: brief "preparing" state shown for a moment on click, before the
+  // ready line — shell is already cached so this is a fake-progress beat,
+  // not a real wait.
+  function renderOfflinePreparingTextsHtml() {
+    return '<div class="offline-flow-state" data-offline-state="preparing-text">'
+      + '<div class="offline-panel-title">📖 ' + esc(t('offlinePreparingTexts')) + '</div>'
+      + '<div class="offline-progress-bar"><div class="offline-progress-fill" style="width:100%"></div></div>'
+      + '</div>';
+  }
+
+  // Flow B: live/resumable download state. `resumable` is true when audio
+  // is partially cached but no download is currently in flight (e.g. after
+  // reopening the app) — per Rājan's "user chooses" requirement this never
+  // auto-starts; it shows a button wired to the same entry point
+  // (window.startOfflineDownload) that Flow B's chooser button uses.
+  function renderOfflineDownloadingHtml(done, total, bytesDone, resumable) {
+    const pct = total ? Math.round((done / total) * 100) : 0;
+    const remaining = total && done < total
+      ? Math.max(0, Math.round((bytesDone / Math.max(done, 1)) * (total - done)))
+      : 0;
+    const resumeBtn = resumable
+      ? '<button type="button" class="offline-choose-btn" onclick="window.startOfflineDownload()">'
+        + esc(t('offlineWithAudioBtn', { size: fmtSize(remaining) })) + '</button>'
+      : '';
+    return '<div class="offline-flow-state offline-flow-state--busy" data-offline-state="downloading-audio">'
+      + '<div class="offline-panel-title">🎵 ' + esc(t('offlineDownloadingAudio')) + '</div>'
       + '<p class="offline-panel-body">' + esc(t('audioBgHint1'))
       + '<span class="offline-panel-hint">' + esc(t('audioBgHint2')) + '</span></p>'
-      + '<button type="button" class="offline-start-btn" onclick="window.startOfflineDownload()">'
-      + esc(t('audioStartBtn', { size })) + '</button>'
+      + '<div class="offline-panel-body" id="offline-progress-text">'
+      + esc(t('audioBgProgress', { done, total, size: fmtSize(bytesDone) })) + '</div>'
+      + '<div class="offline-progress-bar"><div class="offline-progress-fill" id="offline-progress-fill" style="width:' + pct + '%"></div></div>'
+      + resumeBtn
       + '<div class="offline-panel-footnote">' + esc(t('wifiHint')) + '</div>'
       + '</div>';
   }
 
-  function renderOfflineBusyHtml(done, total, bytesDone) {
-    const pct = total ? Math.round((done / total) * 100) : 0;
-    return '<div class="offline-panel offline-panel--busy" data-offline-state="busy">'
-      + '<div class="offline-panel-title">🎵 ' + esc(t('audioBgDownloading')) + '</div>'
-      + '<div class="offline-panel-body" id="offline-progress-text">'
-      + esc(t('audioBgProgress', { done, total, size: fmtSize(bytesDone) })) + '</div>'
-      + '<div class="offline-progress-bar"><div class="offline-progress-fill" id="offline-progress-fill" style="width:' + pct + '%"></div></div>'
-      + '<div class="offline-panel-footnote">' + esc(t('audioBgFine')) + '</div>'
-      + '</div>';
-  }
-
-  function renderOfflineReadyHtml(count) {
-    return '<div class="offline-ready-row">' + esc(t('audioReady', { count })) + '</div>';
+  // State C: everything (text + all audio) ready.
+  function renderOfflineAllReadyHtml(count) {
+    return '<div class="offline-ready-row">' + esc(t('offlineAllReady', { count })) + '</div>';
   }
 
   // Persistent offline-status control on the home page (always discoverable,
   // unlike the transient banner). Rendered by renderHome via #offline-status.
-  // Three states: not started (button + calm copy), busy (live progress),
-  // ready (subtle confirmation). Never re-renders mid-download except to
-  // transition INTO the busy state — see updateHomeOfflineProgress, which
-  // patches numbers in place once the busy panel exists.
+  // States: two-button chooser / text-only ready / downloading audio
+  // (live or resumable) / everything ready. Never re-renders mid-download
+  // except to transition INTO the downloading state — see
+  // updateHomeOfflineProgress, which patches numbers in place once that
+  // panel exists.
   async function refreshOfflineStatus() {
     const el = document.getElementById('offline-status');
     if (!el) return;
     try {
       if (audioDownloading) {
-        el.innerHTML = renderOfflineBusyHtml(lastProgress.done, lastProgress.total, lastProgress.bytesDone);
+        el.innerHTML = renderOfflineDownloadingHtml(lastProgress.done, lastProgress.total, lastProgress.bytesDone, false);
         return;
       }
       const cachedUrls = await getCachedMediaUrls();
@@ -4758,26 +4939,53 @@ updateOnlineUI();
         const res = await fetch('asset-list.json', { cache: 'no-store' });
         if (res.ok) manifest = await res.json();
       } catch (e) { /* offline */ }
+
       if (!manifest) {
-        el.innerHTML = cachedUrls.size > 0 ? renderOfflineReadyHtml(cachedUrls.size) : '';
+        // Can't reach the manifest (offline, first load before SW is warm) —
+        // render from what we already know locally.
+        if (cachedUrls.size > 0) {
+          el.innerHTML = renderOfflineAllReadyHtml(cachedUrls.size);
+        } else if (isTextOnlyAccepted()) {
+          el.innerHTML = renderOfflineTextReadyHtml(0);
+        } else {
+          el.innerHTML = '';
+        }
         return;
       }
+
+      const totalCount = manifest.assets.length;
+      const totalSize = manifest.assets.reduce((s, a) => s + (a.size || 0), 0);
       const missing = manifest.assets.filter((a) => !cachedUrls.has(toPathKey(a.url)));
-      if (missing.length === 0) {
-        el.innerHTML = renderOfflineReadyHtml(manifest.assets.length);
-      } else {
-        const size = missing.reduce((s, a) => s + (a.size || 0), 0);
-        el.innerHTML = renderOfflineStartHtml(size);
+      const missingSize = missing.reduce((s, a) => s + (a.size || 0), 0);
+      const cachedCount = totalCount - missing.length;
+
+      if (totalCount > 0 && missing.length === 0) {
+        el.innerHTML = renderOfflineAllReadyHtml(totalCount);
+        return;
       }
+
+      if (cachedCount > 0 && missing.length > 0) {
+        // Audio partially downloaded from an earlier session — offer to
+        // resume via the same button, without auto-starting.
+        el.innerHTML = renderOfflineDownloadingHtml(cachedCount, totalCount, totalSize - missingSize, true);
+        return;
+      }
+
+      if (isTextOnlyAccepted()) {
+        el.innerHTML = renderOfflineTextReadyHtml(missingSize);
+        return;
+      }
+
+      el.innerHTML = renderOfflineChooserHtml(missingSize);
     } catch (e) { /* leave empty */ }
   }
 
   // Called from both progress-delivery paths (SW 'PROGRESS' postMessage and
-  // directDownload's own loop). If the busy panel is already showing, patch
-  // its numbers/width in place — cheap, no re-render of the home page. If
-  // the panel isn't up yet (download just started, or user navigated home
-  // mid-download), do one refreshOfflineStatus() to bring it up; further
-  // calls then take the cheap patch path.
+  // directDownload's own loop). If the downloading panel is already
+  // showing, patch its numbers/width in place — cheap, no re-render of the
+  // home page. If the panel isn't up yet (download just started, or user
+  // navigated home mid-download), do one refreshOfflineStatus() to bring it
+  // up; further calls then take the cheap patch path.
   function updateHomeOfflineProgress(done, total, bytesDone) {
     lastProgress = { done, total, bytesDone };
     const textNode = document.getElementById('offline-progress-text');
@@ -4791,6 +4999,22 @@ updateOnlineUI();
     }
   }
 
+  // Flow A entry point — wired to the "Text only" chooser button. The app
+  // shell is already precached by the SW on first visit, so this is
+  // effectively an acknowledgement: persist the choice and show the ready
+  // state. A brief fake-progress beat is shown first so the click feels
+  // like it did something.
+  window.chooseTextOnlyOffline = function () {
+    try { localStorage.setItem(TEXT_ONLY_KEY, '1'); } catch (e) {}
+    const el = document.getElementById('offline-status');
+    if (el) el.innerHTML = renderOfflinePreparingTextsHtml();
+    setTimeout(refreshOfflineStatus, 700);
+  };
+
+  // Flow B entry point — wired to the "Text + audio" chooser button, the
+  // "Add audio too" secondary button (Flow A -> B), and the resumable
+  // downloading-state button. Unchanged from v32: goes through
+  // checkForMediaUpdate() -> nowBtn.click() -> beginAudioDownload().
   window.startOfflineDownload = function () {
     try { sessionStorage.removeItem(LATER_KEY); } catch (e) {}
     checkForMediaUpdate().then(() => {
