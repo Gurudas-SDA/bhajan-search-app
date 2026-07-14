@@ -1,5 +1,5 @@
 {
-  "version": 35,
+  "version": 36,
   "assets": [
     {
       "url": "audio/ali_mohe_lage_vrndavana_niko.ogg?v=4c9e072c",
@@ -227,6 +227,16 @@
       "size": 2552625
     },
     {
+      "url": "audio/ohe_premera_thakura_gora.ogg?v=d9f2765b",
+      "hash": "d9f2765b5e6df11c8f8bd8bc7ccad8b977116f3dbd1d1e04596a873f50036a3c",
+      "size": 3069832
+    },
+    {
+      "url": "audio/radha_krsna_prana_mora.ogg?v=77a826b7",
+      "hash": "77a826b70580ab56f7e574f58c4e04f21f43f31ee798e07f332875d03336da17",
+      "size": 2219597
+    },
+    {
       "url": "audio/sakhe_kalaya_gauram_udaram.ogg?v=f47f6eee",
       "hash": "f47f6eeeefabb74e4cfab60c0f60b9f527f0f7a052391059fbe2888a4a5ec75c",
       "size": 1974955
@@ -237,9 +247,34 @@
       "size": 1292042
     },
     {
+      "url": "audio/sri_gurvastakam_bengali_rendition.ogg?v=9b063fff",
+      "hash": "9b063fffde480238e29048b36d45c296888221d1ab4634fe486c3ad3d1853ce5",
+      "size": 1475065
+    },
+    {
+      "url": "audio/sri_rupa_manjari_pada.ogg?v=6bd064aa",
+      "hash": "6bd064aa281760f0b868235627208f59eff7136c4ea39d40ddb6041eb784805a",
+      "size": 2527857
+    },
+    {
+      "url": "audio/sri_sri_godruma_candra_bhajanopadesah.ogg?v=d209e60c",
+      "hash": "d209e60cc0775cfd71ce0e1cca544c8b546324be01d582a229529300c3fd0d4a",
+      "size": 4808320
+    },
+    {
       "url": "audio/sri_vaisnavavandana.ogg?v=725652b6",
       "hash": "725652b67754838a91243e4a3941d432c274835c562c36daf9690858ae8526bd",
       "size": 1085769
+    },
+    {
+      "url": "audio/suniyachi_sadhu_mukhe.ogg?v=a4559fb4",
+      "hash": "a4559fb4e0772d99c201d48fea7ff3db48e7a3e81223fc1d2887a4848fd22be8",
+      "size": 1364262
+    },
+    {
+      "url": "audio/vande_visvambhara.ogg?v=500a4aac",
+      "hash": "500a4aac24502fca890c3e1a2179a7ddc1df384172a3173488960cb2d668c528",
+      "size": 1729327
     },
     {
       "url": "audio/vrsabhanusuta.ogg?v=98d90a6e",
