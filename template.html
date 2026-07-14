@@ -3355,7 +3355,7 @@ function renderBhajan(title, opts) {
     html += '<div class="audio-player">';
     html += '<div class="audio-player-header">';
     html += '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>';
-    html += esc(t('audioSankirtana')) + '</div>';
+    html += esc(b.title) + ' (vocal only)</div>';
     html += '<audio id="' + apId + '" preload="none" data-src="' + audioSrc + '" style="display:none"></audio>';
     html += '<div class="audio-controls">';
     html += '<button class="ap-play-btn" aria-label="Play/Pause" onclick="apToggle(\'' + apId + '\')" id="btn_' + apId + '">';
