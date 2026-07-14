@@ -1,6 +1,16 @@
 {
-  "version": 33,
+  "version": 34,
   "assets": [
+    {
+      "url": "audio/ali_mohe_lage_vrndavana_niko.ogg?v=4c9e072c",
+      "hash": "4c9e072c2f3887d0533c951dbbe7ef6bb625fb9ccd52c20eed25d56203a5b9d5",
+      "size": 1813095
+    },
+    {
+      "url": "audio/amara_jivana.ogg?v=67806741",
+      "hash": "67806741a0b694201bdf48a103310f583bbc4d5bdaad74e37d7b8e89c2179334",
+      "size": 2091051
+    },
     {
       "url": "audio/anupama_madhuri_jodi.ogg?v=4d41c08c",
       "hash": "4d41c08cad2aa7b82ec07d8e6e3959cc479e87fd1925aaf7be45130788e96fc0",
@@ -17,9 +27,24 @@
       "size": 3659349
     },
     {
+      "url": "audio/bhai_re_sri_caitanya_nityananda.ogg?v=6d0c674e",
+      "hash": "6d0c674eed38ae61152ccdbf4bbab39c0d69abcdb565c6f2c5ad13051a705f8e",
+      "size": 802089
+    },
+    {
+      "url": "audio/bhavarnave_pade_mora.ogg?v=3629b947",
+      "hash": "3629b947ad91d25a77ab67e47b442f9b8879824af9c513443fa8cb62e7ec35ae",
+      "size": 2153239
+    },
+    {
       "url": "audio/brajajanamanasukhakari.ogg?v=af146b44",
       "hash": "af146b44c4f8946af8fbb1a9e376ce6097b4eb8315efd5099aec2968a4b92e4f",
       "size": 2623546
+    },
+    {
+      "url": "audio/emona_gauranga_bina_nahi_ara.ogg?v=06bfcd64",
+      "hash": "06bfcd64216065b7b2a34f606f2fe3302836a2216132111cccd4f6d8513b125c",
+      "size": 2074234
     },
     {
       "url": "audio/gauranga_bolite_habe.ogg?v=c7ef8006",
@@ -30,6 +55,11 @@
       "url": "audio/gauranga_tumi_more.ogg?v=00289a28",
       "hash": "00289a2829ba0bc3cdf6e6d23ce3211f817c57b4e297a9b62a441935c08c7827",
       "size": 1877013
+    },
+    {
+      "url": "audio/gaurangera_duti_pada.ogg?v=ae423797",
+      "hash": "ae4237975ea1479d6178098b59b8aef95adf2e4dcb10740af03ed912c670cf10",
+      "size": 2560845
     },
     {
       "url": "audio/gauridasamandire.ogg?v=6093ffb6",
@@ -47,6 +77,21 @@
       "size": 2684988
     },
     {
+      "url": "audio/gora_pahu_na_bhajiya_mainu.ogg?v=7d3204ea",
+      "hash": "7d3204ea35668d4df14de2f04987ed9628c9d832337d3a05a4a70cf0ab28d001",
+      "size": 2064133
+    },
+    {
+      "url": "audio/gurudeva_krpa_bindu_diya.ogg?v=e1b7f1c8",
+      "hash": "e1b7f1c8019bee0262fb31f64db4d54a5ebd0ab24f4da35e2d805f387f1fdfc2",
+      "size": 2145535
+    },
+    {
+      "url": "audio/gurudeva_krpa_karke.ogg?v=71557a75",
+      "hash": "71557a753959edb573d7b8d37b816e6bac2e2475a8c883c4a773aab17a1c416b",
+      "size": 1880086
+    },
+    {
       "url": "audio/ha_ha_mora_gaurakisora.ogg?v=c0d2ed27",
       "hash": "c0d2ed273a4e2ababd180e6d5294a5616bc26a2f842a28aeb905f1d865fda4c4",
       "size": 2033815
@@ -60,6 +105,11 @@
       "url": "audio/hari_bole_moder_gaura_elo.ogg?v=c61b4087",
       "hash": "c61b4087fdc3542643496b5866522712f5a8a84dd7d67dcce1af0f824efa1d47",
       "size": 2315547
+    },
+    {
+      "url": "audio/hari_hari_biphale_janama_goainu.ogg?v=dec30c62",
+      "hash": "dec30c62ab78710a520520ccae236ce0362f0f3c6fe29b5cb44a4b96b21cb248",
+      "size": 2600048
     },
     {
       "url": "audio/hari_hari_kabe_habo_vrndavanavasi.ogg?v=38c4e8ee",
@@ -117,14 +167,64 @@
       "size": 1616775
     },
     {
+      "url": "audio/kabe_habe_bolo.ogg?v=661cc375",
+      "hash": "661cc375f0bf25ba0201ed3ed4268cc3d271c7e690eab6000168a71ae81e53b6",
+      "size": 3358842
+    },
+    {
+      "url": "audio/kalayati_nayanam.ogg?v=c8862cb1",
+      "hash": "c8862cb1bb0a8d69f27dfa6e26fbe595ca7b37791ae586ab0345ec2b03157088",
+      "size": 1421053
+    },
+    {
+      "url": "audio/kali_kukura.ogg?v=74159562",
+      "hash": "7415956266454786801f0edd5ba278f96a764108ac1a0d2da644247dc351392c",
+      "size": 2729291
+    },
+    {
+      "url": "audio/kali_yuga_pavana.ogg?v=fa50e72a",
+      "hash": "fa50e72a2ed91480a8f4d716d0812039cf0d5645c3de5856d9bf0a0dda35fdc5",
+      "size": 2781563
+    },
+    {
+      "url": "audio/ke_jabi_ke_jabi_re_bhai.ogg?v=6cbf88d8",
+      "hash": "6cbf88d8e65c1852ef57113c840e57512aab1a98f3116557830b2447359eccdd",
+      "size": 2450937
+    },
+    {
       "url": "audio/krsna_deva_bhavantam_vande.ogg?v=0317a297",
       "hash": "0317a297e3c5d82c2049f035a5f300f93b36950b2cae5f52d9774ac12892b881",
       "size": 1310720
     },
     {
+      "url": "audio/krsna_govinda_hare.ogg?v=5e5b586c",
+      "hash": "5e5b586c33f54d090dda6506e3906a576b2fc33427a7c4b69628e3d80e4c5cbe",
+      "size": 1944906
+    },
+    {
+      "url": "audio/madhava_bahuta_minati_kori_taya.ogg?v=c0b3ea1e",
+      "hash": "c0b3ea1eb782db59dae5e8d11b6583671fa08d003bfc96c157ff12402c5ffe3e",
+      "size": 2634675
+    },
+    {
+      "url": "audio/mama_mana_mandire.ogg?v=fde4551e",
+      "hash": "fde4551e24b39551f19f01dace13877aaa9d058e66f87f73d2cb58c0bf6c34bd",
+      "size": 1871900
+    },
+    {
       "url": "audio/mangalacarana.ogg?v=dabd7249",
       "hash": "dabd72499e944983468647c6f26bc1209c6355f08de0245f2fcf886114c26c93",
       "size": 2319419
+    },
+    {
+      "url": "audio/nitai_guna_mani.ogg?v=4873d5c4",
+      "hash": "4873d5c419811c933c10ca013e01e1ff5e6df7453c478bc3854c5294ea2bc702",
+      "size": 2544023
+    },
+    {
+      "url": "audio/nitai_pada_kamala.ogg?v=f56d0704",
+      "hash": "f56d0704ac53c4afb0dfffa70ef3b94813b7aba50d81311a501bc4a23a6a92fd",
+      "size": 2552625
     },
     {
       "url": "audio/sakhe_kalaya_gauram_udaram.ogg?v=f47f6eee",
