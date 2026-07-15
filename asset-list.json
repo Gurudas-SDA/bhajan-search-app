@@ -1,5 +1,5 @@
 {
-  "version": 38,
+  "version": 39,
   "assets": [
     {
       "url": "audio/ali_mohe_lage_vrndavana_niko.ogg?v=4c9e072c",
@@ -232,14 +232,39 @@
       "size": 3069832
     },
     {
+      "url": "audio/palya_dasi_kori.ogg?v=ea9c9848",
+      "hash": "ea9c9848a411154df7b59a28291c00a406aab36794ac27eed7deb5d634f906e8",
+      "size": 1792940
+    },
+    {
+      "url": "audio/para_karenge.ogg?v=eaaa377a",
+      "hash": "eaaa377a2d1459d7bf2f7e308e234bae21c0ff8d18ab7b0b51557a33814c9fc8",
+      "size": 1928510
+    },
+    {
       "url": "audio/radha_krsna_prana_mora.ogg?v=77a826b7",
       "hash": "77a826b70580ab56f7e574f58c4e04f21f43f31ee798e07f332875d03336da17",
       "size": 2219597
     },
     {
+      "url": "audio/radha_nama_parama_sukhadai.ogg?v=317541fd",
+      "hash": "317541fd8bd27049417225c781d3d3039940f48551bb09ebcb6a350589635108",
+      "size": 1645201
+    },
+    {
       "url": "audio/radhe_jaya_jaya_madhava_dayite.ogg?v=0f0d1759",
       "hash": "0f0d17596054d054deaca00d64253cf49e01bb55c160fcd4a29aab0fc993d819",
       "size": 1919692
+    },
+    {
+      "url": "audio/radhe_jhulana_padharo.ogg?v=87ee200b",
+      "hash": "87ee200b7807e23194a31e1f84e83d83c2ffe1d49dacf2d28ad75b8e1131be9f",
+      "size": 1287705
+    },
+    {
+      "url": "audio/ramani_siromani.ogg?v=05d41b74",
+      "hash": "05d41b749ecb5a61b669fc2bf9632377d4a6fb085524f18cef96238a988cba6f",
+      "size": 3214741
     },
     {
       "url": "audio/sakhe_kalaya_gauram_udaram.ogg?v=f47f6eee",
@@ -255,6 +280,11 @@
       "url": "audio/sri_gurvastakam_bengali_rendition.ogg?v=9b063fff",
       "hash": "9b063fffde480238e29048b36d45c296888221d1ab4634fe486c3ad3d1853ce5",
       "size": 1475065
+    },
+    {
+      "url": "audio/sri_krsna_caitanya_prabhu_daya_karo_more.ogg?v=2211fcce",
+      "hash": "2211fcce456cb9cb5cf8c2cfd7165a8772585c3591bbde396788cbc07ecd352f",
+      "size": 2287933
     },
     {
       "url": "audio/sri_rupa_manjari_pada.ogg?v=6bd064aa",
