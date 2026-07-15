@@ -1,5 +1,5 @@
 {
-  "version": 39,
+  "version": 40,
   "assets": [
     {
       "url": "audio/ali_mohe_lage_vrndavana_niko.ogg?v=4c9e072c",
@@ -285,6 +285,11 @@
       "url": "audio/sri_krsna_caitanya_prabhu_daya_karo_more.ogg?v=2211fcce",
       "hash": "2211fcce456cb9cb5cf8c2cfd7165a8772585c3591bbde396788cbc07ecd352f",
       "size": 2287933
+    },
+    {
+      "url": "audio/sri_mangala_gitam.ogg?v=88335f53",
+      "hash": "88335f53f1e73ccd7feedb08118a645b0a3d910f052caad5fc80ce9256f29574",
+      "size": 3590608
     },
     {
       "url": "audio/sri_rupa_manjari_pada.ogg?v=6bd064aa",
