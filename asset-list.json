@@ -1,5 +1,5 @@
 {
-  "version": 41,
+  "version": 42,
   "assets": [
     {
       "url": "audio/ali_mohe_lage_vrndavana_niko.ogg?v=4c9e072c",
@@ -262,6 +262,11 @@
       "size": 2219597
     },
     {
+      "url": "audio/radha_kunda_tata.ogg?v=0fe1f239",
+      "hash": "0fe1f2395af4a47ea6875b75fd01d21888d012515b5d3bd4ed2cce6ba248e96f",
+      "size": 1744531
+    },
+    {
       "url": "audio/radha_nama_parama_sukhadai.ogg?v=317541fd",
       "hash": "317541fd8bd27049417225c781d3d3039940f48551bb09ebcb6a350589635108",
       "size": 1645201
@@ -275,6 +280,11 @@
       "url": "audio/radhe_jhulana_padharo.ogg?v=87ee200b",
       "hash": "87ee200b7807e23194a31e1f84e83d83c2ffe1d49dacf2d28ad75b8e1131be9f",
       "size": 1287705
+    },
+    {
+      "url": "audio/radhika_carana_padma.ogg?v=6219fc6a",
+      "hash": "6219fc6afd095b1ba30def75c1738917eb277a9107b8c0d5ae63f823a0c952ee",
+      "size": 1878624
     },
     {
       "url": "audio/ramani_siromani.ogg?v=05d41b74",
@@ -292,6 +302,16 @@
       "size": 2524931
     },
     {
+      "url": "audio/sri_gaura_arati.ogg?v=326dee00",
+      "hash": "326dee0023817746565ff38ce3a2f88d88fdce6408bfac9da62a818b14090174",
+      "size": 2111650
+    },
+    {
+      "url": "audio/sri_guru_carana_padma.ogg?v=42b0a2e3",
+      "hash": "42b0a2e38bcc68d849ad0e108357531e9bd76ea2b7beb61c8834fc3342e99b62",
+      "size": 2369559
+    },
+    {
       "url": "audio/sri_guruparampara.ogg?v=dba04d23",
       "hash": "dba04d2350ca6e0a3cadc5be99011e31caf131f88bf7a5957abdfd89c3251528",
       "size": 1292042
@@ -305,6 +325,11 @@
       "url": "audio/sri_krsna_caitanya_prabhu_daya_karo_more.ogg?v=2211fcce",
       "hash": "2211fcce456cb9cb5cf8c2cfd7165a8772585c3591bbde396788cbc07ecd352f",
       "size": 2287933
+    },
+    {
+      "url": "audio/sri_madhurastakam.ogg?v=803b9e6d",
+      "hash": "803b9e6d5a5a08ea4fae77fdabff218809c64a7291a379a3271bbd2189464903",
+      "size": 1744359
     },
     {
       "url": "audio/sri_mangala_gitam.ogg?v=88335f53",
@@ -335,6 +360,11 @@
       "url": "audio/sri_vaisnavavandana.ogg?v=725652b6",
       "hash": "725652b67754838a91243e4a3941d432c274835c562c36daf9690858ae8526bd",
       "size": 1085769
+    },
+    {
+      "url": "audio/sri_yamunastakam.ogg?v=4ed35063",
+      "hash": "4ed350632c2f948c65b3d42d9e7d195c561ce35329558083a37bb7da3d844f62",
+      "size": 2195417
     },
     {
       "url": "audio/suniyachi_sadhu_mukhe.ogg?v=a4559fb4",
