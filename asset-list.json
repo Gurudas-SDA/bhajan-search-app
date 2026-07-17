@@ -1,5 +1,5 @@
 {
-  "version": 40,
+  "version": 41,
   "assets": [
     {
       "url": "audio/ali_mohe_lage_vrndavana_niko.ogg?v=4c9e072c",
@@ -232,6 +232,11 @@
       "size": 3069832
     },
     {
+      "url": "audio/ohe_vaisnava_thakura.ogg?v=76d20b76",
+      "hash": "76d20b76d412cf4817f18dbaf154e2124574c2b82cd1214ebaf02a5bdf69648c",
+      "size": 1472834
+    },
+    {
       "url": "audio/palya_dasi_kori.ogg?v=ea9c9848",
       "hash": "ea9c9848a411154df7b59a28291c00a406aab36794ac27eed7deb5d634f906e8",
       "size": 1792940
@@ -240,6 +245,16 @@
       "url": "audio/para_karenge.ogg?v=eaaa377a",
       "hash": "eaaa377a2d1459d7bf2f7e308e234bae21c0ff8d18ab7b0b51557a33814c9fc8",
       "size": 1928510
+    },
+    {
+      "url": "audio/prabhu_tava_pada_juge.ogg?v=5aca7e7a",
+      "hash": "5aca7e7a173532841d9aced0f47ce078308080b31ca8d281c73ef4595013cef9",
+      "size": 2412524
+    },
+    {
+      "url": "audio/radha_krsna_bol_bol.ogg?v=0f0733c9",
+      "hash": "0f0733c9e0e34b5495c1a18240daaa4d341b55d8bf7b97eb1111842454471a28",
+      "size": 2042436
     },
     {
       "url": "audio/radha_krsna_prana_mora.ogg?v=77a826b7",
@@ -272,6 +287,11 @@
       "size": 1974955
     },
     {
+      "url": "audio/sri_dasavatara_stotram.ogg?v=1d03c2ca",
+      "hash": "1d03c2ca268475c447b31fed13b8e8c8a935fcd83f553bbd23af06b15f49f33b",
+      "size": 2524931
+    },
+    {
       "url": "audio/sri_guruparampara.ogg?v=dba04d23",
       "hash": "dba04d2350ca6e0a3cadc5be99011e31caf131f88bf7a5957abdfd89c3251528",
       "size": 1292042
@@ -292,6 +312,16 @@
       "size": 3590608
     },
     {
+      "url": "audio/sri_nanda_nandanastakam.ogg?v=2cb2bc6d",
+      "hash": "2cb2bc6d111024644ce44f46999100016150c77cd203988def0b91bcad307da3",
+      "size": 3242922
+    },
+    {
+      "url": "audio/sri_radha_krpa_kataksa_stava_raja.ogg?v=60b13ca3",
+      "hash": "60b13ca30104f212999086bf7c3526f424566faf3da33803b81ae96f6d8e7705",
+      "size": 2238235
+    },
+    {
       "url": "audio/sri_rupa_manjari_pada.ogg?v=6bd064aa",
       "hash": "6bd064aa281760f0b868235627208f59eff7136c4ea39d40ddb6041eb784805a",
       "size": 2527857
@@ -310,6 +340,11 @@
       "url": "audio/suniyachi_sadhu_mukhe.ogg?v=a4559fb4",
       "hash": "a4559fb4e0772d99c201d48fea7ff3db48e7a3e81223fc1d2887a4848fd22be8",
       "size": 1364262
+    },
+    {
+      "url": "audio/udilo_aruna.ogg?v=23f425ea",
+      "hash": "23f425ead1bb316d3f4cd7812dad6bff7d6bf79ed73a686c855401d7ec43dd8f",
+      "size": 2310580
     },
     {
       "url": "audio/vande_visvambhara.ogg?v=500a4aac",
